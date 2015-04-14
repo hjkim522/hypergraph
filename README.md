@@ -1,3 +1,5 @@
+# Input file format
+```
 # num nodes
 7
 
@@ -12,8 +14,10 @@
 
 # targets (optional)
 6
+```
 
-# or use json format
+# JSON format
+```
 {
   "numNodes": 7,
   "hyperedges": [
@@ -23,3 +27,4 @@
   "startables": [1,2,3,7],
   "targets": [6]
 }
+```
