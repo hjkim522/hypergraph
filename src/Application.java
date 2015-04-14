@@ -7,6 +7,12 @@ import org.neo4j.graphdb.factory.GraphDatabaseFactory;
 
 public class Application {
 
+    private static GraphDatabaseService graphDb;
+
+    public static GraphDatabaseService getGraphDatabase() {
+        return graphDb;
+    }
+
     public static void main(String[] args) {
         System.out.println("Hello World!");
         GraphDatabaseService graphDb = new GraphDatabaseFactory().newEmbeddedDatabase("db/graphDb");
@@ -17,6 +23,8 @@ public class Application {
             Node node2 = graphDb.createNode();
             node2.setProperty("Hello", "world");
             tx.success();
+
+            //Label label = DynamicLabel.label( "User" );
         }
 
         graphDb.shutdown();
