@@ -13,37 +13,60 @@ import java.io.FileReader;
  */
 public class Importer { //XXX: rename to SimpleImporter
     private String filename;
+    private GraphDatabaseService graphDb;
 
     public Importer(String filename) {
         this.filename = filename;
+        this.graphDb = Application.getGraphDatabase();
     }
 
     public void run() {
         try (FileReader fr = new FileReader(filename)) {
             BufferedReader br = new BufferedReader(fr);
-            String s = null;
+            String s = br.readLine();
+
+            importNodes(Integer.valueOf(s));
+
             while ((s = br.readLine()) != null) {
-                System.out.println(s);
+                // skip empty lines and comments - XXX: temporal impl
+                if (s.length() == 0 || s.startsWith("#"))
+                    continue;
+
+                importHyperedge(s);
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    private void addNodes() {
-        GraphDatabaseService graphDb = Application.getGraphDatabase();
+    // insert n nodes
+    private void importNodes(int n) {
         try (Transaction tx = graphDb.beginTx()) {
-            Node node = graphDb.createNode();
-            node.setProperty("name", 1);
+            for (int i = 1; i <= n; i++) {
+                Node node = graphDb.createNode();
+                node.setProperty("name", i);
+            }
             tx.success();
         }
     }
 
-    private void addHyperedges() {
+    // parse and insert hyperedges
+    private void importHyperedge(String s) {
+        // parse (source set -> target)
+        String nodeStr[] = s.split(" -> ");
+        String sourceStr[] = nodeStr[0].split(",");
+        String targetStr = nodeStr[1];
 
-    }
+        Hyperedge hyperedge = new Hyperedge();
 
-    private void addHyperedge() {
+        for (String source : sourceStr) {
+            //graphDb.getNodeById()
+            //XXX: fuck need index!!!! // nodeid or uniqueid
+        }
 
+        try (Transaction tx = graphDb.beginTx()) {
+            hyperedge.save(graphDb);
+            tx.success();
+        }
     }
 }
