@@ -3,7 +3,7 @@ import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.factory.GraphDatabaseFactory;
 
-public class Main {
+public class Application {
 
     public static void main(String[] args) {
         System.out.println("Hello World!");
