@@ -12,14 +12,3 @@
 
 # targets (optional)
 6
-
-# or use json format
-{
-  "numNodes": 7,
-  "hyperedges": [
-     { "source": [1,2,3], "target": 4 },
-     { "source": [1,2,3], "target": 4 },
-  ],
-  "startables": [1,2,3,7],
-  "targets": [6]
-}

@@ -7,13 +7,19 @@ import org.neo4j.graphdb.factory.GraphDatabaseFactory;
 
 public class Application {
 
-    private static GraphDatabaseService graphDb;
+    private static GraphDatabaseService graphDb = null;
 
+    //XXX: need sync?
     public static GraphDatabaseService getGraphDatabase() {
         return graphDb;
     }
 
     public static void main(String[] args) {
+        Importer importer = new Importer("sample.txt");
+        importer.run();
+    }
+
+    public static void _main(String[] args) {
         System.out.println("Hello World!");
         GraphDatabaseService graphDb = new GraphDatabaseFactory().newEmbeddedDatabase("db/graphDb");
         registerShutdownHook(graphDb);

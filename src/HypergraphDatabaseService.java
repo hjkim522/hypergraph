@@ -12,11 +12,15 @@ import java.util.Map;
  * Created by Hyunjun on 2015-04-15.
  */
 public class HypergraphDatabaseService implements GraphDatabaseService {
+    private GraphDatabaseService graphDb;
 
+    public HypergraphDatabaseService(GraphDatabaseService graphDb) {
+        this.graphDb = graphDb;
+    }
 
     @Override
     public Node createNode() {
-        return null;
+        return graphDb.createNode();
     }
 
     @Override
