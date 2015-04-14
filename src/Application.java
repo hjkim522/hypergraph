@@ -3,11 +3,13 @@ import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.factory.GraphDatabaseFactory;
 
+// http://neo4j.com/docs/stable/tutorials-java-embedded-hello-world.html
+
 public class Application {
 
     public static void main(String[] args) {
         System.out.println("Hello World!");
-        GraphDatabaseService graphDb = new GraphDatabaseFactory().newEmbeddedDatabase( "db/graphDb" );
+        GraphDatabaseService graphDb = new GraphDatabaseFactory().newEmbeddedDatabase("db/graphDb");
         registerShutdownHook(graphDb);
         try (Transaction tx = graphDb.beginTx()) {
             Node node = graphDb.createNode();
