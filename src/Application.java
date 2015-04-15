@@ -5,10 +5,16 @@ import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.factory.GraphDatabaseFactory;
 import org.neo4j.graphdb.schema.IndexDefinition;
 import org.neo4j.graphdb.schema.Schema;
+import org.neo4j.io.fs.FileUtils;
+
+import java.io.File;
+import java.util.concurrent.TimeUnit;
 
 // http://neo4j.com/docs/stable/tutorials-java-embedded-hello-world.html
 
 public class Application {
+    private static final String DB_PATH = "db/graphDb";
+
     private static GraphDatabaseService graphDb = null;
 
     public static GraphDatabaseService getGraphDatabase() {
@@ -16,13 +22,17 @@ public class Application {
     }
 
     public static void main(String[] args) {
-        Importer importer = new Importer("sample.txt");
-        importer.run();
-    }
-
-    public static void _main(String[] args) {
-        GraphDatabaseService graphDb = new GraphDatabaseFactory().newEmbeddedDatabase("db/graphDb");
+        deleteDatabase();
+        graphDb = new GraphDatabaseFactory().newEmbeddedDatabase(DB_PATH);
         registerShutdownHook(graphDb);
+        createIndex();
+
+        SimpleImporter importer = new SimpleImporter("sample.txt");
+        importer.run();
+
+        MMSIndexBuilder builder = new MMSIndexBuilder();
+        builder.build();
+
         graphDb.shutdown();
     }
 
@@ -40,20 +50,28 @@ public class Application {
     }
 
     private static void deleteDatabase() {
-        //TODO:
+        try {
+            FileUtils.deleteRecursively(new File(DB_PATH));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     // This only needs to be done once
     private static void createIndex() {
         IndexDefinition indexDefinition;
-        try (Transaction tx = graphDb.beginTx())
-        {
+        try (Transaction tx = graphDb.beginTx()) {
             Schema schema = graphDb.schema();
             indexDefinition = schema.indexFor(DynamicLabel.label("Node"))
                     .on("uniqueId")
                     .create();
+
             tx.success();
         }
-        //schema.awaitIndexOnline( indexDefinition, 10, TimeUnit.SECONDS ); ?????
+
+        try (Transaction tx = graphDb.beginTx()) {
+            Schema schema = graphDb.schema();
+            schema.awaitIndexOnline(indexDefinition, 10, TimeUnit.SECONDS);
+        }
     }
 }

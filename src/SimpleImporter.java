@@ -1,3 +1,4 @@
+import org.neo4j.graphdb.DynamicLabel;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
@@ -11,11 +12,15 @@ import java.io.FileReader;
 /**
  * Created by Hyunjun on 2015-04-15.
  */
-public class Importer { //XXX: rename to SimpleImporter
+public class SimpleImporter { //XXX: rename to SimpleImporter
     private String filename;
     private GraphDatabaseService graphDb;
 
-    public Importer(String filename) {
+    //XXX: temporal....
+    //XXX: needs index!
+    private Node nodes[] = new Node[10];
+
+    public SimpleImporter(String filename) {
         this.filename = filename;
         this.graphDb = Application.getGraphDatabase();
     }
@@ -43,8 +48,9 @@ public class Importer { //XXX: rename to SimpleImporter
     private void importNodes(int n) {
         try (Transaction tx = graphDb.beginTx()) {
             for (int i = 1; i <= n; i++) {
-                Node node = graphDb.createNode();
+                Node node = graphDb.createNode(DynamicLabel.label("Node"));
                 node.setProperty("name", i);
+                nodes[i] = node;
             }
             tx.success();
         }
@@ -60,9 +66,12 @@ public class Importer { //XXX: rename to SimpleImporter
         Hyperedge hyperedge = new Hyperedge();
 
         for (String source : sourceStr) {
-            //graphDb.getNodeById()
-            //XXX: fuck need index!!!! // nodeid or uniqueid
+            int sourceIdx = Integer.valueOf(source);
+            hyperedge.addSource(nodes[sourceIdx]);
         }
+
+        int targetIdx = Integer.valueOf(targetStr);
+        hyperedge.setTarget(nodes[targetIdx]);
 
         try (Transaction tx = graphDb.beginTx()) {
             hyperedge.save(graphDb);

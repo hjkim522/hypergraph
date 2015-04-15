@@ -1,7 +1,4 @@
-import org.neo4j.graphdb.DynamicLabel;
-import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.Label;
-import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.*;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -33,10 +30,10 @@ public class Hyperedge {
 
         // create edges from source set to hypernode
         for (Node s : source) {
-            s.createRelationshipTo(hypernode, null);
+            s.createRelationshipTo(hypernode, DynamicRelationshipType.withName("fromSource"));
         }
 
         // create an edge from hypernode to target
-        hypernode.createRelationshipTo(target, null);
+        hypernode.createRelationshipTo(target, DynamicRelationshipType.withName("toTarget"));
     }
 }

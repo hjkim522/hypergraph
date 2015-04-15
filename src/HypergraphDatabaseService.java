@@ -18,6 +18,11 @@ public class HypergraphDatabaseService implements GraphDatabaseService {
         this.graphDb = graphDb;
     }
 
+    //XXX: to hypergraph addon???
+    public Hyperedge createHyperedge(Node target, Node... sources) {
+        return null;
+    }
+
     @Override
     public Node createNode() {
         return graphDb.createNode();
@@ -25,7 +30,7 @@ public class HypergraphDatabaseService implements GraphDatabaseService {
 
     @Override
     public Node createNode(Label... labels) {
-        return null;
+        return graphDb.createNode(labels);
     }
 
     @Override
