@@ -18,8 +18,12 @@ public class HypergraphDatabaseService implements GraphDatabaseService {
         this.graphDb = graphDb;
     }
 
-    //XXX: to hypergraph addon???
-    public Hyperedge createHyperedge(Node target, Node... sources) {
+    public Hyperedge createHyperedge(Node target, Node... source) {
+        Node hypernode = graphDb.createNode(DynamicLabel.label("Hypernode"));
+        for (Node s : source) {
+            s.createRelationshipTo(hypernode, DynamicRelationshipType.withName("fromSource"));
+        }
+        hypernode.createRelationshipTo(target, DynamicRelationshipType.withName("toTarget"));
         return null;
     }
 

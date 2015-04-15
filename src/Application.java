@@ -1,6 +1,5 @@
 import org.neo4j.graphdb.DynamicLabel;
 import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.factory.GraphDatabaseFactory;
 import org.neo4j.graphdb.schema.IndexDefinition;
@@ -24,13 +23,14 @@ public class Application {
     public static void main(String[] args) {
         deleteDatabase();
         graphDb = new GraphDatabaseFactory().newEmbeddedDatabase(DB_PATH);
+        //graphDb = new HypergraphDatabaseService(graphDb);
         registerShutdownHook(graphDb);
         createIndex();
 
         SimpleImporter importer = new SimpleImporter("sample.txt");
         importer.run();
 
-        MMSIndexBuilder builder = new MMSIndexBuilder();
+        MSSBuilder builder = new MSSBuilder();
         builder.build();
 
         graphDb.shutdown();
