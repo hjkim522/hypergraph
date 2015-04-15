@@ -14,4 +14,13 @@ public class MSS { // MinimalSourceSet
     public static MSS valueOf(String s) {
         return null;
     }
+
+    public MSS cartesian(MSS other) {
+        return null;
+    }
+
+    // filtering minimal set
+    private void filter() {
+
+    }
 }
