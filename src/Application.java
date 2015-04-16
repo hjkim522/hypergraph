@@ -35,12 +35,12 @@ public class Application {
 
         try (Transaction tx = graphDb.beginTx()) {
             Set<Node> start = new HashSet<Node>();
+            start.add(graphDb.findNode(Const.LABEL_NODE, "name", 0));
             start.add(graphDb.findNode(Const.LABEL_NODE, "name", 1));
             start.add(graphDb.findNode(Const.LABEL_NODE, "name", 2));
-            start.add(graphDb.findNode(Const.LABEL_NODE, "name", 3));
-            start.add(graphDb.findNode(Const.LABEL_NODE, "name", 7));
+            start.add(graphDb.findNode(Const.LABEL_NODE, "name", 6));
 
-            HypergraphTraversal traversal = new HypergraphTraversal();
+            HypergraphTraversal traversal = new HypergraphTraversal(node -> {System.out.println(node.getId());});
             traversal.traverse(start);
         }
 

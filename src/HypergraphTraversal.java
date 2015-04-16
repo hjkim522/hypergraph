@@ -14,10 +14,16 @@ import java.util.Set;
 public class HypergraphTraversal {
     private GraphDatabaseService graphDb;
     private Set<Long> visited; // visited nodes, in-memory
+    private HypergraphTraversalCallback callback;
 
     public HypergraphTraversal() {
-        graphDb = Application.getGraphDatabase();
-        visited = new HashSet<Long>();
+        this(node -> {});
+    }
+
+    public HypergraphTraversal(HypergraphTraversalCallback callback) {
+        this.graphDb = Application.getGraphDatabase();
+        this.visited = new HashSet<Long>();
+        this.callback = callback;
     }
 
     public void traverse(Set<Node> start) {
@@ -26,7 +32,7 @@ public class HypergraphTraversal {
         for (Node s : start) {
             setVisited(s);
             queue.add(s);
-            System.out.println(s.getId());
+            callback.onVisit(s);
         }
 
         while (!queue.isEmpty()) {
@@ -50,7 +56,7 @@ public class HypergraphTraversal {
                 if (!isVisited(t)) {
                     setVisited(t);
                     queue.add(t);
-                    System.out.println(t.getId());
+                    callback.onVisit(t);
                 }
             }
         }
