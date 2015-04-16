@@ -21,7 +21,7 @@ public class MSSBuilder {
     public void build() {
         // start from startables
         try (Transaction tx = graphDb.beginTx()) {
-            ResourceIterator<Node> iter = graphDb.findNodes(DynamicLabel.label("startable"));
+            ResourceIterator<Node> iter = graphDb.findNodes(Const.LABEL_STARTABLE);
             //Node v = iter.next();
             iter.close();
         }

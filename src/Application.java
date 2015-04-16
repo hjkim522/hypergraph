@@ -15,7 +15,6 @@ import java.util.concurrent.TimeUnit;
 // http://neo4j.com/docs/stable/tutorials-java-embedded-hello-world.html
 
 public class Application {
-    private static final String DB_PATH = "db/graphDb";
 
     private static GraphDatabaseService graphDb = null;
 
@@ -25,14 +24,14 @@ public class Application {
 
     //XXX: write test cases
     public static void main(String[] args) {
-        graphDb = new GraphDatabaseFactory().newEmbeddedDatabase(DB_PATH);
+        graphDb = new GraphDatabaseFactory().newEmbeddedDatabase(Const.DB_PATH);
         registerShutdownHook(graphDb);
 
         try (Transaction tx = graphDb.beginTx()) {
             Set<Node> start = new HashSet<Node>();
-            start.add(graphDb.findNode(DynamicLabel.label("Node"), "name", 1));
-            start.add(graphDb.findNode(DynamicLabel.label("Node"), "name", 2));
-            start.add(graphDb.findNode(DynamicLabel.label("Node"), "name", 3));
+            start.add(graphDb.findNode(Const.LABEL_NODE, "name", 1));
+            start.add(graphDb.findNode(Const.LABEL_NODE, "name", 2));
+            start.add(graphDb.findNode(Const.LABEL_NODE, "name", 3));
 
             HypergraphTraversal traversal = new HypergraphTraversal();
             traversal.traverse(start);
@@ -43,7 +42,7 @@ public class Application {
 
     public static void _main(String[] args) {
         deleteDatabase();
-        graphDb = new GraphDatabaseFactory().newEmbeddedDatabase(DB_PATH);
+        graphDb = new GraphDatabaseFactory().newEmbeddedDatabase(Const.DB_PATH);
         registerShutdownHook(graphDb);
         createIndex();
 
@@ -71,7 +70,7 @@ public class Application {
 
     private static void deleteDatabase() {
         try {
-            FileUtils.deleteRecursively(new File(DB_PATH));
+            FileUtils.deleteRecursively(new File(Const.DB_PATH));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -82,8 +81,8 @@ public class Application {
         IndexDefinition indexDefinition;
         try (Transaction tx = graphDb.beginTx()) {
             Schema schema = graphDb.schema();
-            indexDefinition = schema.indexFor(DynamicLabel.label("Node"))
-                    .on("name")
+            indexDefinition = schema.indexFor(Const.LABEL_NODE)
+                    .on(Const.UNIQUE_ATTR)
                     .create();
 
             tx.success();

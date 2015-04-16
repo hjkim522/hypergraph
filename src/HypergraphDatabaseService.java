@@ -19,11 +19,11 @@ public class HypergraphDatabaseService implements GraphDatabaseService {
     }
 
     public Hyperedge createHyperedge(Node target, Node... source) {
-        Node hypernode = graphDb.createNode(DynamicLabel.label("Hypernode"));
+        Node hypernode = graphDb.createNode(Const.LABEL_HYPERNODE);
         for (Node s : source) {
-            s.createRelationshipTo(hypernode, DynamicRelationshipType.withName("fromSource"));
+            s.createRelationshipTo(hypernode, Const.REL_FROM_SOURCE);
         }
-        hypernode.createRelationshipTo(target, DynamicRelationshipType.withName("toTarget"));
+        hypernode.createRelationshipTo(target, Const.REL_TO_TARGET);
         return null;
     }
 

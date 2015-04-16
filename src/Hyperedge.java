@@ -7,7 +7,6 @@ import java.util.Set;
  * Created by Hyunjun on 2015-04-15.
  */
 public class Hyperedge {
-    private static final Label label = DynamicLabel.label("Hypernode");
     private Set<Node> source;
     private Node target;
     private Node hypernode;
@@ -28,14 +27,14 @@ public class Hyperedge {
 
     public void save(GraphDatabaseService graphDb) {
         // create a pseudo hypernode
-        hypernode = graphDb.createNode(label);
+        hypernode = graphDb.createNode(Const.LABEL_HYPERNODE);
 
         // create edges from source set to hypernode
         for (Node s : source) {
-            s.createRelationshipTo(hypernode, DynamicRelationshipType.withName("fromSource"));
+            s.createRelationshipTo(hypernode, Const.REL_FROM_SOURCE);
         }
 
         // create an edge from hypernode to target
-        hypernode.createRelationshipTo(target, DynamicRelationshipType.withName("toTarget"));
+        hypernode.createRelationshipTo(target, Const.REL_TO_TARGET);
     }
 }
