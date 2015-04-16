@@ -23,7 +23,6 @@ public class Application {
     public static void main(String[] args) {
         deleteDatabase();
         graphDb = new GraphDatabaseFactory().newEmbeddedDatabase(DB_PATH);
-        //graphDb = new HypergraphDatabaseService(graphDb);
         registerShutdownHook(graphDb);
         createIndex();
 

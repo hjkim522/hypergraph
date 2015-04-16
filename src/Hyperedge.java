@@ -10,10 +10,12 @@ public class Hyperedge {
     private static final Label label = DynamicLabel.label("Hypernode");
     private Set<Node> source;
     private Node target;
+    private Node hypernode;
 
     public Hyperedge() {
         source = new HashSet<Node>();
         target = null;
+        hypernode = null;
     }
 
     public void addSource(Node node) {
@@ -26,7 +28,7 @@ public class Hyperedge {
 
     public void save(GraphDatabaseService graphDb) {
         // create a pseudo hypernode
-        Node hypernode = graphDb.createNode(label);
+        hypernode = graphDb.createNode(label);
 
         // create edges from source set to hypernode
         for (Node s : source) {
