@@ -12,8 +12,14 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-// http://neo4j.com/docs/stable/tutorials-java-embedded-hello-world.html
-
+/**
+ * Main Application
+ *
+ * Initialize Neo4j as follows
+ * http://neo4j.com/docs/stable/tutorials-java-embedded-hello-world.html
+ *
+ * Created by Hyunjun on 2015-04-15.
+ */
 public class Application {
 
     private static GraphDatabaseService graphDb = null;
@@ -32,6 +38,7 @@ public class Application {
             start.add(graphDb.findNode(Const.LABEL_NODE, "name", 1));
             start.add(graphDb.findNode(Const.LABEL_NODE, "name", 2));
             start.add(graphDb.findNode(Const.LABEL_NODE, "name", 3));
+            start.add(graphDb.findNode(Const.LABEL_NODE, "name", 7));
 
             HypergraphTraversal traversal = new HypergraphTraversal();
             traversal.traverse(start);
@@ -84,7 +91,6 @@ public class Application {
             indexDefinition = schema.indexFor(Const.LABEL_NODE)
                     .on(Const.UNIQUE_ATTR)
                     .create();
-
             tx.success();
         }
 

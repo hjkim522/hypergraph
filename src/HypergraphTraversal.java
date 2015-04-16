@@ -1,5 +1,7 @@
+import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Relationship;
 
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -11,25 +13,64 @@ import java.util.Set;
  */
 public class HypergraphTraversal {
     private GraphDatabaseService graphDb;
+    private Set<Long> visited; // visited nodes, in-memory
 
     public HypergraphTraversal() {
         graphDb = Application.getGraphDatabase();
+        visited = new HashSet<Long>();
     }
 
     public void traverse(Set<Node> start) {
         Queue<Node> queue = new LinkedList<Node>();
-        Set<Long> visited = new HashSet<Long>(); // visited nodes
 
         for (Node s : start) {
-            System.out.println(s.getId());
-            visited.add(s.getId());
+            setVisited(s);
             queue.add(s);
+            System.out.println(s.getId());
         }
 
         while (!queue.isEmpty()) {
-            Node v = queue.poll(); // a normal node
-            //v.getHyperedge?
-            //v.getRelationships()
+            // dequeue a normal node (one of source nodes)
+            Node v = queue.poll();
+
+            // get connected hyperedges
+            Iterable<Relationship> rels = v.getRelationships(Direction.OUTGOING, Const.REL_FROM_SOURCE);
+            for (Relationship rel : rels) {
+                // pseudo hypernode - XXX: considering getHyperedges()
+                Node h = rel.getEndNode();
+                if (isVisited(h) == true)
+                    continue;
+                else if (isEnabled(h) == false)
+                    continue;
+                else
+                    setVisited(h);
+
+                // get single target node
+                Node t = h.getSingleRelationship(Const.REL_TO_TARGET, Direction.OUTGOING).getEndNode();
+                if (isVisited(t) == false) {
+                    setVisited(t);
+                    queue.add(t);
+                    System.out.println(t.getId());
+                }
+            }
         }
+    }
+
+    private void setVisited(Node node) {
+        visited.add(node.getId());
+    }
+
+    private boolean isVisited(Node node) {
+        return visited.contains(node.getId());
+    }
+
+    private boolean isEnabled(Node hypernode) {
+        Iterable<Relationship> rels = hypernode.getRelationships(Direction.INCOMING, Const.REL_FROM_SOURCE);
+        for (Relationship rel : rels) {
+            if (isVisited(rel.getStartNode()) == false) {
+                return false;
+            }
+        }
+        return true;
     }
 }
