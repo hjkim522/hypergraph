@@ -38,16 +38,16 @@ public class HypergraphTraversal {
             for (Relationship rel : rels) {
                 // pseudo hypernode - XXX: considering getHyperedges()
                 Node h = rel.getEndNode();
-                if (isVisited(h) == true)
+                if (isVisited(h))
                     continue;
-                else if (isEnabled(h) == false)
+                else if (!isEnabled(h))
                     continue;
                 else
                     setVisited(h);
 
                 // get single target node
                 Node t = h.getSingleRelationship(Const.REL_TO_TARGET, Direction.OUTGOING).getEndNode();
-                if (isVisited(t) == false) {
+                if (!isVisited(t)) {
                     setVisited(t);
                     queue.add(t);
                     System.out.println(t.getId());
@@ -67,7 +67,7 @@ public class HypergraphTraversal {
     private boolean isEnabled(Node hypernode) {
         Iterable<Relationship> rels = hypernode.getRelationships(Direction.INCOMING, Const.REL_FROM_SOURCE);
         for (Relationship rel : rels) {
-            if (isVisited(rel.getStartNode()) == false) {
+            if (!isVisited(rel.getStartNode())) {
                 return false;
             }
         }
