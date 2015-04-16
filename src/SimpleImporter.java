@@ -12,13 +12,14 @@ import java.io.FileReader;
  * Number of nodes at the first line
  * Startable set at the second line
  * Hyperedge description (source -> target) from next line
+ * (nodeID starts from 0)
  *
  * ex)
  * 7
- * 1,2,3 -> 4
- * 4,5 -> 6
- * 7 -> 3
- * 7 -> 5
+ * 0,1,2 -> 3
+ * 3,4, -> 5
+ * 6 -> 2
+ * 6 -> 4
  *
  * Created by Hyunjun on 2015-04-15.
  */
@@ -53,9 +54,9 @@ public class SimpleImporter {
 
     // insert n nodes
     private void importNodes(int n) {
-        nodes = new Node[n + 1]; // nodes[0] = null
+        nodes = new Node[n];
         try (Transaction tx = graphDb.beginTx()) {
-            for (int i = 1; i <= n; i++) {
+            for (int i = 0; i < n; i++) {
                 Node node = graphDb.createNode(DynamicLabel.label("Node"));
                 node.setProperty("name", i);
                 nodes[i] = node;
