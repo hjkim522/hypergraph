@@ -18,6 +18,15 @@ public class HypergraphDatabaseService implements GraphDatabaseService {
         this.graphDb = graphDb;
     }
 
+    public Hyperedge createHyperedge(Node target, Node... source) {
+        Node hypernode = graphDb.createNode(Const.LABEL_HYPERNODE);
+        for (Node s : source) {
+            s.createRelationshipTo(hypernode, Const.REL_FROM_SOURCE);
+        }
+        hypernode.createRelationshipTo(target, Const.REL_TO_TARGET);
+        return null;
+    }
+
     @Override
     public Node createNode() {
         return graphDb.createNode();
@@ -25,7 +34,7 @@ public class HypergraphDatabaseService implements GraphDatabaseService {
 
     @Override
     public Node createNode(Label... labels) {
-        return null;
+        return graphDb.createNode(labels);
     }
 
     @Override

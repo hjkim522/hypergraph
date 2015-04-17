@@ -5,9 +5,21 @@ import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.factory.GraphDatabaseFactory;
 import org.neo4j.graphdb.schema.IndexDefinition;
 import org.neo4j.graphdb.schema.Schema;
+import org.neo4j.io.fs.FileUtils;
 
-// http://neo4j.com/docs/stable/tutorials-java-embedded-hello-world.html
+import java.io.File;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
+/**
+ * Main Application
+ *
+ * Initialize Neo4j as follows
+ * http://neo4j.com/docs/stable/tutorials-java-embedded-hello-world.html
+ *
+ * Created by Hyunjun on 2015-04-15.
+ */
 public class Application {
     private static GraphDatabaseService graphDb = null;
 
@@ -15,14 +27,37 @@ public class Application {
         return graphDb;
     }
 
+    //XXX: write test cases
     public static void main(String[] args) {
-        Importer importer = new Importer("sample.txt");
-        importer.run();
+        graphDb = new GraphDatabaseFactory().newEmbeddedDatabase(Const.DB_PATH);
+        registerShutdownHook(graphDb);
+
+        try (Transaction tx = graphDb.beginTx()) {
+            Set<Node> start = new HashSet<Node>();
+            start.add(graphDb.findNode(Const.LABEL_NODE, "name", 0));
+            start.add(graphDb.findNode(Const.LABEL_NODE, "name", 1));
+            start.add(graphDb.findNode(Const.LABEL_NODE, "name", 2));
+            start.add(graphDb.findNode(Const.LABEL_NODE, "name", 6));
+
+            HypergraphTraversal traversal = new HypergraphTraversal(node -> {System.out.println(node.getId());});
+            traversal.traverse(start);
+        }
+
+        graphDb.shutdown();
     }
 
     public static void _main(String[] args) {
-        GraphDatabaseService graphDb = new GraphDatabaseFactory().newEmbeddedDatabase("db/graphDb");
+        deleteDatabase();
+        graphDb = new GraphDatabaseFactory().newEmbeddedDatabase(Const.DB_PATH);
         registerShutdownHook(graphDb);
+        createIndex();
+
+        SimpleImporter importer = new SimpleImporter("sample.txt");
+        importer.run();
+
+        MSSBuilder builder = new MSSBuilder();
+        builder.build();
+
         graphDb.shutdown();
     }
 
@@ -40,20 +75,27 @@ public class Application {
     }
 
     private static void deleteDatabase() {
-        //TODO:
+        try {
+            FileUtils.deleteRecursively(new File(Const.DB_PATH));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     // This only needs to be done once
     private static void createIndex() {
         IndexDefinition indexDefinition;
-        try (Transaction tx = graphDb.beginTx())
-        {
+        try (Transaction tx = graphDb.beginTx()) {
             Schema schema = graphDb.schema();
-            indexDefinition = schema.indexFor(DynamicLabel.label("Node"))
-                    .on("uniqueId")
+            indexDefinition = schema.indexFor(Const.LABEL_NODE)
+                    .on(Const.UNIQUE_ATTR)
                     .create();
             tx.success();
         }
-        //schema.awaitIndexOnline( indexDefinition, 10, TimeUnit.SECONDS ); ?????
+
+        try (Transaction tx = graphDb.beginTx()) {
+            Schema schema = graphDb.schema();
+            schema.awaitIndexOnline(indexDefinition, 10, TimeUnit.SECONDS);
+        }
     }
 }

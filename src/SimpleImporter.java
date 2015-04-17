@@ -1,21 +1,37 @@
+import org.neo4j.graphdb.DynamicLabel;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
-import org.neo4j.shell.util.json.JSONParser;
 
-import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 
 /**
+ * Simple hypergraph importer
+ *
+ * Number of nodes at the first line
+ * Startable set at the second line
+ * Hyperedge description (source -> target) from next line
+ * (nodeID starts from 0)
+ *
+ * ex)
+ * 7
+ * 0,1,2 -> 3
+ * 3,4 -> 5
+ * 6 -> 2
+ * 6 -> 4
+ *
  * Created by Hyunjun on 2015-04-15.
  */
-public class Importer { //XXX: rename to SimpleImporter
+public class SimpleImporter {
     private String filename;
     private GraphDatabaseService graphDb;
 
-    public Importer(String filename) {
+    // SimpleImporter allows in-memory construction only
+    // NOTE: If hypergraph size exceeds memory size then use unique index of neo4j
+    private Node nodes[];
+
+    public SimpleImporter(String filename) {
         this.filename = filename;
         this.graphDb = Application.getGraphDatabase();
     }
@@ -23,15 +39,12 @@ public class Importer { //XXX: rename to SimpleImporter
     public void run() {
         try (FileReader fr = new FileReader(filename)) {
             BufferedReader br = new BufferedReader(fr);
-            String s = br.readLine();
 
-            importNodes(Integer.valueOf(s));
+            importNodes(Integer.valueOf(br.readLine()));
+            importStartable(br.readLine());
 
+            String s;
             while ((s = br.readLine()) != null) {
-                // skip empty lines and comments - XXX: temporal impl
-                if (s.length() == 0 || s.startsWith("#"))
-                    continue;
-
                 importHyperedge(s);
             }
         } catch (Exception e) {
@@ -41,13 +54,20 @@ public class Importer { //XXX: rename to SimpleImporter
 
     // insert n nodes
     private void importNodes(int n) {
+        nodes = new Node[n];
         try (Transaction tx = graphDb.beginTx()) {
-            for (int i = 1; i <= n; i++) {
-                Node node = graphDb.createNode();
+            for (int i = 0; i < n; i++) {
+                Node node = graphDb.createNode(DynamicLabel.label("Node"));
                 node.setProperty("name", i);
+                nodes[i] = node;
             }
             tx.success();
         }
+    }
+
+    // mark startable nodes
+    private void importStartable(String s) {
+        //TODO: add labels
     }
 
     // parse and insert hyperedges
@@ -60,9 +80,12 @@ public class Importer { //XXX: rename to SimpleImporter
         Hyperedge hyperedge = new Hyperedge();
 
         for (String source : sourceStr) {
-            //graphDb.getNodeById()
-            //XXX: fuck need index!!!! // nodeid or uniqueid
+            int sourceIdx = Integer.valueOf(source);
+            hyperedge.addSource(nodes[sourceIdx]);
         }
+
+        int targetIdx = Integer.valueOf(targetStr);
+        hyperedge.setTarget(nodes[targetIdx]);
 
         try (Transaction tx = graphDb.beginTx()) {
             hyperedge.save(graphDb);
