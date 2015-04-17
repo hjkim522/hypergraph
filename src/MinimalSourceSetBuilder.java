@@ -11,13 +11,15 @@ import java.util.concurrent.SynchronousQueue;
  */
 public class MinimalSourceSetBuilder {
     private static GraphDatabaseService graphDb;
-    private Set<Long> visited;
     private Map<Long, MinimalSourceSet> mssMap;
+    private Set<Long> visited;
+    private Set<Long> calculated; // vote for halt
 
     public MinimalSourceSetBuilder() {
         graphDb = Application.getGraphDatabase();
-        visited = new HashSet<>();
         mssMap = new HashMap<>();
+        visited = new HashSet<>();
+        calculated = new HashSet<>();
     }
 
     public void run() {
@@ -75,10 +77,13 @@ public class MinimalSourceSetBuilder {
                 if (!isEnabled(h))
                     continue;
 
-                //TODO: check modified
+                // check already calculated by another source node
+                else if (isCalculated(h))
+                    continue;
 
                 // calculate mss of hyperedge
                 MinimalSourceSet mssHyperedge = computeMinimalSourceSet(h);
+                setCalculated(h);
 
                 // update targets mss
                 Node t = h.getSingleRelationship(Const.REL_TO_TARGET, Direction.OUTGOING).getEndNode();
@@ -88,6 +93,7 @@ public class MinimalSourceSetBuilder {
                 boolean modified = mssTarget.addAll(mssHyperedge);
                 if (modified) {
                     queue.add(t);
+                    unsetCalculated(t);
                 }
             }
         }
@@ -132,5 +138,21 @@ public class MinimalSourceSetBuilder {
             }
         }
         return true;
+    }
+
+    private void setCalculated(Node node) {
+        calculated.add(node.getId());
+    }
+
+    private boolean isCalculated(Node node) {
+        return calculated.contains(node.getId());
+    }
+
+    private void unsetCalculated(Node node) {
+        Iterable<Relationship> rels = node.getRelationships(Direction.OUTGOING, Const.REL_FROM_SOURCE);
+        for (Relationship rel : rels) {
+            Node h = rel.getEndNode();
+            calculated.remove(h.getId());
+        }
     }
 }
