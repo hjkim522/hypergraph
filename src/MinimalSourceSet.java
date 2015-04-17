@@ -2,6 +2,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
+ * Naive implementation of minimal source set
+ * No optimization applied
+ *
  * Created by Hyunun on 2015-04-17.
  */
 public class MinimalSourceSet {
@@ -11,11 +14,12 @@ public class MinimalSourceSet {
         mss = new HashSet<>();
     }
 
-    public void addSourceSet(Set<Long> sourceSet) {
+    // return true if modified
+    public boolean addSourceSet(Set<Long> sourceSet) {
         // check minimality of sourceSet
         for (Set<Long> s : mss) {
             if (sourceSet.containsAll(s)) {
-                return;
+                return false;
             }
         }
 
@@ -25,15 +29,30 @@ public class MinimalSourceSet {
                 mss.remove(s);
             }
         }
+
+        mss.add(sourceSet);
+        return true;
     }
 
-    public void union(MinimalSourceSet other) {
+    // return true if modified
+    public boolean union(MinimalSourceSet other) {
+        boolean modified = false;
         for (Set<Long> s : other.mss) {
-            addSourceSet(s);
+            modified = modified | addSourceSet(s);
         }
+        return modified;
     }
 
     public void cartesian(MinimalSourceSet other) {
-        
+        MinimalSourceSet cartesian = new MinimalSourceSet();
+        for (Set<Long> s1 : mss) {
+            for (Set<Long> s2 : other.mss) {
+                Set<Long> s = new HashSet<>();
+                s.addAll(s1);
+                s.addAll(s2);
+                cartesian.addSourceSet(s);
+            }
+        }
+        mss = cartesian.mss;
     }
 }
