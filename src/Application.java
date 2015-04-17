@@ -26,8 +26,13 @@ public class Application {
         return graphDb;
     }
 
+    public static void main2(String[] args) {
+        SimpleGenerator generator = new SimpleGenerator();
+        generator.run();
+    }
+
     //XXX: write test cases
-    public static void _main(String[] args) {
+    public static void main3(String[] args) {
         graphDb = new GraphDatabaseFactory().newEmbeddedDatabase(Const.DB_PATH);
         registerShutdownHook(graphDb);
 
@@ -36,7 +41,7 @@ public class Application {
             start.add(graphDb.findNode(Const.LABEL_NODE, Const.PROP_UNIQUE, 0));
             start.add(graphDb.findNode(Const.LABEL_NODE, Const.PROP_UNIQUE, 1));
             start.add(graphDb.findNode(Const.LABEL_NODE, Const.PROP_UNIQUE, 2));
-            start.add(graphDb.findNode(Const.LABEL_NODE, Const.PROP_UNIQUE, 6));
+            start.add(graphDb.findNode(Const.LABEL_NODE, Const.PROP_UNIQUE, 3));
 
             HypergraphTraversal traversal = new HypergraphTraversal(node -> {System.out.println(node.getId());});
             traversal.traverse(start);
