@@ -5,7 +5,7 @@ import java.util.Set;
  * Naive implementation of minimal source set
  * No optimization applied
  *
- * Created by Hyunun on 2015-04-17.
+ * Created by Hyunjun on 2015-04-17.
  */
 public class MinimalSourceSet {
     private Set<Set<Long>> mss;
@@ -14,12 +14,11 @@ public class MinimalSourceSet {
         mss = new HashSet<>();
     }
 
-    // return true if modified
-    public boolean addSourceSet(Set<Long> sourceSet) {
+    public void addSourceSet(Set<Long> sourceSet) {
         // check minimality of sourceSet
         for (Set<Long> s : mss) {
             if (sourceSet.containsAll(s)) {
-                return false;
+                return;
             }
         }
 
@@ -31,16 +30,13 @@ public class MinimalSourceSet {
         }
 
         mss.add(sourceSet);
-        return true;
     }
 
-    // return true if modified
-    public boolean union(MinimalSourceSet other) {
+    public void union(MinimalSourceSet other) {
         boolean modified = false;
         for (Set<Long> s : other.mss) {
-            modified = modified | addSourceSet(s);
+            addSourceSet(s);
         }
-        return modified;
     }
 
     public void cartesian(MinimalSourceSet other) {
@@ -55,4 +51,32 @@ public class MinimalSourceSet {
         }
         mss = cartesian.mss;
     }
+
+    @Override
+    public String toString() {
+        String str = "";
+        for (Set<Long> s : mss) {
+            for (Long id : s) {
+                str += id + ",";
+            }
+            str += ";";
+        }
+        return str;
+    }
+
+    public static MinimalSourceSet valueOf(String str) {
+        return null;
+    }
+
+    // for testing purpose
+    public boolean contains(Set<Long> sourceSet) {
+        for (Set<Long> s : mss) {
+            if (s.containsAll(sourceSet) && sourceSet.containsAll(s)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
 }
