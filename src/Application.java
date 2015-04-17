@@ -1,4 +1,3 @@
-import org.neo4j.graphdb.DynamicLabel;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
@@ -34,10 +33,10 @@ public class Application {
 
         try (Transaction tx = graphDb.beginTx()) {
             Set<Node> start = new HashSet<Node>();
-            start.add(graphDb.findNode(Const.LABEL_NODE, Const.UNIQUE_ATTR, 0));
-            start.add(graphDb.findNode(Const.LABEL_NODE, Const.UNIQUE_ATTR, 1));
-            start.add(graphDb.findNode(Const.LABEL_NODE, Const.UNIQUE_ATTR, 2));
-            start.add(graphDb.findNode(Const.LABEL_NODE, Const.UNIQUE_ATTR, 6));
+            start.add(graphDb.findNode(Const.LABEL_NODE, Const.PROP_UNIQUE, 0));
+            start.add(graphDb.findNode(Const.LABEL_NODE, Const.PROP_UNIQUE, 1));
+            start.add(graphDb.findNode(Const.LABEL_NODE, Const.PROP_UNIQUE, 2));
+            start.add(graphDb.findNode(Const.LABEL_NODE, Const.PROP_UNIQUE, 6));
 
             HypergraphTraversal traversal = new HypergraphTraversal(node -> {System.out.println(node.getId());});
             traversal.traverse(start);
@@ -88,7 +87,7 @@ public class Application {
         try (Transaction tx = graphDb.beginTx()) {
             Schema schema = graphDb.schema();
             indexDefinition = schema.indexFor(Const.LABEL_NODE)
-                    .on(Const.UNIQUE_ATTR)
+                    .on(Const.PROP_UNIQUE)
                     .create();
             tx.success();
         }

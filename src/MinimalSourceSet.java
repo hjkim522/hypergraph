@@ -1,3 +1,5 @@
+import org.neo4j.cypher.internal.compiler.v1_9.commands.expressions.Min;
+
 import java.util.HashSet;
 import java.util.Set;
 
@@ -47,23 +49,24 @@ public class MinimalSourceSet {
         return modified;
     }
 
-    public void union(MinimalSourceSet other) { //XXX: define as binary operator
-        for (Set<Long> s : other.mss) {
-            addSourceSet(s);
-        }
+    public MinimalSourceSet union(MinimalSourceSet other) {
+        MinimalSourceSet result = new MinimalSourceSet();
+        result.addAll(this); //XXX: do deep copy
+        result.addAll(other);
+        return result;
     }
 
-    public void cartesian(MinimalSourceSet other) {
-        MinimalSourceSet cartesian = new MinimalSourceSet();
+    public MinimalSourceSet cartesian(MinimalSourceSet other) {
+        MinimalSourceSet result = new MinimalSourceSet();
         for (Set<Long> s1 : mss) {
             for (Set<Long> s2 : other.mss) {
                 Set<Long> s = new HashSet<>();
                 s.addAll(s1);
                 s.addAll(s2);
-                cartesian.addSourceSet(s);
+                result.addSourceSet(s);
             }
         }
-        mss = cartesian.mss;
+        return result;
     }
 
     @Override

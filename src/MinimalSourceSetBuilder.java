@@ -1,6 +1,7 @@
 import org.neo4j.graphdb.*;
 
 import java.util.*;
+import java.util.concurrent.SynchronousQueue;
 
 /**
  * Simple in-memory builder
@@ -34,11 +35,17 @@ public class MinimalSourceSetBuilder {
 
             // write computed mms into database
             flush();
+            tx.success();
         }
     }
 
     private void flush() {
-
+        for (Map.Entry<Long, MinimalSourceSet> entry : mssMap.entrySet()) {
+            Long id = entry.getKey();
+            MinimalSourceSet mss = entry.getValue();
+            Node node = graphDb.getNodeById(id);
+            node.setProperty(Const.PROP_MSS, mss.toString());
+        }
     }
 
     //XXX: copy of HypergraphTraversal.traverse()
@@ -58,12 +65,12 @@ public class MinimalSourceSetBuilder {
 
         while (!queue.isEmpty()) {
             // dequeue a normal node (one of source nodes)
-            Node v = queue.poll();
+            Node s = queue.poll();
 
             // get connected hyperedges
-            Iterable<Relationship> rels = v.getRelationships(Direction.OUTGOING, Const.REL_FROM_SOURCE);
+            Iterable<Relationship> rels = s.getRelationships(Direction.OUTGOING, Const.REL_FROM_SOURCE);
             for (Relationship rel : rels) {
-                // pseudo hypernode - XXX: considering Node.getHyperedges()
+                // get pseudo hypernode and check enabled
                 Node h = rel.getEndNode();
                 if (!isEnabled(h))
                     continue;
@@ -103,7 +110,7 @@ public class MinimalSourceSetBuilder {
             if (mss == null) {
                 mss = getMinimalSourceSet(s);
             } else {
-                mss.cartesian(getMinimalSourceSet(s));
+                mss = mss.cartesian(getMinimalSourceSet(s));
             }
         }
         return mss;

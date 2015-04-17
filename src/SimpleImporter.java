@@ -1,4 +1,3 @@
-import org.neo4j.graphdb.DynamicLabel;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
@@ -60,7 +59,7 @@ public class SimpleImporter {
         try (Transaction tx = graphDb.beginTx()) {
             for (int i = 0; i < n; i++) {
                 Node node = graphDb.createNode(Const.LABEL_NODE);
-                node.setProperty(Const.UNIQUE_ATTR, i);
+                node.setProperty(Const.PROP_UNIQUE, i);
                 nodes[i] = node;
             }
             tx.success();
