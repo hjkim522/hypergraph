@@ -42,7 +42,7 @@ public class MinimalSourceSetTest {
 
         mss1.cartesian(mss2);
 
-        assertTrue(mss1.contains(constructSourceSet(3, 4, 5)));
+        assertTrue(mss1.contains(constructSourceSet(3, 4)));
     }
 
     private Set<Long> constructSourceSet(Number... ids) {
