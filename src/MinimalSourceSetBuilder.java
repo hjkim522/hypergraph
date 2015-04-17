@@ -23,6 +23,9 @@ public class MinimalSourceSetBuilder {
     }
 
     public void run() {
+        // measure building time
+        long t = System.currentTimeMillis();
+
         try (Transaction tx = graphDb.beginTx()) {
             // find all startable nodes
             Set<Node> start = new HashSet<>();
@@ -39,6 +42,8 @@ public class MinimalSourceSetBuilder {
             flush();
             tx.success();
         }
+
+        System.out.println("Build MSSIndex complete (" + (System.currentTimeMillis() - t) + " ms)");
     }
 
     private void flush() {
