@@ -46,13 +46,13 @@ public class Application {
     }
 
     public static void main(String[] args) {
-        //deleteDatabase();
+        deleteDatabase();
         graphDb = new GraphDatabaseFactory().newEmbeddedDatabase(Const.DB_PATH);
         registerShutdownHook(graphDb);
-        //createIndex();
+        createIndex();
 
-        //SimpleImporter importer = new SimpleImporter("sample.txt");
-        //importer.run();
+        SimpleImporter importer = new SimpleImporter("sample-medium.txt");
+        importer.run();
 
         MinimalSourceSetBuilder builder = new MinimalSourceSetBuilder();
         builder.run();
