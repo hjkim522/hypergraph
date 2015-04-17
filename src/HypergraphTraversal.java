@@ -42,7 +42,7 @@ public class HypergraphTraversal {
             // get connected hyperedges
             Iterable<Relationship> rels = v.getRelationships(Direction.OUTGOING, Const.REL_FROM_SOURCE);
             for (Relationship rel : rels) {
-                // pseudo hypernode - XXX: considering getHyperedges()
+                // pseudo hypernode - XXX: considering Node.getHyperedges()
                 Node h = rel.getEndNode();
                 if (isVisited(h))
                     continue;
