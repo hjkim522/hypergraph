@@ -56,7 +56,7 @@ public class Application {
         registerShutdownHook(graphDb);
         createIndex();
 
-        SimpleImporter importer = new SimpleImporter("output.txt");
+        SimpleImporter importer = new SimpleImporter("sample-medium.txt");
         importer.run();
 
         MinimalSourceSetBuilder builder = new MinimalSourceSetBuilder();
