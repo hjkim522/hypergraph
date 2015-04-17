@@ -14,11 +14,17 @@ public class MinimalSourceSet {
         mss = new HashSet<>();
     }
 
-    public void addSourceSet(Set<Long> sourceSet) {
+    /**
+     * Add a source set to MSS
+     * Check minimality constraing
+     * @param sourceSet source set to add
+     * @return true if modified
+     */
+    public boolean addSourceSet(Set<Long> sourceSet) {
         // check minimality of sourceSet
         for (Set<Long> s : mss) {
             if (sourceSet.containsAll(s)) {
-                return;
+                return false;
             }
         }
 
@@ -30,10 +36,18 @@ public class MinimalSourceSet {
         }
 
         mss.add(sourceSet);
+        return true;
     }
 
-    public void union(MinimalSourceSet other) {
+    public boolean addAll(MinimalSourceSet other) {
         boolean modified = false;
+        for (Set<Long> s : other.mss) {
+            modified = modified | addSourceSet(s);
+        }
+        return modified;
+    }
+
+    public void union(MinimalSourceSet other) { //XXX: define as binary operator
         for (Set<Long> s : other.mss) {
             addSourceSet(s);
         }

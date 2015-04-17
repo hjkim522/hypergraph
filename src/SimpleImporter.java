@@ -21,6 +21,8 @@ import java.io.FileReader;
  * 6 -> 2
  * 6 -> 4
  *
+ * XXX: run in single transaction
+ *
  * Created by Hyunjun on 2015-04-15.
  */
 public class SimpleImporter {
@@ -57,8 +59,8 @@ public class SimpleImporter {
         nodes = new Node[n];
         try (Transaction tx = graphDb.beginTx()) {
             for (int i = 0; i < n; i++) {
-                Node node = graphDb.createNode(DynamicLabel.label("Node"));
-                node.setProperty("name", i);
+                Node node = graphDb.createNode(Const.LABEL_NODE);
+                node.setProperty(Const.UNIQUE_ATTR, i);
                 nodes[i] = node;
             }
             tx.success();
@@ -67,7 +69,14 @@ public class SimpleImporter {
 
     // mark startable nodes
     private void importStartable(String s) {
-        //TODO: add labels
+        String nodeSeq[] = s.split(",");
+        try (Transaction tx = graphDb.beginTx()) {
+            for (String node : nodeSeq) {
+                int idx = Integer.valueOf(node);
+                nodes[idx].addLabel(Const.LABEL_STARTABLE);
+            }
+            tx.success();
+        }
     }
 
     // parse and insert hyperedges

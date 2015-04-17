@@ -28,16 +28,16 @@ public class Application {
     }
 
     //XXX: write test cases
-    public static void main(String[] args) {
+    public static void _main(String[] args) {
         graphDb = new GraphDatabaseFactory().newEmbeddedDatabase(Const.DB_PATH);
         registerShutdownHook(graphDb);
 
         try (Transaction tx = graphDb.beginTx()) {
             Set<Node> start = new HashSet<Node>();
-            start.add(graphDb.findNode(Const.LABEL_NODE, "name", 0));
-            start.add(graphDb.findNode(Const.LABEL_NODE, "name", 1));
-            start.add(graphDb.findNode(Const.LABEL_NODE, "name", 2));
-            start.add(graphDb.findNode(Const.LABEL_NODE, "name", 6));
+            start.add(graphDb.findNode(Const.LABEL_NODE, Const.UNIQUE_ATTR, 0));
+            start.add(graphDb.findNode(Const.LABEL_NODE, Const.UNIQUE_ATTR, 1));
+            start.add(graphDb.findNode(Const.LABEL_NODE, Const.UNIQUE_ATTR, 2));
+            start.add(graphDb.findNode(Const.LABEL_NODE, Const.UNIQUE_ATTR, 6));
 
             HypergraphTraversal traversal = new HypergraphTraversal(node -> {System.out.println(node.getId());});
             traversal.traverse(start);
@@ -46,17 +46,17 @@ public class Application {
         graphDb.shutdown();
     }
 
-    public static void _main(String[] args) {
-        deleteDatabase();
+    public static void main(String[] args) {
+        //deleteDatabase();
         graphDb = new GraphDatabaseFactory().newEmbeddedDatabase(Const.DB_PATH);
         registerShutdownHook(graphDb);
-        createIndex();
+        //createIndex();
 
-        SimpleImporter importer = new SimpleImporter("sample.txt");
-        importer.run();
+        //SimpleImporter importer = new SimpleImporter("sample.txt");
+        //importer.run();
 
-        MSSBuilder builder = new MSSBuilder();
-        builder.build();
+        MinimalSourceSetBuilder builder = new MinimalSourceSetBuilder();
+        builder.run();
 
         graphDb.shutdown();
     }
