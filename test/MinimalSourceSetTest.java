@@ -1,3 +1,5 @@
+import org.junit.Test;
+
 import java.util.HashSet;
 import java.util.Set;
 
@@ -8,14 +10,14 @@ import static org.junit.Assert.*;
  */
 public class MinimalSourceSetTest {
 
-    @org.junit.Test
+    @Test
     public void testAddSourceSet() throws Exception {
         MinimalSourceSet mss = new MinimalSourceSet();
         mss.addSourceSet(constructSourceSet(0, 1, 2));
         assertTrue(mss.contains(constructSourceSet(0, 1, 2)));
     }
 
-    @org.junit.Test
+    @Test
     public void testUnion() throws Exception {
         MinimalSourceSet mss1 = new MinimalSourceSet();
         mss1.addSourceSet(constructSourceSet(0, 1, 2));
@@ -29,7 +31,7 @@ public class MinimalSourceSetTest {
         assertFalse(union.contains(constructSourceSet(3, 4, 5)));
     }
 
-    @org.junit.Test
+    @Test
     public void testCartesian() throws Exception {
         MinimalSourceSet mss1 = new MinimalSourceSet();
         mss1.addSourceSet(constructSourceSet(0, 1, 2));
