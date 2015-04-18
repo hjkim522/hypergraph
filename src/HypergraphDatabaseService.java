@@ -27,6 +27,10 @@ public class HypergraphDatabaseService implements GraphDatabaseService {
         return null;
     }
 
+    public ResourceIterable<Hyperedge> getHyperedges(Node node, Direction direction) {
+        return null;
+    }
+
     @Override
     public Node createNode() {
         return graphDb.createNode();
