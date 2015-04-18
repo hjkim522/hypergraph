@@ -1,6 +1,7 @@
 import org.neo4j.cypher.internal.compiler.v1_9.commands.expressions.Min;
 
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 /**
@@ -31,9 +32,11 @@ public class MinimalSourceSet {
         }
 
         // remove all superset of sourceSet
-        for (Set<Long> s : mss) {
+        Iterator<Set<Long>> iter = mss.iterator();
+        while (iter.hasNext()) {
+            Set<Long> s = iter.next();
             if (s.containsAll(sourceSet)) {
-                mss.remove(s);
+                iter.remove();
             }
         }
 
