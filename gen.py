@@ -7,9 +7,9 @@ def main():
 
     #parameters
     outputFile = "output.txt"
-    numNodes = 100
-    numStartable = 10
-    numHyperedges = 100
+    numNodes = 1000
+    numStartable = 100
+    numHyperedges = 1000
 
     #write number of nodes
     f = open(outputFile, "w")
@@ -30,7 +30,7 @@ def main():
             idx = random.randint(0, len(sourcePool)-1)
             sourceList = list(sourcePool)
             sourceSet.add(sourceList[idx])
-        targetNode = random.randint(0, numNodes)
+        targetNode = random.randint(0, numNodes-1)
         sourcePool.add(targetNode)
 
         #write edge
