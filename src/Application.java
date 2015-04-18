@@ -26,37 +26,13 @@ public class Application {
         return graphDb;
     }
 
-    public static void main2(String[] args) {
-        SimpleGenerator generator = new SimpleGenerator();
-        generator.run();
-    }
-
-    //XXX: write test cases
-    public static void main3(String[] args) {
-        graphDb = new GraphDatabaseFactory().newEmbeddedDatabase(Const.DB_PATH);
-        registerShutdownHook(graphDb);
-
-        try (Transaction tx = graphDb.beginTx()) {
-            Set<Node> start = new HashSet<Node>();
-            start.add(graphDb.findNode(Const.LABEL_NODE, Const.PROP_UNIQUE, 0));
-            start.add(graphDb.findNode(Const.LABEL_NODE, Const.PROP_UNIQUE, 1));
-            start.add(graphDb.findNode(Const.LABEL_NODE, Const.PROP_UNIQUE, 2));
-            start.add(graphDb.findNode(Const.LABEL_NODE, Const.PROP_UNIQUE, 3));
-
-            HypergraphTraversal traversal = new HypergraphTraversal(node -> {System.out.println(node.getId());});
-            traversal.traverse(start);
-        }
-
-        graphDb.shutdown();
-    }
-
     public static void main(String[] args) {
-        deleteDatabase();
+        deleteDatabase(Const.DB_PATH);
         graphDb = new GraphDatabaseFactory().newEmbeddedDatabase(Const.DB_PATH);
         registerShutdownHook(graphDb);
         createIndex();
 
-        SimpleImporter importer = new SimpleImporter("output.txt");
+        SimpleImporter importer = new SimpleImporter("sample.txt");
         importer.run();
 
         MinimalSourceSetBuilder builder = new MinimalSourceSetBuilder();
@@ -78,9 +54,9 @@ public class Application {
         });
     }
 
-    private static void deleteDatabase() {
+    private static void deleteDatabase(String path) {
         try {
-            FileUtils.deleteRecursively(new File(Const.DB_PATH));
+            FileUtils.deleteRecursively(new File(path));
         } catch (Exception e) {
             e.printStackTrace();
         }
