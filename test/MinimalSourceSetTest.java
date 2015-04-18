@@ -25,10 +25,9 @@ public class MinimalSourceSetTest {
         MinimalSourceSet mss2 = new MinimalSourceSet();
         mss2.addSourceSet(constructSourceSet(3, 4, 5));
 
-        mss1.union(mss2);
-
-        assertTrue(mss1.contains(constructSourceSet(3, 4)));
-        assertFalse(mss1.contains(constructSourceSet(3, 4, 5)));
+        MinimalSourceSet union = mss1.union(mss2);
+        assertTrue(union.contains(constructSourceSet(3, 4)));
+        assertFalse(union.contains(constructSourceSet(3, 4, 5)));
     }
 
     @org.junit.Test
@@ -40,9 +39,8 @@ public class MinimalSourceSetTest {
         MinimalSourceSet mss2 = new MinimalSourceSet();
         mss2.addSourceSet(constructSourceSet(3, 4, 5));
 
-        mss1.cartesian(mss2);
-
-        assertTrue(mss1.contains(constructSourceSet(3, 4)));
+        MinimalSourceSet cartesian = mss1.cartesian(mss2);
+        assertTrue(cartesian.contains(constructSourceSet(3, 4, 5)));
     }
 
     private Set<Long> constructSourceSet(Number... ids) {
