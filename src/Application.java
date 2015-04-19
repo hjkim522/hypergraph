@@ -32,7 +32,7 @@ public class Application {
         registerShutdownHook(graphDb);
         createIndex();
 
-        SimpleImporter importer = new SimpleImporter("sample.txt");
+        SimpleImporter importer = new SimpleImporter("output.txt");
         importer.run();
 
         MinimalSourceSetBuilder builder = new MinimalSourceSetBuilder();
