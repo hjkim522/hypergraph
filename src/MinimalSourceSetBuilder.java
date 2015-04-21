@@ -124,6 +124,15 @@ public class MinimalSourceSetBuilder {
             } else {
                 mss = mss.cartesian(getMinimalSourceSet(s));
             }
+
+            // decomposition
+            if (mss.size() > 64) { // temporal threshold
+                Set<Long> sourceSet = new HashSet<>();
+                sourceSet.add(hypernode.getId());
+                mss = new MinimalSourceSet();
+                mss.addSourceSet(sourceSet);
+                return mss;
+            }
         }
         return mss;
     }

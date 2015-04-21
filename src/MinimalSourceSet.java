@@ -72,6 +72,10 @@ public class MinimalSourceSet {
         return result;
     }
 
+    public int size() {
+        return mss.size();
+    }
+
     @Override
     public String toString() {
         String str = "";
