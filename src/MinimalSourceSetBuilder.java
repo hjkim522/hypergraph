@@ -93,7 +93,7 @@ public class MinimalSourceSetBuilder {
             Node s = queue.poll();
             System.out.println("Build for node " + s.getId());
 
-            //TODO: remove duplication
+            //TODO: remove duplicated computation
 
             // get connected hyperedges
             Iterable<Relationship> rels = s.getRelationships(Direction.OUTGOING, Const.REL_FROM_SOURCE);
@@ -118,7 +118,7 @@ public class MinimalSourceSetBuilder {
                 boolean modified = mssTarget.addAll(mssHyperedge);
                 if (modified) {
                     queue.add(t);
-                    printQueue(queue);
+                    //printQueue(queue);
                     unsetCalculated(t);
                 }
             }

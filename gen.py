@@ -7,9 +7,9 @@ def main():
 
     #parameters
     outputFile = "output.txt"
-    numNodes = 100
-    numStartable = 10
-    numHyperedges = 100
+    numNodes = 10000
+    numStartable = 100
+    numHyperedges = 10000
 
     #write number of nodes
     f = open(outputFile, "w")
