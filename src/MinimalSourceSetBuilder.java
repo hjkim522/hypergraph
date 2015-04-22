@@ -112,6 +112,8 @@ public class MinimalSourceSetBuilder {
                 // update targets mss
                 Node t = h.getSingleRelationship(Const.REL_TO_TARGET, Direction.OUTGOING).getEndNode();
                 setVisited(t);
+
+                // count calculated in-edges
                 calculatedMap.put(t.getId(), calculatedMap.getOrDefault(t.getId(), 0) + 1);
 
                 MinimalSourceSet mssTarget = getMinimalSourceSet(t);
