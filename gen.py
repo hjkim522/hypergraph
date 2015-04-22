@@ -1,15 +1,30 @@
 #simple hypergraph generator
 
+import sys
 import random
 
 def main():
-    print("hypergraph generator")
-
     #parameters
     outputFile = "output.txt"
-    numNodes = 10000
-    numStartable = 100
-    numHyperedges = 10000
+    numNodes = 100
+    numStartable = 10
+    numHyperedges = 100
+
+    #parse command ling args
+    if len(sys.argv) > 1:
+    	numNodes = int(sys.argv[1])
+    	numStartable = numNodes / 10
+    	numHyperedges = numNodes
+    if len(sys.argv) > 2:
+    	numStartable = int(sys.argv[2])
+    if len(sys.argv) > 3:
+    	numHyperedges = int(sys.argv[3])
+    if len(sys.argv) > 4:
+    	outputFile = sys.argv[4]
+
+    print("numNodes: " + str(numNodes))
+    print("numStartable: " + str(numStartable))
+    print("numHyperedges: " + str(numHyperedges))
 
     #write number of nodes
     f = open(outputFile, "w")
@@ -39,5 +54,6 @@ def main():
         f.write(" -> " + str(targetNode) + "\n")
 
     f.close()
-
+    print("DONE > " + outputFile)
+    
 main()
