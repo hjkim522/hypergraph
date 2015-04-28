@@ -16,6 +16,9 @@ public class MinimalSourceSetBuilder {
     private Set<Long> calculated; // vote for halt
     private Map<Long, Integer> calculatedMap;
 
+    // statistic
+    private int statDecomposed;
+
     public MinimalSourceSetBuilder() {
         graphDb = Application.getGraphDatabase();
         mssMap = new HashMap<>();
@@ -27,6 +30,7 @@ public class MinimalSourceSetBuilder {
     public void run() {
         // measure building time
         long t = System.currentTimeMillis();
+        statDecomposed = 0;
 
         try (Transaction tx = graphDb.beginTx()) {
             // find all startable nodes
@@ -46,6 +50,7 @@ public class MinimalSourceSetBuilder {
         }
 
         System.out.println("Build MSSIndex complete (" + (System.currentTimeMillis() - t) + " ms)");
+        System.out.println("Decomposed MSS " + statDecomposed);
     }
 
     private void flush() {
@@ -153,6 +158,7 @@ public class MinimalSourceSetBuilder {
                 sourceSet.add(hypernode.getId());
                 mss = new MinimalSourceSet();
                 mss.addSourceSet(sourceSet);
+                statDecomposed++;
                 return mss;
             }
         }
