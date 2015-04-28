@@ -2,6 +2,7 @@
 
 import sys
 import random
+import array
 
 def main():
     #parameters
@@ -15,6 +16,9 @@ def main():
     avgIndegree = 3
     avgOutdegree = 3
     avgPathLen = 10
+
+    #count occuerence
+    indegree = [0] * numNodes
 
     #parse command ling args
     if len(sys.argv) > 1:
@@ -48,17 +52,30 @@ def main():
         sourceSetSize = random.randint(1, sourceSetSizeMax)
         sourceSet = set()
         while len(sourceSet) < sourceSetSize:
-            idx = random.randint(0, len(sourcePool)-1)
-            sourceList = list(sourcePool)
-            sourceSet.add(sourceList[idx])
+            #idx = random.randint(0, len(sourcePool)-1)
+            #sourceList = list(sourcePool)
+            #sourceSet.add(sourceList[idx])
+            s = random.randint(0, numNodes-1)
+            sourceSet.add(s)
         targetNode = random.randint(0, numNodes-1)
-        sourcePool.add(targetNode)
+        #sourcePool.add(targetNode)
+        indegree[targetNode] = indegree[targetNode] + 1
 
         #write edge
         for s in sourceSet:
             f.write(str(s) + ",")
         f.write(" -> " + str(targetNode) + "\n")
 
+    #write startables
+    count = 0
+    for i in range(numNodes):
+        if indegree[i] == 0:
+            f.write(str(i) + ",")
+            count = count + 1
+    f.write("\n")
+    print(str(count) + " startables\n")
+
+    #close file
     f.close()
     print("DONE > " + outputFile)
     
