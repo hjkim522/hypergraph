@@ -7,9 +7,9 @@ import array
 def main():
     #parameters
     outputFile = "output.txt"
-    numNodes = 100
+    numNodes = 10000
     numStartable = 10
-    numHyperedges = 100
+    numHyperedges = 10000
 
     #other parameters
     sourceSetSizeMax = 3

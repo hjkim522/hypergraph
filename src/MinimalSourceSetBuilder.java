@@ -17,6 +17,7 @@ public class MinimalSourceSetBuilder {
     private Map<Long, Integer> calculatedMap;
 
     // statistic
+    // XXX: separate as a module
     private int statDecomposed;
 
     public MinimalSourceSetBuilder() {
