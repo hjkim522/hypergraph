@@ -14,6 +14,7 @@ def main():
     sourceSetSizeMax = 3
     avgIndegree = 3
     avgOutdegree = 3
+    avgPathLen = 10
 
     #parse command ling args
     if len(sys.argv) > 1:
