@@ -10,6 +10,11 @@ def main():
     numStartable = 10
     numHyperedges = 100
 
+    #other parameters
+    sourceSetSizeMax = 3
+    avgIndegree = 3
+    avgOutdegree = 3
+
     #parse command ling args
     if len(sys.argv) > 1:
     	numNodes = int(sys.argv[1])
@@ -39,7 +44,7 @@ def main():
     #generate hyperedge by hops
     sourcePool = set(startable)
     for i in range(numHyperedges):
-        sourceSetSize = random.randint(1, 4) #hyperedge source size 1~5
+        sourceSetSize = random.randint(1, sourceSetSizeMax)
         sourceSet = set()
         while len(sourceSet) < sourceSetSize:
             idx = random.randint(0, len(sourcePool)-1)
