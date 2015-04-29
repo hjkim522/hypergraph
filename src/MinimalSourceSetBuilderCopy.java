@@ -8,7 +8,7 @@ import java.util.*;
  *
  * Created by Hyunjun on 2015-04-17.
  */
-public class MinimalSourceSetBuilder {
+public class MinimalSourceSetBuilderCopy {
     private static GraphDatabaseService graphDb;
     private Map<Long, MinimalSourceSet> mssMap;
     private Set<Long> visited;
@@ -19,7 +19,7 @@ public class MinimalSourceSetBuilder {
     private int statDecomposed;
     private int totalCalculated;
 
-    public MinimalSourceSetBuilder() {
+    public MinimalSourceSetBuilderCopy() {
         graphDb = Application.getGraphDatabase();
         mssMap = new HashMap<>();
         visited = new HashSet<>();
@@ -77,10 +77,11 @@ public class MinimalSourceSetBuilder {
     }
 
     // revised - XXX: copy of HypergraphTraversal.traverse()
-    private void compute(Set<Node> start) {
+    private void _compute(Set<Node> start) {
         PriorityQueue<Node> queue = new PriorityQueue<Node>(new Comparator<Node>() {
             @Override
             public int compare(Node n1, Node n2) {
+                //return n1.getDegree(Direction.INCOMING) - n2.getDegree(Direction.INCOMING);
                 return getCalculationRate(n1) - getCalculationRate(n2);
             }
         });
@@ -93,7 +94,42 @@ public class MinimalSourceSetBuilder {
         }
 
         while (!queue.isEmpty()) {
-//            printQueue(queue);
+            // dequeue a normal node (one of source nodes)
+            Node s = queue.poll();
+            //TODO:
+        }
+    }
+
+    private void createBasisMinimalSourceSet(MinimalSourceSet mss, Node s) {
+        Set<Long> sourceSet = new HashSet<>();
+        sourceSet.add(s.getId());
+        mss.addSourceSet(sourceSet);
+    }
+
+    //XXX: copy of HypergraphTraversal.traverse()
+    private void compute(Set<Node> start) {
+        PriorityQueue<Node> queue = new PriorityQueue<Node>(new Comparator<Node>() {
+            @Override
+            public int compare(Node n1, Node n2) {
+                //return n1.getDegree(Direction.INCOMING) - n2.getDegree(Direction.INCOMING);
+                return getCalculationRate(n1) - getCalculationRate(n2);
+            }
+        });
+
+        for (Node s : start) {
+            setVisited(s);
+            queue.add(s);
+
+            Set<Long> sourceSet = new HashSet<>();
+            sourceSet.add(s.getId());
+
+            MinimalSourceSet mss = getMinimalSourceSet(s);
+            mss.addSourceSet(sourceSet);
+        }
+
+        while (!queue.isEmpty()) {
+            // print queue for debugging
+            printQueue(queue);
 
             // dequeue a normal node (one of source nodes)
             Node s = queue.poll();
@@ -111,6 +147,13 @@ public class MinimalSourceSetBuilder {
                 // get target node
                 Node t = h.getSingleRelationship(Const.REL_TO_TARGET, Direction.OUTGOING).getEndNode();
                 setVisited(t);
+
+                // skip if negative
+//                if (getCalculationRate(t) < 0)
+//                    continue;
+
+                //XXX: set dirty
+                //XXX: compute dirty edges only 
 
                 // calculate mss of hyperedge
                 MinimalSourceSet mssHyperedge = computeMinimalSourceSet(h);
@@ -131,12 +174,6 @@ public class MinimalSourceSetBuilder {
                 }
             }
         }
-    }
-
-    private void createBasisMinimalSourceSet(MinimalSourceSet mss, Node s) {
-        Set<Long> sourceSet = new HashSet<>();
-        sourceSet.add(s.getId());
-        mss.addSourceSet(sourceSet);
     }
 
     private MinimalSourceSet getMinimalSourceSet(Node node) {
