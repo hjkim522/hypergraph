@@ -5,10 +5,10 @@ import random
 import array
 
 #parameters
-outputFile = "hypergraph.txt"
-numNodes = 20
-numHyperedges = 40
-numStartable = 5 #not used
+outputFile = "input/hypergraph.txt"
+numNodes = 100
+numHyperedges = 200
+numStartable = 20
 sourceSetSizeMax = 3
 avgPathLen = 5
 
@@ -38,7 +38,7 @@ def parseParam():
     if len(sys.argv) > 1:
         numNodes = int(sys.argv[1])
         numHyperedges = numNodes * 2
-        numStartable = numNodes / 10
+        numStartable = numNodes / 5
     if len(sys.argv) > 2:
         numHyperedges = int(sys.argv[2])
     if len(sys.argv) > 3:
@@ -91,16 +91,21 @@ def generate():
             h.sourceSet.add(t)
             outdegree[t] = outdegree[t] + 1
 
+    #pick startables
+    startables = set()
+    for i in range(numNodes):
+        if indegree[i] == 0:
+            startables.add(i)
+    while len(startables) < numStartable:
+        startables.add(random.randint(0, numNodes-1))
+
     #write output file
     f = open(outputFile, "w")
     f.write(str(numNodes) + "\n")
 
     #write startables
-    startable = 0
-    for i in range(numNodes):
-        if indegree[i] == 0:
-            f.write(str(i) + ",")
-            startable = startable + 1
+    for i in startables:
+        f.write(str(i) + ",")
     f.write("\n")
 
     #write hyperedges
@@ -112,7 +117,7 @@ def generate():
     print("DONE")
 
     #print graph statistic
-    print("startables: " + str(startable))
+    print("startables: " + str(len(startables)))
     print("indegree: " + str(reduce(lambda x, y: x+ y, indegree) / float(numNodes)))
     print("outdegree: " + str(reduce(lambda x, y: x+ y, outdegree) / float(numNodes)))
 
