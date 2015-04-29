@@ -27,17 +27,35 @@ public class Application {
     }
 
     public static void main(String[] args) {
-        deleteDatabase("db/hypergraph");
-        graphDb = new GraphDatabaseFactory().newEmbeddedDatabase("db/hypergraph");
-        registerShutdownHook(graphDb);
+        //commandInitDB("db/hypergraph");
+        //commandImportGraph("input/hypergraph.txt");
+        commandOpenDB("db/hypergraph");
+        commandBuildMSS();
+        commandShutdownDB();
+    }
+
+    private static void commandInitDB(String path) {
+        deleteDatabase(path);
+        commandOpenDB(path);
         createIndex();
+    }
 
-        SimpleImporter importer = new SimpleImporter("input/hypergraph.txt");
+    private static void commandOpenDB(String path) {
+        graphDb = new GraphDatabaseFactory().newEmbeddedDatabase(path);
+        registerShutdownHook(graphDb);
+    }
+
+    private static void commandImportGraph(String input) {
+        SimpleImporter importer = new SimpleImporter(input);
         importer.run();
+    }
 
+    private static void commandBuildMSS() {
         MinimalSourceSetBuilder builder = new MinimalSourceSetBuilder();
         builder.run();
+    }
 
+    private static void commandShutdownDB() {
         graphDb.shutdown();
     }
 
