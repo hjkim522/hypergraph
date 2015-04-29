@@ -7,8 +7,6 @@ import org.neo4j.graphdb.RelationshipType;
  * Created by Hyunjun on 2015-04-17.
  */
 public class Const {
-    public static final String DB_PATH = "db/graphdb";
-
     public static final Label LABEL_NODE = DynamicLabel.label("Node");
     public static final Label LABEL_HYPERNODE = DynamicLabel.label("Hypernode");
     public static final Label LABEL_STARTABLE = DynamicLabel.label("Startable");

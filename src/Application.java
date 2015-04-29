@@ -27,12 +27,12 @@ public class Application {
     }
 
     public static void main(String[] args) {
-        deleteDatabase(Const.DB_PATH);
-        graphDb = new GraphDatabaseFactory().newEmbeddedDatabase(Const.DB_PATH);
+        deleteDatabase("db/hypergraph");
+        graphDb = new GraphDatabaseFactory().newEmbeddedDatabase("db/hypergraph");
         registerShutdownHook(graphDb);
         createIndex();
 
-        SimpleImporter importer = new SimpleImporter("output.txt");
+        SimpleImporter importer = new SimpleImporter("input/hypergraph.txt");
         importer.run();
 
         MinimalSourceSetBuilder builder = new MinimalSourceSetBuilder();

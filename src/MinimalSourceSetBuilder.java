@@ -60,6 +60,7 @@ public class MinimalSourceSetBuilder {
             MinimalSourceSet mss = entry.getValue();
             Node node = graphDb.getNodeById(id);
             node.setProperty(Const.PROP_MSS, mss.toString());
+            System.out.println("MSS(" + id + ") = " + mss.toString());
         }
     }
 
