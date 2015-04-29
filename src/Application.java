@@ -33,6 +33,7 @@ public class Application {
 
         commandOpenDB("db/hypergraph");
         commandBuildMSS();
+        commandQueryMSS();
         commandShutdownDB();
     }
 
@@ -62,6 +63,16 @@ public class Application {
     private static void commandShutdownDB() {
         graphDb.shutdown();
         graphDb = null;
+    }
+
+    private static void commandQueryMSS() {
+        try (Transaction tx = graphDb.beginTx()) {
+            Node target = graphDb.findNode(Const.LABEL_NODE, Const.PROP_UNIQUE, 0);
+
+            MinimalSourceSetFinder finder = new MinimalSourceSetFinder();
+            MinimalSourceSet mss = finder.find(target);
+            System.out.println(mss.toString());
+        }
     }
 
     private static void registerShutdownHook(final GraphDatabaseService graphDb)

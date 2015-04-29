@@ -83,14 +83,25 @@ public class MinimalSourceSet {
             for (Long id : s) {
                 str += id + ",";
             }
-            str += "|";
+            str += "/";
         }
         return str;
     }
 
     public static MinimalSourceSet valueOf(String str) {
-        //TODO:
-        return null;
+        MinimalSourceSet mss = new MinimalSourceSet();
+
+        String[] setSeq = str.split("/");
+        for (String setStr : setSeq) {
+            Set<Long> s = new HashSet<>();
+
+            String[] nodeSeq = setStr.split(",");
+            for (String nodeStr : nodeSeq) {
+                s.add(Long.valueOf(nodeStr));
+            }
+            mss.mss.add(s);
+        }
+        return mss;
     }
 
     // for testing purpose

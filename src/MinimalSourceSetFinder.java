@@ -14,7 +14,8 @@ public class MinimalSourceSetFinder {
     }
 
     public MinimalSourceSet find(Node target) {
-
-        return null;
+        //TODO: reconstruction
+        String mssStr = (String) target.getProperty(Const.PROP_MSS);
+        return MinimalSourceSet.valueOf(mssStr);
     }
 }
