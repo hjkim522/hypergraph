@@ -3,4 +3,4 @@
 /out
 *.iml
 output.txt
-
+.DS_Store
