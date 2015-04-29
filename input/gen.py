@@ -7,8 +7,8 @@ import array
 #parameters
 outputFile = "hypergraph.txt"
 numNodes = 20
-numHyperedges = 20
-numStartable = 10 #notused
+numHyperedges = 40
+numStartable = 5 #not used
 sourceSetSizeMax = 3
 avgPathLen = 5
 
@@ -37,7 +37,7 @@ def parseParam():
     #parse command ling args
     if len(sys.argv) > 1:
         numNodes = int(sys.argv[1])
-        numHyperedges = numNodes
+        numHyperedges = numNodes * 2
         numStartable = numNodes / 10
     if len(sys.argv) > 2:
         numHyperedges = int(sys.argv[2])

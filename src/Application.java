@@ -27,8 +27,10 @@ public class Application {
     }
 
     public static void main(String[] args) {
-        //commandInitDB("db/hypergraph");
-        //commandImportGraph("input/hypergraph.txt");
+        // comment below 2 lines from the second execution
+        commandInitDB("db/hypergraph");
+        commandImportGraph("input/hypergraph.txt");
+
         commandOpenDB("db/hypergraph");
         commandBuildMSS();
         commandShutdownDB();
@@ -41,8 +43,10 @@ public class Application {
     }
 
     private static void commandOpenDB(String path) {
-        graphDb = new GraphDatabaseFactory().newEmbeddedDatabase(path);
-        registerShutdownHook(graphDb);
+        if (graphDb == null) { //XXX: for convenience
+            graphDb = new GraphDatabaseFactory().newEmbeddedDatabase(path);
+            registerShutdownHook(graphDb);
+        }
     }
 
     private static void commandImportGraph(String input) {
@@ -57,6 +61,7 @@ public class Application {
 
     private static void commandShutdownDB() {
         graphDb.shutdown();
+        graphDb = null;
     }
 
     private static void registerShutdownHook(final GraphDatabaseService graphDb)

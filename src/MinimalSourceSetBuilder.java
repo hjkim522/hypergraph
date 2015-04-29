@@ -1,7 +1,6 @@
 import org.neo4j.graphdb.*;
 
 import java.util.*;
-import java.util.concurrent.SynchronousQueue;
 
 /**
  * Simple in-memory builder
@@ -42,11 +41,11 @@ public class MinimalSourceSetBuilder {
                 start.add(v);
             }
 
-            // build with startable nodes
-            build(start);
+            // compute with startable nodes
+            compute(start);
 
             // write computed mms into database
-            flush();
+            save();
             tx.success();
         }
 
@@ -54,14 +53,17 @@ public class MinimalSourceSetBuilder {
         System.out.println("Decomposed MSS " + statDecomposed);
     }
 
-    private void flush() {
+    private void save() {
+        int total = 0;
         for (Map.Entry<Long, MinimalSourceSet> entry : mssMap.entrySet()) {
             Long id = entry.getKey();
             MinimalSourceSet mss = entry.getValue();
             Node node = graphDb.getNodeById(id);
             node.setProperty(Const.PROP_MSS, mss.toString());
             System.out.println("MSS(" + id + ") = " + mss.toString());
+            total += mss.size();
         }
+        System.out.println("total " + total);
     }
 
     private void printQueue(Queue<Node> queue) {
@@ -72,7 +74,7 @@ public class MinimalSourceSetBuilder {
     }
 
     //XXX: copy of HypergraphTraversal.traverse()
-    private void build(Set<Node> start) {
+    private void compute(Set<Node> start) {
         //Queue<Node> queue = new LinkedList<Node>();
         Queue<Node> queue = new PriorityQueue<>(new Comparator() {
             @Override
@@ -96,6 +98,8 @@ public class MinimalSourceSetBuilder {
         }
 
         while (!queue.isEmpty()) {
+//            printQueue(queue);
+
             // dequeue a normal node (one of source nodes)
             Node s = queue.poll();
             //System.out.println("Build for node " + s.getId());
@@ -127,7 +131,6 @@ public class MinimalSourceSetBuilder {
                 boolean modified = mssTarget.addAll(mssHyperedge);
                 if (modified) {
                     queue.add(t);
-                    //printQueue(queue);
                     unsetCalculated(t);
                 }
             }

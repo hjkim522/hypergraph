@@ -83,7 +83,7 @@ public class MinimalSourceSet {
             for (Long id : s) {
                 str += id + ",";
             }
-            str += ";";
+            str += "|";
         }
         return str;
     }
