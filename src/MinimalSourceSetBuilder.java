@@ -98,7 +98,7 @@ public class MinimalSourceSetBuilder {
         while (!queue.isEmpty()) {
             // dequeue a normal node (one of source nodes)
             Node s = queue.poll();
-            System.out.println("Build for node " + s.getId());
+            //System.out.println("Build for node " + s.getId());
 
             //TODO: remove duplicated computation
 
