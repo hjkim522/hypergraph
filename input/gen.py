@@ -9,6 +9,7 @@ outputFile = "input/hypergraph.txt"
 numNodes = 100
 numHyperedges = 200
 numStartable = 20
+sourceSetSizeMin = 2
 sourceSetSizeMax = 3
 avgPathLen = 5
 
@@ -57,6 +58,7 @@ def generate():
     global numNodes
     global numHyperedges
     global numStartable
+    global sourceSetSizeMin
     global sourceSetSizeMax
     global avgPathLen #XXX: use range
 
@@ -68,12 +70,13 @@ def generate():
     hyperedges = []
 
     #generate path segments
+    avgPathLen = 1
     for i in range(numHyperedges / avgPathLen):
         h = Hyperedge()
         
         for j in range(avgPathLen):
             #generate source set
-            sourceSetSize = random.randint(1, sourceSetSizeMax)
+            sourceSetSize = random.randint(sourceSetSizeMin, sourceSetSizeMax)
             while len(h.sourceSet) < sourceSetSize:            
                 s = random.randint(0, numNodes-1)
                 h.sourceSet.add(s)

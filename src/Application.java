@@ -8,6 +8,7 @@ import org.neo4j.io.fs.FileUtils;
 
 import java.io.File;
 import java.util.HashSet;
+import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -67,8 +68,15 @@ public class Application {
 
     private static void commandQueryMSS() {
         //TODO: pick random target nodes and measure query times
+        // select random target nodes
+//        final int numQuery = 10;
+//        Random random = new Random();
+//        Set<Integer> targets = new HashSet<>();
+//        while (targets.size() < numQuery)
+//            targets.add(random.nextInt(100)); //XXX: dataset size 어떻게알지 .... 젠장
+
         try (Transaction tx = graphDb.beginTx()) {
-            Node target = graphDb.findNode(Const.LABEL_NODE, Const.PROP_UNIQUE, 0);
+            Node target = graphDb.findNode(Const.LABEL_NODE, Const.PROP_UNIQUE, 99);
 
             MinimalSourceSetFinder finder = new MinimalSourceSetFinder();
             MinimalSourceSet mss = finder.find(target);

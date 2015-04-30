@@ -9,12 +9,9 @@ outputFile = "input/hypergraph.txt"
 numNodes = 100
 numHyperedges = 200
 numStartable = 20
+sourceSetSizeMin = 2
 sourceSetSizeMax = 3
 avgPathLen = 5
-
-#not used
-avgIndegree = 3
-avgOutdegree = 3
 
 class Hyperedge:
     def __init__(self):
@@ -57,8 +54,9 @@ def generate():
     global numNodes
     global numHyperedges
     global numStartable
+    global sourceSetSizeMin
     global sourceSetSizeMax
-    global avgPathLen #XXX: use range
+    global avgPathLen
 
     #degree count
     indegree = [0] * numNodes
@@ -74,7 +72,7 @@ def generate():
         
         for j in range(avgPathLen):
             #generate source set
-            sourceSetSize = random.randint(1, sourceSetSizeMax)
+            sourceSetSize = random.randint(sourceSetSizeMin, sourceSetSizeMax)
             while len(h.sourceSet) < sourceSetSize:            
                 s = random.randint(0, numNodes - 2)
                 h.sourceSet.add(s)

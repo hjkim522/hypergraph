@@ -17,6 +17,10 @@ public class MinimalSourceSet {
         mss = new HashSet<>();
     }
 
+    public Set<Set<Long>> getMSS() {
+        return mss;
+    }
+
     /**
      * Add a source set to MSS
      * Check minimality constraing
