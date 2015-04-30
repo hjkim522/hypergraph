@@ -71,39 +71,27 @@ def generate():
     startables = set(range(numStartable))
 
     #acyclic using sourcePool
-    sourcePool = set()
+    sourcePool = set(startables)
 
-    #generate path segments
-    for i in range(numHyperedges / avgPathLen):
+    #generate hyperedges
+    for i in range(numHyperedges):
         h = Hyperedge()
         
-        for j in range(avgPathLen):
-            #generate source set
-            sourceSetSize = random.randint(1, sourceSetSizeMax)
-            while len(h.sourceSet) < sourceSetSize:            
-                s = random.randint(0, numNodes-1)
-                h.sourceSet.add(s)
-                outdegree[s] = outdegree[s] + 1
+        #generate source set
+        sourceSetSize = random.randint(1, sourceSetSizeMax)
+        while len(h.sourceSet) < sourceSetSize:            
+            idx = random.randint(0, len(sourcePool)-1)
+            s = list(sourcePool)[idx]
+            h.sourceSet.add(s)
+            outdegree[s] = outdegree[s] + 1
 
-            #generate target node
-            t = random.randint(0, numNodes-1)
-            h.targetNode = t
-            indegree[t] = indegree[t] + 1
+        #generate target node
+        t = random.randint(0, numNodes-1)
+        h.targetNode = t
+        indegree[t] = indegree[t] + 1
+        sourcePool.add(t)
 
-            hyperedges.append(h)
-
-            #continue path
-            h = Hyperedge()
-            h.sourceSet.add(t)
-            outdegree[t] = outdegree[t] + 1
-
-    #pick startables
-    startables = set()
-    for i in range(numNodes):
-        if indegree[i] == 0:
-            startables.add(i)
-    while len(startables) < numStartable:
-        startables.add(random.randint(0, numNodes-1))
+        hyperedges.append(h)
 
     #write output file
     f = open(outputFile, "w")
