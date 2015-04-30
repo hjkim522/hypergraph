@@ -12,27 +12,25 @@ public class MinimalSourceSetBuilder {
     private static GraphDatabaseService graphDb;
     private Map<Long, MinimalSourceSet> mssMap;
     private Set<Long> visited;
-    private Set<Long> calculated; // vote for halt
-    private Map<Long, Integer> calculatedMap;
+    private Set<Long> computed;
 
     // statistic - XXX: separate as a module
     private int statDecomposed;
-    private int totalCalculated;
+    private int totalComputation;
     private int queueLen;
 
     public MinimalSourceSetBuilder() {
         graphDb = Application.getGraphDatabase();
         mssMap = new HashMap<>();
         visited = new HashSet<>();
-        calculated = new HashSet<>();
-        calculatedMap = new HashMap<>();
+        computed = new HashSet<>();
     }
 
     public void run() {
         // measure building time
         long t = System.currentTimeMillis();
         statDecomposed = 0;
-        totalCalculated = 0;
+        totalComputation = 0;
         queueLen = 0;
 
         try (Transaction tx = graphDb.beginTx()) {
@@ -54,7 +52,7 @@ public class MinimalSourceSetBuilder {
 
         System.out.println("Build MSSIndex complete (" + (System.currentTimeMillis() - t) + " ms)");
         System.out.println("Decomposed MSS " + statDecomposed);
-        System.out.println("totalCalculated " + totalCalculated);
+        System.out.println("totalComputation " + totalComputation);
         System.out.println("queueLen " + queueLen);
     }
 
@@ -74,18 +72,16 @@ public class MinimalSourceSetBuilder {
 
     private void printQueue(Queue<Node> queue) {
         for (Node n : queue) {
-            System.out.print(getCalculationRate(n) + ":" + n.getId() + ", ");
+            System.out.print(getComputationRate(n) + ":" + n.getId() + ", ");
         }
         System.out.println();
     }
 
-    // revised - XXX: copy of HypergraphTraversal.traverse()
     private void compute(Set<Node> start) {
         PriorityQueue<Node> queue = new PriorityQueue<Node>(new Comparator<Node>() {
             @Override
             public int compare(Node n1, Node n2) {
-                //return (int) (n1.getId() - n2.getId()); //XXX: 중복이 있네... 뭐지
-                return getCalculationRate(n1) - getCalculationRate(n2);
+                return getComputationRate(n1) - getComputationRate(n2);
             }
         });
 
@@ -103,36 +99,43 @@ public class MinimalSourceSetBuilder {
             System.out.println("node " + s.getId());
             queueLen++;
 
-            // get connected hyperedges
+            if (getComputationRate(s) != 0)
+                System.out.println("nonzero rate " + getComputationRate(s));
+
+            // get forward star
             Iterable<Relationship> rels = s.getRelationships(Direction.OUTGOING, Const.REL_FROM_SOURCE);
             for (Relationship rel : rels) {
                 // get pseudo hypernode and check enabled
                 Node h = rel.getEndNode();
-                if (isCalculated(h))
+
+                // skip if already computed and not modified
+                if (isComputed(h))
                     continue;
+
+                // check enabled (all source visited)
                 if (!isEnabled(h))
                     continue;
+
+                // mark given hyperedge as computed
+                setComputed(h);
 
                 // get target node
                 Node t = h.getSingleRelationship(Const.REL_TO_TARGET, Direction.OUTGOING).getEndNode();
                 setVisited(t);
+                System.out.println("add target " + t.getId());
 
-                // calculate mss of hyperedge
+                // calculate and update mss
                 MinimalSourceSet mssHyperedge = computeMinimalSourceSet(h);
-                setCalculated(h);
-
-                // count calculated in-edges
-                calculatedMap.put(t.getId(), calculatedMap.getOrDefault(t.getId(), 0) + 1);
-                totalCalculated++;
-
-                // update targets mss
                 MinimalSourceSet mssTarget = getMinimalSourceSet(t);
+                totalComputation++;
+
                 boolean modified = mssTarget.addAll(mssHyperedge);
                 if (modified) {
-                    if (queue.contains(t))
+                    if (queue.contains(t)) {
                         queue.remove(t);
+                        System.out.println("already contains node " + t.getId());
+                    }
                     queue.add(t);
-                    unsetCalculated(t);
                 }
             }
         }
@@ -195,25 +198,36 @@ public class MinimalSourceSetBuilder {
         return true;
     }
 
-    private int getCalculationRate(Node node) {
-        int calculated = calculatedMap.getOrDefault(node.getId(), 0);
-        int total = node.getDegree(Const.REL_TO_TARGET);
-        return total - calculated;
+    //TODO: how to handle changes
+    private int getComputationRate(Node node) {
+        int countComputed = 0;
+        int countTotal = 0;
+
+        // get incoming hyperedges
+        Iterable<Relationship> rels = node.getRelationships(Direction.INCOMING, Const.REL_TO_TARGET);
+        for (Relationship rel : rels) {
+            Node h = rel.getStartNode();
+            if (isComputed(h))
+                countComputed++;
+            countTotal++;
+        }
+
+        return countTotal - countComputed;
     }
 
-    private void setCalculated(Node node) {
-        calculated.add(node.getId());
+    private void setComputed(Node node) {
+        computed.add(node.getId());
     }
 
-    private boolean isCalculated(Node node) {
-        return calculated.contains(node.getId());
+    private boolean isComputed(Node node) {
+        return computed.contains(node.getId());
     }
 
-    private void unsetCalculated(Node node) {
+    private void unsetComputed(Node node) {
         Iterable<Relationship> rels = node.getRelationships(Direction.OUTGOING, Const.REL_FROM_SOURCE);
         for (Relationship rel : rels) {
             Node h = rel.getEndNode();
-            calculated.remove(h.getId());
+            computed.remove(h.getId());
         }
     }
 }

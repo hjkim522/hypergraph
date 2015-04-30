@@ -18,6 +18,7 @@ public class MinimalSourceSetBuilderCopy {
     // statistic - XXX: separate as a module
     private int statDecomposed;
     private int totalCalculated;
+    private int queueLen;
 
     public MinimalSourceSetBuilderCopy() {
         graphDb = Application.getGraphDatabase();
@@ -32,6 +33,7 @@ public class MinimalSourceSetBuilderCopy {
         long t = System.currentTimeMillis();
         statDecomposed = 0;
         totalCalculated = 0;
+        queueLen = 0;
 
         try (Transaction tx = graphDb.beginTx()) {
             // find all startable nodes
@@ -53,6 +55,7 @@ public class MinimalSourceSetBuilderCopy {
         System.out.println("Build MSSIndex complete (" + (System.currentTimeMillis() - t) + " ms)");
         System.out.println("Decomposed MSS " + statDecomposed);
         System.out.println("totalCalculated " + totalCalculated);
+        System.out.println("queueLen " + queueLen);
     }
 
     private void save() {
@@ -77,11 +80,11 @@ public class MinimalSourceSetBuilderCopy {
     }
 
     // revised - XXX: copy of HypergraphTraversal.traverse()
-    private void _compute(Set<Node> start) {
+    private void compute(Set<Node> start) {
         PriorityQueue<Node> queue = new PriorityQueue<Node>(new Comparator<Node>() {
             @Override
             public int compare(Node n1, Node n2) {
-                //return n1.getDegree(Direction.INCOMING) - n2.getDegree(Direction.INCOMING);
+                //return (int) (n1.getId() - n2.getId()); //XXX: 중복이 있네... 뭐지
                 return getCalculationRate(n1) - getCalculationRate(n2);
             }
         });
@@ -95,44 +98,10 @@ public class MinimalSourceSetBuilderCopy {
 
         while (!queue.isEmpty()) {
             // dequeue a normal node (one of source nodes)
-            Node s = queue.poll();
-            //TODO:
-        }
-    }
-
-    private void createBasisMinimalSourceSet(MinimalSourceSet mss, Node s) {
-        Set<Long> sourceSet = new HashSet<>();
-        sourceSet.add(s.getId());
-        mss.addSourceSet(sourceSet);
-    }
-
-    //XXX: copy of HypergraphTraversal.traverse()
-    private void compute(Set<Node> start) {
-        PriorityQueue<Node> queue = new PriorityQueue<Node>(new Comparator<Node>() {
-            @Override
-            public int compare(Node n1, Node n2) {
-                //return n1.getDegree(Direction.INCOMING) - n2.getDegree(Direction.INCOMING);
-                return getCalculationRate(n1) - getCalculationRate(n2);
-            }
-        });
-
-        for (Node s : start) {
-            setVisited(s);
-            queue.add(s);
-
-            Set<Long> sourceSet = new HashSet<>();
-            sourceSet.add(s.getId());
-
-            MinimalSourceSet mss = getMinimalSourceSet(s);
-            mss.addSourceSet(sourceSet);
-        }
-
-        while (!queue.isEmpty()) {
-            // print queue for debugging
             printQueue(queue);
-
-            // dequeue a normal node (one of source nodes)
             Node s = queue.poll();
+            System.out.println("node " + s.getId());
+            queueLen++;
 
             // get connected hyperedges
             Iterable<Relationship> rels = s.getRelationships(Direction.OUTGOING, Const.REL_FROM_SOURCE);
@@ -147,13 +116,6 @@ public class MinimalSourceSetBuilderCopy {
                 // get target node
                 Node t = h.getSingleRelationship(Const.REL_TO_TARGET, Direction.OUTGOING).getEndNode();
                 setVisited(t);
-
-                // skip if negative
-//                if (getCalculationRate(t) < 0)
-//                    continue;
-
-                //XXX: set dirty
-                //XXX: compute dirty edges only 
 
                 // calculate mss of hyperedge
                 MinimalSourceSet mssHyperedge = computeMinimalSourceSet(h);
@@ -174,6 +136,12 @@ public class MinimalSourceSetBuilderCopy {
                 }
             }
         }
+    }
+
+    private void createBasisMinimalSourceSet(MinimalSourceSet mss, Node s) {
+        Set<Long> sourceSet = new HashSet<>();
+        sourceSet.add(s.getId());
+        mss.addSourceSet(sourceSet);
     }
 
     private MinimalSourceSet getMinimalSourceSet(Node node) {
