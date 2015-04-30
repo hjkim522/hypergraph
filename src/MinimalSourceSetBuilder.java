@@ -61,7 +61,7 @@ public class MinimalSourceSetBuilder {
             Node node = graphDb.getNodeById(id);
             node.setProperty(Const.PROP_MSS, mss.toString());
 
-            System.out.println("MSS(" + id + ") = " + mss.toString());
+            //System.out.println("MSS(" + id + ") = " + mss.toString());
             total += mss.size();
         }
         System.out.println("total " + total);
@@ -99,7 +99,7 @@ public class MinimalSourceSetBuilder {
         }
 
         while (!queue.isEmpty()) {
-            printQueue(queue);
+            //printQueue(queue);
 
             // dequeue a normal node (one of source nodes)
             Node s = queue.poll();
