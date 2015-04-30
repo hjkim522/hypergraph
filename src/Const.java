@@ -10,10 +10,12 @@ public class Const {
     public static final Label LABEL_NODE = DynamicLabel.label("Node");
     public static final Label LABEL_HYPERNODE = DynamicLabel.label("Hypernode");
     public static final Label LABEL_STARTABLE = DynamicLabel.label("Startable");
+    public static final Label LABEL_META = DynamicLabel.label("Meta");
 
     public static final RelationshipType REL_FROM_SOURCE = DynamicRelationshipType.withName("fromSource");
     public static final RelationshipType REL_TO_TARGET = DynamicRelationshipType.withName("toTarget");
 
     public static final String PROP_UNIQUE = "name";
     public static final String PROP_MSS = "mss";
+    public static final String PROP_COUNT = "count";
 }

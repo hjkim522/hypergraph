@@ -76,11 +76,19 @@ public class Application {
 //            targets.add(random.nextInt(100)); //XXX: dataset size 어떻게알지 .... 젠장
 
         try (Transaction tx = graphDb.beginTx()) {
-            Node target = graphDb.findNode(Const.LABEL_NODE, Const.PROP_UNIQUE, 99);
+            // get number of nodes from meta node
+            Node meta = graphDb.findNodes(Const.LABEL_META).next();
+            int numNodes = (int) meta.getProperty(Const.PROP_COUNT);
+
+            // query last node's mss
+            Node target = graphDb.findNode(Const.LABEL_NODE, Const.PROP_UNIQUE, numNodes - 1);
 
             MinimalSourceSetFinder finder = new MinimalSourceSetFinder();
             MinimalSourceSet mss = finder.find(target);
             System.out.println(mss.toString());
+
+            // check reachability
+
         }
     }
 

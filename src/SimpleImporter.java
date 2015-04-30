@@ -38,13 +38,15 @@ public class SimpleImporter {
     }
 
     public void run() {
-        System.out.println("SimpleImporter START " + filename);
+        Log.info("SimpleImporter START " + filename);
 
         try (FileReader fr = new FileReader(filename)) {
             BufferedReader br = new BufferedReader(fr);
+            int numNodes = Integer.valueOf(br.readLine());
 
-            importNodes(Integer.valueOf(br.readLine()));
+            importNodes(numNodes);
             importStartable(br.readLine());
+            createMetaNode(numNodes);
 
             String s;
             while ((s = br.readLine()) != null) {
@@ -54,7 +56,7 @@ public class SimpleImporter {
             e.printStackTrace();
         }
 
-        System.out.println("SimpleImporter DONE");
+        Log.info("SimpleImporter DONE");
     }
 
     // insert n nodes
@@ -101,6 +103,14 @@ public class SimpleImporter {
 
         try (Transaction tx = graphDb.beginTx()) {
             hyperedge.save(graphDb);
+            tx.success();
+        }
+    }
+
+    private void createMetaNode(int numNodes) {
+        try (Transaction tx = graphDb.beginTx()) {
+            Node node = graphDb.createNode(Const.LABEL_META);
+            node.setProperty(Const.PROP_COUNT, numNodes);
             tx.success();
         }
     }
