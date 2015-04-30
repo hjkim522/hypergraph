@@ -29,11 +29,11 @@ public class Application {
 
     public static void main(String[] args) {
         // comment below 2 lines from the second execution
-        commandInitDB("db/hypergraph");
-        commandImportGraph("input/hypergraph.txt");
-
+//        commandInitDB("db/hypergraph");
+//        commandImportGraph("input/hypergraph.txt");
+//
         commandOpenDB("db/hypergraph");
-        commandBuildMSS();
+//        commandBuildMSS();
         commandQueryMSS();
         commandShutdownDB();
     }
