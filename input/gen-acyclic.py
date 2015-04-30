@@ -37,7 +37,7 @@ def parseParam():
     #parse command ling args
     if len(sys.argv) > 1:
         numNodes = int(sys.argv[1])
-        numHyperedges = numNodes / 2
+        numHyperedges = numNodes * 2
         numStartable = numNodes / 5
     if len(sys.argv) > 2:
         numHyperedges = int(sys.argv[2])
@@ -67,30 +67,41 @@ def generate():
     #hyperedges
     hyperedges = []
 
-    #startables
-    startables = set(range(numStartable))
-
-    #acyclic using sourcePool
-    sourcePoolMax = numStartable
-
-    #generate hyperedges
-    while len(hyperedges) < numHyperedges:
+    #generate path segments
+    avgPathLen = 1 #XXX: not used for acyclic hypergraph
+    for i in range(numHyperedges / avgPathLen):
         h = Hyperedge()
         
-        #generate source set
-        sourceSetSize = random.randint(1, sourceSetSizeMax)
-        while len(h.sourceSet) < sourceSetSize:            
-            s = random.randint(0, sourcePoolMax-1)
-            h.sourceSet.add(s)
-            outdegree[s] = outdegree[s] + 1
+        for j in range(avgPathLen):
+            #generate source set
+            sourceSetSize = random.randint(1, sourceSetSizeMax)
+            while len(h.sourceSet) < sourceSetSize:            
+                s = random.randint(0, numNodes - 2)
+                h.sourceSet.add(s)
+                outdegree[s] = outdegree[s] + 1
 
-        #generate target node
-        t = sourcePoolMax
-        h.targetNode = t
-        indegree[t] = indegree[t] + 1
-        sourcePoolMax = sourcePoolMax + 1 #XXX - grow with prob
+            #generate target node
+            #assuming nodes are topologically sorted from 0 to n-1
+            #do not allow edges from big number to smaller number
+            t = random.randint(max(h.sourceSet)+1, numNodes-1)
+            h.targetNode = t
+            indegree[t] = indegree[t] + 1
 
-        hyperedges.append(h)
+            hyperedges.append(h)
+
+            #continue path
+            h = Hyperedge()
+            if t < numNodes-1:
+                h.sourceSet.add(t)
+                outdegree[t] = outdegree[t] + 1
+
+    #pick startables
+    startables = set()
+    for i in range(numNodes):
+        if indegree[i] == 0:
+            startables.add(i)
+    while len(startables) < numStartable:
+        startables.add(random.randint(0, numNodes-1))
 
     #write output file
     f = open(outputFile, "w")

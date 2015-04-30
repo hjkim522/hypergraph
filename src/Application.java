@@ -33,7 +33,7 @@ public class Application {
 
         commandOpenDB("db/hypergraph");
         commandBuildMSS();
-        //commandQueryMSS();
+        commandQueryMSS();
         commandShutdownDB();
     }
 
@@ -66,8 +66,9 @@ public class Application {
     }
 
     private static void commandQueryMSS() {
+        //TODO: pick random target nodes and measure query times
         try (Transaction tx = graphDb.beginTx()) {
-            Node target = graphDb.findNode(Const.LABEL_NODE, Const.PROP_UNIQUE, 4000);
+            Node target = graphDb.findNode(Const.LABEL_NODE, Const.PROP_UNIQUE, 0);
 
             MinimalSourceSetFinder finder = new MinimalSourceSetFinder();
             MinimalSourceSet mss = finder.find(target);

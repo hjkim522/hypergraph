@@ -18,6 +18,7 @@ public class MinimalSourceSetBuilder {
     // statistic - XXX: separate as a module
     private int statDecomposed;
     private int totalCalculated;
+    private int queueLen;
 
     public MinimalSourceSetBuilder() {
         graphDb = Application.getGraphDatabase();
@@ -32,6 +33,7 @@ public class MinimalSourceSetBuilder {
         long t = System.currentTimeMillis();
         statDecomposed = 0;
         totalCalculated = 0;
+        queueLen = 0;
 
         try (Transaction tx = graphDb.beginTx()) {
             // find all startable nodes
@@ -53,6 +55,7 @@ public class MinimalSourceSetBuilder {
         System.out.println("Build MSSIndex complete (" + (System.currentTimeMillis() - t) + " ms)");
         System.out.println("Decomposed MSS " + statDecomposed);
         System.out.println("totalCalculated " + totalCalculated);
+        System.out.println("queueLen " + queueLen);
     }
 
     private void save() {
@@ -63,7 +66,7 @@ public class MinimalSourceSetBuilder {
             Node node = graphDb.getNodeById(id);
             node.setProperty(Const.PROP_MSS, mss.toString());
 
-            //System.out.println("MSS(" + id + ") = " + mss.toString());
+            System.out.println("MSS(" + id + ") = " + mss.toString());
             total += mss.size();
         }
         System.out.println("total " + total);
@@ -81,6 +84,7 @@ public class MinimalSourceSetBuilder {
         PriorityQueue<Node> queue = new PriorityQueue<Node>(new Comparator<Node>() {
             @Override
             public int compare(Node n1, Node n2) {
+                //return (int) (n1.getId() - n2.getId()); //XXX: 중복이 있네... 뭐지
                 return getCalculationRate(n1) - getCalculationRate(n2);
             }
         });
@@ -97,6 +101,7 @@ public class MinimalSourceSetBuilder {
             printQueue(queue);
             Node s = queue.poll();
             System.out.println("node " + s.getId());
+            queueLen++;
 
             // get connected hyperedges
             Iterable<Relationship> rels = s.getRelationships(Direction.OUTGOING, Const.REL_FROM_SOURCE);

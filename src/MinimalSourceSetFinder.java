@@ -14,7 +14,8 @@ public class MinimalSourceSetFinder {
     }
 
     public MinimalSourceSet find(Node target) {
-        //TODO: check hasProperty
+        if (!target.hasProperty(Const.PROP_MSS))
+            return new MinimalSourceSet();
 
         //TODO: reconstruction
         String mssStr = (String) target.getProperty(Const.PROP_MSS);
