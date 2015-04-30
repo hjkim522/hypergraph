@@ -50,10 +50,10 @@ public class MinimalSourceSetBuilder {
             tx.success();
         }
 
-        System.out.println("Build MSSIndex complete (" + (System.currentTimeMillis() - t) + " ms)");
-        System.out.println("Decomposed MSS " + statDecomposed);
-        System.out.println("totalComputation " + totalComputation);
-        System.out.println("queueLen " + queueLen);
+        Log.info("Build MSSIndex complete (" + (System.currentTimeMillis() - t) + " ms)");
+        Log.info("Decomposed MSS " + statDecomposed);
+        Log.info("totalComputation " + totalComputation);
+        Log.info("queueLen " + queueLen);
     }
 
     private void save() {
@@ -64,17 +64,18 @@ public class MinimalSourceSetBuilder {
             Node node = graphDb.getNodeById(id);
             node.setProperty(Const.PROP_MSS, mss.toString());
 
-            System.out.println("MSS(" + id + ") = " + mss.toString());
+            Log.debug("MSS(" + id + ") = " + mss.toString());
             total += mss.size();
         }
-        System.out.println("total " + total);
+        Log.info("total MSS size " + total);
     }
 
     private void printQueue(Queue<Node> queue) {
+        String str = "";
         for (Node n : queue) {
-            System.out.print(getComputationRate(n) + ":" + n.getId() + ", ");
+            str += getComputationRate(n) + ":" + n.getId() + ", ";
         }
-        System.out.println();
+        Log.debug(str);
     }
 
     private void compute(Set<Node> start) {
@@ -96,11 +97,12 @@ public class MinimalSourceSetBuilder {
             // dequeue a normal node (one of source nodes)
             printQueue(queue);
             Node s = queue.poll();
-            System.out.println("node " + s.getId());
+            Log.debug("node " + s.getId());
             queueLen++;
 
-            if (getComputationRate(s) != 0)
-                System.out.println("nonzero rate " + getComputationRate(s));
+            if (getComputationRate(s) != 0) {
+                Log.warn("nonzero rate " + getComputationRate(s));
+            }
 
             // get forward star
             Iterable<Relationship> rels = s.getRelationships(Direction.OUTGOING, Const.REL_FROM_SOURCE);
@@ -122,7 +124,7 @@ public class MinimalSourceSetBuilder {
                 // get target node
                 Node t = h.getSingleRelationship(Const.REL_TO_TARGET, Direction.OUTGOING).getEndNode();
                 setVisited(t);
-                System.out.println("add target " + t.getId());
+                Log.debug("add target " + t.getId());
 
                 // calculate and update mss
                 MinimalSourceSet mssHyperedge = computeMinimalSourceSet(h);
@@ -133,7 +135,7 @@ public class MinimalSourceSetBuilder {
                 if (modified) {
                     if (queue.contains(t)) {
                         queue.remove(t);
-                        System.out.println("already contains node " + t.getId());
+                        Log.debug("already contains node " + t.getId());
                     }
                     queue.add(t);
                 }
