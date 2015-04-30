@@ -47,6 +47,7 @@ public class HypergraphTraversal {
                 if (isVisited(h))
                     continue;
                 else if (!isEnabled(h))
+
                     continue;
                 else
                     setVisited(h);

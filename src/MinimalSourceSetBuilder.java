@@ -94,7 +94,9 @@ public class MinimalSourceSetBuilder {
 
         while (!queue.isEmpty()) {
             // dequeue a normal node (one of source nodes)
+            printQueue(queue);
             Node s = queue.poll();
+            System.out.println("node " + s.getId());
 
             // get connected hyperedges
             Iterable<Relationship> rels = s.getRelationships(Direction.OUTGOING, Const.REL_FROM_SOURCE);

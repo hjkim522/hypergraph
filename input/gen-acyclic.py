@@ -37,7 +37,7 @@ def parseParam():
     #parse command ling args
     if len(sys.argv) > 1:
         numNodes = int(sys.argv[1])
-        numHyperedges = numNodes * 2
+        numHyperedges = numNodes / 2
         numStartable = numNodes / 5
     if len(sys.argv) > 2:
         numHyperedges = int(sys.argv[2])
@@ -71,25 +71,24 @@ def generate():
     startables = set(range(numStartable))
 
     #acyclic using sourcePool
-    sourcePool = set(startables)
+    sourcePoolMax = numStartable
 
     #generate hyperedges
-    for i in range(numHyperedges):
+    while len(hyperedges) < numHyperedges:
         h = Hyperedge()
         
         #generate source set
         sourceSetSize = random.randint(1, sourceSetSizeMax)
         while len(h.sourceSet) < sourceSetSize:            
-            idx = random.randint(0, len(sourcePool)-1)
-            s = list(sourcePool)[idx]
+            s = random.randint(0, sourcePoolMax-1)
             h.sourceSet.add(s)
             outdegree[s] = outdegree[s] + 1
 
         #generate target node
-        t = random.randint(0, numNodes-1)
+        t = sourcePoolMax
         h.targetNode = t
         indegree[t] = indegree[t] + 1
-        sourcePool.add(t)
+        sourcePoolMax = sourcePoolMax + 1 #XXX - grow with prob
 
         hyperedges.append(h)
 
