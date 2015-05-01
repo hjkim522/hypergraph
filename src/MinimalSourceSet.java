@@ -17,6 +17,16 @@ public class MinimalSourceSet {
         mss = new HashSet<>();
     }
 
+    public MinimalSourceSet(Set<Long> sourceSet) {
+        this();
+        mss.add(sourceSet);
+    }
+
+    public MinimalSourceSet(Long nodeId) {
+        this();
+        addSourceSetOfSingleNode(nodeId);
+    }
+
     public Set<Set<Long>> getMSS() {
         return mss;
     }
@@ -54,6 +64,12 @@ public class MinimalSourceSet {
             modified = modified | addSourceSet(s);
         }
         return modified;
+    }
+
+    public boolean addSourceSetOfSingleNode(Long nodeId) {
+        Set<Long> sourceSet = new HashSet<>();
+        sourceSet.add(nodeId);
+        return addSourceSet(sourceSet);
     }
 
     public MinimalSourceSet union(MinimalSourceSet other) {

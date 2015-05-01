@@ -90,7 +90,8 @@ public class MinimalSourceSetBuilder {
         for (Node s : start) {
             setVisited(s);
             queue.add(s);
-            createBasisMinimalSourceSet(getMinimalSourceSet(s), s);
+            MinimalSourceSet mss = getMinimalSourceSet(s);
+            mss.addSourceSetOfSingleNode(s.getId());
         }
 
         while (!queue.isEmpty()) {
@@ -141,12 +142,6 @@ public class MinimalSourceSetBuilder {
                 }
             }
         }
-    }
-
-    private void createBasisMinimalSourceSet(MinimalSourceSet mss, Node s) {
-        Set<Long> sourceSet = new HashSet<>();
-        sourceSet.add(s.getId());
-        mss.addSourceSet(sourceSet);
     }
 
     private MinimalSourceSet getMinimalSourceSet(Node node) {

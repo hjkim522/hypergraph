@@ -30,23 +30,45 @@ public class MinimalSourceSetFinder {
         return MinimalSourceSet.valueOf((String) target.getProperty(Const.PROP_MSS));
     }
 
-    //XXX: considering non recursive
+    //XXX: considering non recursive version
     private void reconstruct(MinimalSourceSet mss) {
         for (Set<Long> s : mss.getMSS()) {
             for (Long nodeId : s) {
-                Node node = graphDb.getNodeById(nodeId);
+                Node v = graphDb.getNodeById(nodeId);
 
                 // if decomposed
-                if (node.hasLabel(Const.LABEL_HYPERNODE)) {
-                    Log.info("need recon at " + nodeId);
-                    MinimalSourceSet reconstructed = computeMinimalSourceSet(node);
-                    //TODO:
+                if (v.hasLabel(Const.LABEL_HYPERNODE)) {
+                    Log.info("need recon at " + nodeId + " set size " + s.size());
+                    MinimalSourceSet recon = computeMinimalSourceSet(v);
+                    //TODO: remove s from mss
+
+                    //TODO: add cartesian of (s-v) * recon(v)
+
+                    //but how to avoid both simultaneous modification
+                    //as using iter
+                    //근데 이게 cartesian 일까? ㅇ set 이 크면 cartesian 이 맞네 ...
                 }
             }
         }
     }
 
-    //XXX: copy from builder
+    private void createMinimalSourceSet(Set<Long> s) {
+
+    }
+
+    //XXX: 아 이 인덱스를 계산할때 1번 하고 2홉에 또하고 3홉에 또하고 이러면 되는건가
+    //계산 시간이 남을때 packing하는걸로?
+
+    private boolean needReconstruction(Set<Long> s) {
+        for (Long nodeId : s) {
+            Node v = graphDb.getNodeById(nodeId);
+            if (v.hasLabel(Const.LABEL_HYPERNODE)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private MinimalSourceSet computeMinimalSourceSet(Node hypernode) {
         MinimalSourceSet mss = null;
         Iterable<Relationship> rels = hypernode.getRelationships(Direction.INCOMING, Const.REL_FROM_SOURCE);
