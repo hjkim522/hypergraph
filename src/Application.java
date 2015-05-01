@@ -29,11 +29,11 @@ public class Application {
 
     public static void main(String[] args) {
         // comment below 2 lines from the second execution
-        commandInitDB("db/hypergraph");
-        commandImportGraph("input/hypergraph.txt");
+//        commandInitDB("db/hypergraph");
+//        commandImportGraph("input/hypergraph.txt");
 
         commandOpenDB("db/hypergraph");
-        commandBuildMSS();
+//        commandBuildMSS();
         commandQueryMSS();
         commandShutdownDB();
     }
@@ -73,7 +73,7 @@ public class Application {
 //        Random random = new Random();
 //        Set<Integer> targets = new HashSet<>();
 //        while (targets.size() < numQuery)
-//            targets.add(random.nextInt(100)); //XXX: dataset size ¾î¶»°Ô¾ËÁö .... Á¨Àå
+//            targets.add(random.nextInt(100)); //XXX: dataset size ï¿½î¶»ï¿½Ô¾ï¿½ï¿½ï¿½ .... ï¿½ï¿½ï¿½ï¿½
 
         try (Transaction tx = graphDb.beginTx()) {
             // get number of nodes from meta node

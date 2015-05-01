@@ -17,6 +17,13 @@ public class MinimalSourceSet {
         mss = new HashSet<>();
     }
 
+    public MinimalSourceSet(MinimalSourceSet other) {
+        this();
+        for (Set<Long> sourceSet : other.mss) {
+            mss.add(sourceSet); //XXX: Set of Long 도 deep copy 해야되지않나? 이거 아무래도 sourceSet 으로 revise 하는게 나을것같은데
+        }
+    }
+
     public MinimalSourceSet(Set<Long> sourceSet) {
         this();
         mss.add(sourceSet);
