@@ -57,7 +57,7 @@ public class MinimalSourceSetBuilder {
     }
 
     private void save() {
-        int total = 0;
+        Measure measure = new Measure("MSS size");
         for (Map.Entry<Long, MinimalSourceSet> entry : mssMap.entrySet()) {
             Long id = entry.getKey();
             MinimalSourceSet mss = entry.getValue();
@@ -65,9 +65,9 @@ public class MinimalSourceSetBuilder {
             node.setProperty(Const.PROP_MSS, mss.toString());
 
             Log.debug("MSS(" + id + ") = " + mss.toString());
-            total += mss.size();
+            measure.addData(mss.size());
         }
-        Log.info("total MSS size " + total);
+        measure.printStatistic();
     }
 
     private void printQueue(Queue<Node> queue) {

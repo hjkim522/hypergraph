@@ -11,6 +11,7 @@ public class Measure {
     private String name;
     private List<Long> list;
     private long start;
+    private long dt;
 
     public Measure(String name) {
         this.name = name;
@@ -26,15 +27,19 @@ public class Measure {
     }
 
     public void end() {
-        long dt = System.currentTimeMillis() - start;
+        dt = System.currentTimeMillis() - start;
         addData(dt);
-        Log.info(name + " : " + dt + " ms");
+    }
+
+    public long getRecentMeasureTime() {
+        return dt;
     }
 
     public void printStatistic() {
         LongSummaryStatistics stat = list.stream().mapToLong((x)->x).summaryStatistics();
         Log.info("Measure - " + name);
         Log.info(" average : " + stat.getAverage());
+        Log.info(" sum : " + stat.getSum());
         Log.info(" max : " + stat.getMax());
     }
 }

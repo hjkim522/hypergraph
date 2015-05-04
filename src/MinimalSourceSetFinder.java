@@ -21,19 +21,21 @@ public class MinimalSourceSetFinder {
     public MinimalSourceSet find(Node target) {
         MinimalSourceSet mss = getMinimalSourceSet(target);
 
-        // Naive implementation
-//        while (needReconstruction(mss)) {
-//            Log.debug(mss.toString());
-//            mss = reconstruct(mss);
-//        }
+        Log.debug("mss len = " + mss.size());
+        Log.debug(mss.toString());
+        needReconstruction(mss);
 
-//        Log.debug(msRs.toString());
-//        needReconstruction(mss);
-//
-        mss = reconstruct(mss);
-//
-//        Log.debug(mss.toString());
-//        needReconstruction(mss);
+        // Naive implementation
+        while (needReconstruction(mss)) {
+            Log.debug("mss len = " + mss.size());
+            Log.debug(mss.toString());
+            mss = reconstruct(mss);
+        }
+
+        // check final result
+        Log.debug("mss len = " + mss.size());
+        Log.debug(mss.toString());
+        needReconstruction(mss);
 
         return mss;
     }

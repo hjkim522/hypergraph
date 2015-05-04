@@ -78,18 +78,22 @@ public class Application {
             int numNodes = (int) meta.getProperty(Const.PROP_COUNT);
 
             // select random target nodes
-            while (targets.size() < numQuery) {
-                targets.add((long) random.nextInt(numNodes));
-            }
+            //XXX: temporal test
+//            while (targets.size() < numQuery) {
+//                targets.add((long) random.nextInt(numNodes));
+//            }
+            // test last node
+            targets.add((long) numNodes - 1);
 
             for (Long nodeId : targets) {
                 Node target = graphDb.findNode(Const.LABEL_NODE, Const.PROP_UNIQUE, nodeId);
-                Log.info("Query for node " + nodeId);
+//                Log.info("Query for node " + nodeId);
 
                 measure.start();
                 MinimalSourceSetFinder finder = new MinimalSourceSetFinder();
                 MinimalSourceSet mss = finder.find(target);
-                Log.info(mss.toString());
+//                Log.info(mss.toString());
+//                Log.info("time : " + measure.getRecentMeasureTime() + " ms");
                 measure.end();
             }
         }
