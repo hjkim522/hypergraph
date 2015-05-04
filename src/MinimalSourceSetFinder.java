@@ -30,11 +30,10 @@ public class MinimalSourceSetFinder {
 //        Log.debug(msRs.toString());
 //        needReconstruction(mss);
 //
-//        mss = reconstruct(mss);
+        mss = reconstruct(mss);
 //
 //        Log.debug(mss.toString());
 //        needReconstruction(mss);
-        // 이거 cycle 에서 계속 돌고있는건가
 
         return mss;
     }
@@ -65,14 +64,14 @@ public class MinimalSourceSetFinder {
                     }
 
                     // remove s and then add recon
-                    recon.getMSS().remove(s); //XXX: 안될것같은데
+                    recon.getMSS().remove(s); //XXX: ?��?��것같???��
                     recon.addAll(mssV);
                     return recon;
                 }
             }
         }
 
-        return null;
+        return recon;
     }
 
     private boolean needReconstruction(MinimalSourceSet mss) {

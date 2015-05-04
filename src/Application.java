@@ -29,11 +29,11 @@ public class Application {
 
     public static void main(String[] args) {
         // comment below 2 lines from the second execution
-//        commandInitDB("db/hypergraph");
-//        commandImportGraph("input/hypergraph.txt");
+        commandInitDB("db/hypergraph");
+        commandImportGraph("input/hypergraph.txt");
 
         commandOpenDB("db/hypergraph");
-//        commandBuildMSS();
+        commandBuildMSS();
         commandQueryMSS();
         commandShutdownDB();
     }
@@ -67,28 +67,35 @@ public class Application {
     }
 
     private static void commandQueryMSS() {
-        //TODO: pick random target nodes and measure query times
-        // select random target nodes
-//        final int numQuery = 10;
-//        Random random = new Random();
-//        Set<Integer> targets = new HashSet<>();
-//        while (targets.size() < numQuery)
-//            targets.add(random.nextInt(100)); //XXX: dataset size ��Ծ��� .... ����
+        final int numQuery = 10;
+        Random random = new Random();
+        Set<Long> targets = new HashSet<>();
 
         try (Transaction tx = graphDb.beginTx()) {
             // get number of nodes from meta node
             Node meta = graphDb.findNodes(Const.LABEL_META).next();
             int numNodes = (int) meta.getProperty(Const.PROP_COUNT);
 
-            // query last node's mss
-            Node target = graphDb.findNode(Const.LABEL_NODE, Const.PROP_UNIQUE, numNodes - 1);
+            // select random target nodes
+            while (targets.size() < numQuery) {
+                targets.add((long) random.nextInt(numNodes));
+            }
 
-            MinimalSourceSetFinder finder = new MinimalSourceSetFinder();
-            MinimalSourceSet mss = finder.find(target);
-            System.out.println(mss.toString());
+            long total = 0;
+            for (Long nodeId : targets) {
+                Node target = graphDb.findNode(Const.LABEL_NODE, Const.PROP_UNIQUE, nodeId);
+                Log.info("Query for node " + nodeId);
 
-            // check reachability
+                long t = System.currentTimeMillis();
+                MinimalSourceSetFinder finder = new MinimalSourceSetFinder();
+                MinimalSourceSet mss = finder.find(target);
 
+                long dt = System.currentTimeMillis() - t;
+                total += dt;
+                Log.info("Query MSS " + dt + "ms");
+                Log.info(mss.toString());
+            }
+            Log.info("Average query time : " + total + " ms");
         }
     }
 
