@@ -70,6 +70,7 @@ public class Application {
         final int numQuery = 10;
         Random random = new Random();
         Set<Long> targets = new HashSet<>();
+        Measure measure = new Measure("Query MSS");
 
         try (Transaction tx = graphDb.beginTx()) {
             // get number of nodes from meta node
@@ -81,22 +82,19 @@ public class Application {
                 targets.add((long) random.nextInt(numNodes));
             }
 
-            long total = 0;
             for (Long nodeId : targets) {
                 Node target = graphDb.findNode(Const.LABEL_NODE, Const.PROP_UNIQUE, nodeId);
                 Log.info("Query for node " + nodeId);
 
-                long t = System.currentTimeMillis();
+                measure.start();
                 MinimalSourceSetFinder finder = new MinimalSourceSetFinder();
                 MinimalSourceSet mss = finder.find(target);
-
-                long dt = System.currentTimeMillis() - t;
-                total += dt;
-                Log.info("Query MSS " + dt + "ms");
                 Log.info(mss.toString());
+                measure.end();
             }
-            Log.info("Average query time : " + total + " ms");
         }
+
+        measure.printStatistic();
     }
 
     private static void registerShutdownHook(final GraphDatabaseService graphDb)
