@@ -23,8 +23,18 @@ public class MinimalSourceSetFinder {
 
         // Naive implementation
 //        while (needReconstruction(mss)) {
+//            Log.debug(mss.toString());
 //            mss = reconstruct(mss);
 //        }
+
+//        Log.debug(msRs.toString());
+//        needReconstruction(mss);
+//
+//        mss = reconstruct(mss);
+//
+//        Log.debug(mss.toString());
+//        needReconstruction(mss);
+        // 이거 cycle 에서 계속 돌고있는건가
 
         return mss;
     }
@@ -70,10 +80,12 @@ public class MinimalSourceSetFinder {
             for (Long nodeId : s) {
                 Node v = graphDb.getNodeById(nodeId);
                 if (v.hasLabel(Const.LABEL_HYPERNODE)) {
+                    Log.debug("needs recon at " + nodeId);
                     return true;
                 }
             }
         }
+        Log.debug("reconstructed!");
         return false;
     }
 

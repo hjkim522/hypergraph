@@ -10,7 +10,7 @@ public class Log {
     public static final int DEBUG = 0x8;
     public static final int ALL = ERROR | WARN | INFO | DEBUG;
 
-    private static int level = INFO; //ALL;
+    private static int level = ALL;
 
     public static void error(String str) {
         println(ERROR, str);
