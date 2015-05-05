@@ -30,11 +30,10 @@ public class Application {
 
     public static void main(String[] args) {
         experiment("100");
-        experiment("1000");
     }
 
     private static void experiment(String dataSet) {
-        Log.init("log-" + dataSet + ".txt");
+        Log.init("log/log-" + dataSet + ".txt");
 
         commandInitDB("db/hypergraph-" + dataSet);
         commandImportGraph("input/hypergraph-" + dataSet + ".txt");

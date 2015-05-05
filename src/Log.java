@@ -1,4 +1,5 @@
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 
 /**
@@ -22,6 +23,7 @@ public class Log {
 
     public static void init(String logFileName) {
         try {
+            new File("log").mkdir();
             fw = new FileWriter(logFileName);
             out = new BufferedWriter(fw);
         } catch (Exception e) {
