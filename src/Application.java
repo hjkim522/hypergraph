@@ -29,11 +29,26 @@ public class Application {
     }
 
     public static void main(String[] args) {
-        experiment("100");
-        //experiment("100-acyclic");
+        experiment("");
+//        experiment("100");
+//        experiment("100-acyclic");
+//        experiment("100-path");
+//        experiment("1000");
+//        experiment("1000-acyclic");
+//        experiment("1000-path");
+//        experiment("10000");
+//        experiment("10000-acyclic");
+//        experiment("10000-path");
+//        experiment("100000");
+//        experiment("100000-acyclic");
+//        experiment("100000-path");
     }
 
     private static void experiment(String dataSet) {
+        if (!dataSet.isEmpty()) {
+            dataSet = "-" + dataSet;
+        }
+
         Log.fileOpen("log-" + dataSet + ".txt");
         Param.logParam();
 

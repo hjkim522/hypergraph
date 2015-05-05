@@ -8,7 +8,7 @@ import shutil
 #parameters
 outputFile = "input/hypergraph.txt"
 numNodes = 100
-numHyperedges = 200
+numHyperedges = 100
 numStartable = 20
 sourceSetSizeMin = 2
 sourceSetSizeMax = 3
@@ -39,7 +39,7 @@ def parseParam():
     #parse command ling args
     if len(sys.argv) > 1:
         numNodes = int(sys.argv[1])
-        numHyperedges = numNodes * 2
+        numHyperedges = numNodes #* 2
         numStartable = numNodes / 5
     if len(sys.argv) > 2:
         numHyperedges = int(sys.argv[2])
