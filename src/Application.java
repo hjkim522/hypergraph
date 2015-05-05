@@ -29,7 +29,8 @@ public class Application {
     }
 
     public static void main(String[] args) {
-        experiment("100");
+        experiment("10000");
+        //experiment("100-acyclic");
     }
 
     private static void experiment(String dataSet) {

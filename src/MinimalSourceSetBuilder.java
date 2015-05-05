@@ -165,7 +165,7 @@ public class MinimalSourceSetBuilder {
             }
 
             // decomposition
-            if (mss.size() > 1024) {//256) {// 128) {//64) { // temporal threshold
+            if (mss.size() > Param.MAX_MSS) {
                 Set<Long> sourceSet = new HashSet<>();
                 sourceSet.add(hypernode.getId());
                 mss = new MinimalSourceSet();
