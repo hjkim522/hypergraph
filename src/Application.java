@@ -49,13 +49,13 @@ public class Application {
             dataSet = "-" + dataSet;
         }
 
-        Log.fileOpen("log-" + dataSet + ".txt");
+        Log.fileOpen("log" + dataSet + ".txt");
         Param.logParam();
 
-        commandInitDB("db/hypergraph-" + dataSet);
-        commandImportGraph("input/hypergraph-" + dataSet + ".txt");
+        commandInitDB("db/hypergraph" + dataSet);
+        commandImportGraph("input/hypergraph" + dataSet + ".txt");
 
-        commandOpenDB("db/hypergraph-" + dataSet);
+        commandOpenDB("db/hypergraph" + dataSet);
         commandBuildMSS();
         commandQueryMSS();
         commandShutdownDB();
