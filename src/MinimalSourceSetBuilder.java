@@ -14,12 +14,20 @@ public class MinimalSourceSetBuilder {
     private Set<Long> visited;
     private Set<Long> computed;
 
+    // decomposition parameter
+    private int maxMSS;
+
     // statistic - XXX: separate as a module
     private int statDecomposed;
     private int totalComputation;
     private int queueLen;
 
     public MinimalSourceSetBuilder() {
+        this(512);
+    }
+
+    public MinimalSourceSetBuilder(int maxMSS) {
+        this.maxMSS = maxMSS;
         graphDb = Application.getGraphDatabase();
         mssMap = new HashMap<>();
         visited = new HashSet<>();
