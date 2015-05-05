@@ -38,7 +38,7 @@ public class SimpleImporter {
     }
 
     public void run() {
-        Log.info("SimpleImporter START " + filename);
+        Log.debug("SimpleImporter START " + filename);
 
         try (FileReader fr = new FileReader(filename)) {
             BufferedReader br = new BufferedReader(fr);
@@ -56,7 +56,7 @@ public class SimpleImporter {
             e.printStackTrace();
         }
 
-        Log.info("SimpleImporter DONE");
+        Log.debug("SimpleImporter DONE");
     }
 
     // insert n nodes

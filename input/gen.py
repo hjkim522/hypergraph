@@ -3,6 +3,7 @@
 import sys
 import random
 import array
+import shutil
 
 #parameters
 outputFile = "input/hypergraph.txt"
@@ -123,6 +124,9 @@ def generate():
     print("startables: " + str(len(startables)))
     print("indegree: " + str(reduce(lambda x, y: x+ y, indegree) / float(numNodes)))
     print("outdegree: " + str(reduce(lambda x, y: x+ y, outdegree) / float(numNodes)))
+
+    #copy input file for experiment
+    shutil.copyfile(outputFile, "input/hypergraph-" + str(numNodes) + ".txt")
 
 def main():
     parseParam()

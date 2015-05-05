@@ -1,3 +1,6 @@
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+
 /**
  * Simple logger
  *
@@ -12,6 +15,28 @@ public class Log {
 
     private static int level = ALL;
 
+    // XXX: have to separate file write
+    private static FileWriter fw = null;
+    private static BufferedWriter out = null;
+
+    public static void init(String logFileName) {
+        try {
+            fw = new FileWriter(logFileName);
+            out = new BufferedWriter(fw);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void close() {
+        try {
+            out.close();
+            fw.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     public static void error(String str) {
         println(ERROR, str);
     }
@@ -22,6 +47,15 @@ public class Log {
 
     public static void info(String str) {
         println(INFO, str);
+
+        if (out != null) {
+            try {
+                out.write(str);
+                out.newLine();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public static void debug(String str) {

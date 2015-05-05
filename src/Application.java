@@ -22,6 +22,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class Application {
     private static GraphDatabaseService graphDb = null;
+    private static Thread hook = null;
 
     public static GraphDatabaseService getGraphDatabase() {
         return graphDb;
@@ -29,13 +30,29 @@ public class Application {
 
     public static void main(String[] args) {
         // comment below 2 lines from the second execution
-        commandInitDB("db/hypergraph");
-        commandImportGraph("input/hypergraph.txt");
+//        commandInitDB("db/hypergraph");
+//        commandImportGraph("input/hypergraph.txt");
+//
+//        commandOpenDB("db/hypergraph");
+//        commandBuildMSS();
+//        commandQueryMSS();
+//        commandShutdownDB();
 
-        commandOpenDB("db/hypergraph");
+        experiment("100");
+    }
+
+    private static void experiment(String dataSet) {
+        Log.init("log-" + dataSet + ".txt");
+
+        commandInitDB("db/hypergraph-" + dataSet);
+        commandImportGraph("input/hypergraph-" + dataSet + ".txt");
+
+        commandOpenDB("db/hypergraph-" + dataSet);
         commandBuildMSS();
         commandQueryMSS();
         commandShutdownDB();
+
+        Log.close();
     }
 
     private static void commandInitDB(String path) {
@@ -62,6 +79,7 @@ public class Application {
     }
 
     private static void commandShutdownDB() {
+        removeShutdownHook();
         graphDb.shutdown();
         graphDb = null;
     }
@@ -101,17 +119,21 @@ public class Application {
         measure.printStatistic();
     }
 
-    private static void registerShutdownHook(final GraphDatabaseService graphDb)
-    {
+    private static void registerShutdownHook(final GraphDatabaseService graphDb) {
         // Registers a shutdown hook for the Neo4j instance so that it
         // shuts down nicely when the VM exits (even if you "Ctrl-C" the
         // running application).
-        Runtime.getRuntime().addShutdownHook(new Thread() {
+        Runtime.getRuntime().addShutdownHook(hook = new Thread() {
             @Override
             public void run() {
                 graphDb.shutdown();
             }
         });
+    }
+
+    private static void removeShutdownHook() {
+        Runtime.getRuntime().removeShutdownHook(hook);
+        hook = null;
     }
 
     private static void deleteDatabase(String path) {
