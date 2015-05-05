@@ -29,12 +29,12 @@ public class Application {
     }
 
     public static void main(String[] args) {
-        experiment("10000");
+        experiment("100");
         //experiment("100-acyclic");
     }
 
     private static void experiment(String dataSet) {
-        Log.init("log/log-" + dataSet + ".txt");
+        Log.fileOpen("log-" + dataSet + ".txt");
 
         commandInitDB("db/hypergraph-" + dataSet);
         commandImportGraph("input/hypergraph-" + dataSet + ".txt");
@@ -44,7 +44,7 @@ public class Application {
         commandQueryMSS();
         commandShutdownDB();
 
-        Log.close();
+        Log.fileClose();
     }
 
     private static void commandInitDB(String path) {
@@ -86,7 +86,6 @@ public class Application {
             Node meta = graphDb.findNodes(Const.LABEL_META).next();
             int numNodes = (int) meta.getProperty(Const.PROP_COUNT);
             int numQuery = (int) (numNodes * 0.05);
-            Log.info("querying " + numQuery + "nodes");
 
             // select random target nodes
             while (targets.size() < numQuery) {
@@ -95,6 +94,8 @@ public class Application {
 
             targets.add((long) numNodes - 1); // test last node
 
+            Log.info("Querying " + targets.size() + " nodes");
+            
             for (Long nodeId : targets) {
                 Node target = graphDb.findNode(Const.LABEL_NODE, Const.PROP_UNIQUE, nodeId);
 

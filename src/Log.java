@@ -4,6 +4,7 @@ import java.io.FileWriter;
 
 /**
  * Simple logger
+ * File writer added for experiments
  *
  * Created by Hyunjun on 2015-05-01.
  */
@@ -14,24 +15,24 @@ public class Log {
     public static final int DEBUG = 0x8;
     public static final int ALL = ERROR | WARN | INFO | DEBUG;
 
-    private static int level = ALL;
+    private static int consoleLevel = ALL;
+    private static int fileLevel = ERROR | INFO;
 
-    // XXX: have to separate file write
-    // XXX: have to be objective
+    // log file writers
     private static FileWriter fw = null;
     private static BufferedWriter out = null;
 
-    public static void init(String logFileName) {
+    public static void fileOpen(String logFileName) {
         try {
             new File("log").mkdir();
-            fw = new FileWriter(logFileName);
+            fw = new FileWriter("log/" + logFileName);
             out = new BufferedWriter(fw);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public static void close() {
+    public static void fileClose() {
         try {
             out.close();
             fw.close();
@@ -52,15 +53,6 @@ public class Log {
 
     public static void info(String str) {
         println(INFO, str);
-
-        if (out != null) {
-            try {
-                out.write(str);
-                out.newLine();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
     }
 
     public static void debug(String str) {
@@ -68,7 +60,17 @@ public class Log {
     }
 
     private static void println(int mask, String str) {
-        if ((level & mask) == mask)
+        if ((consoleLevel & mask) == mask) {
             System.out.println(str);
+        }
+
+        if ((fileLevel & mask) == mask && out != null) {
+            try {
+                out.write(str);
+                out.newLine();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 }
