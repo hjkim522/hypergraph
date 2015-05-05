@@ -102,5 +102,8 @@ public class MinimalSourceSetFinder {
             }
         }
         return mss;
+
+        // Get from saved result
+//        return getMinimalSourceSet(hypernode);
     }
 }

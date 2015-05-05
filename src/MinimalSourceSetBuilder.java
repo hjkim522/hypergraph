@@ -166,6 +166,10 @@ public class MinimalSourceSetBuilder {
 
             // decomposition
             if (mss.size() > Param.MAX_MSS) {
+                // save original mss
+                //mssMap.put(hypernode.getId(), mss);
+
+                // create single element mss
                 Set<Long> sourceSet = new HashSet<>();
                 sourceSet.add(hypernode.getId());
                 mss = new MinimalSourceSet();

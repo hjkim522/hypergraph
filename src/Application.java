@@ -57,7 +57,7 @@ public class Application {
 
         commandOpenDB("db/hypergraph" + dataSet);
         commandBuildMSS();
-        commandQueryMSS();
+//        commandQueryMSS();
         commandShutdownDB();
 
         Log.fileClose();
@@ -93,7 +93,7 @@ public class Application {
     }
 
     private static void commandQueryMSS() {
-        Random random = new Random();
+        Random random = new Random(0);
         Set<Long> targets = new HashSet<>();
         Measure measure = new Measure("Query MSS");
 
