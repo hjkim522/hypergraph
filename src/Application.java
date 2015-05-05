@@ -29,16 +29,8 @@ public class Application {
     }
 
     public static void main(String[] args) {
-        // comment below 2 lines from the second execution
-//        commandInitDB("db/hypergraph");
-//        commandImportGraph("input/hypergraph.txt");
-//
-//        commandOpenDB("db/hypergraph");
-//        commandBuildMSS();
-//        commandQueryMSS();
-//        commandShutdownDB();
-
         experiment("100");
+        experiment("1000");
     }
 
     private static void experiment(String dataSet) {
@@ -84,6 +76,7 @@ public class Application {
         graphDb = null;
     }
 
+    //TODO: have to query worst case
     private static void commandQueryMSS() {
         final int numQuery = 10;
         Random random = new Random();

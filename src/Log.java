@@ -16,6 +16,7 @@ public class Log {
     private static int level = ALL;
 
     // XXX: have to separate file write
+    // XXX: have to be objective
     private static FileWriter fw = null;
     private static BufferedWriter out = null;
 
@@ -35,6 +36,8 @@ public class Log {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        out = null;
+        fw = null;
     }
 
     public static void error(String str) {
