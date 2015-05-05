@@ -3,5 +3,5 @@
 /out
 *.iml
 .DS_Store
-hypergraph.txt
-
+hypergraph*.txt
+log*.txt
