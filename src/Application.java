@@ -75,9 +75,7 @@ public class Application {
         graphDb = null;
     }
 
-    //TODO: have to query worst case
     private static void commandQueryMSS() {
-        final int numQuery = 10;
         Random random = new Random();
         Set<Long> targets = new HashSet<>();
         Measure measure = new Measure("Query MSS");
@@ -86,24 +84,22 @@ public class Application {
             // get number of nodes from meta node
             Node meta = graphDb.findNodes(Const.LABEL_META).next();
             int numNodes = (int) meta.getProperty(Const.PROP_COUNT);
+            int numQuery = (int) (numNodes * 0.05);
+            Log.info("querying " + numQuery + "nodes");
 
             // select random target nodes
-            //XXX: temporal test
-//            while (targets.size() < numQuery) {
-//                targets.add((long) random.nextInt(numNodes));
-//            }
-            // test last node
-            targets.add((long) numNodes - 1);
+            while (targets.size() < numQuery) {
+                targets.add((long) random.nextInt(numNodes));
+            }
+
+            targets.add((long) numNodes - 1); // test last node
 
             for (Long nodeId : targets) {
                 Node target = graphDb.findNode(Const.LABEL_NODE, Const.PROP_UNIQUE, nodeId);
-//                Log.info("Query for node " + nodeId);
 
                 measure.start();
                 MinimalSourceSetFinder finder = new MinimalSourceSetFinder();
                 MinimalSourceSet mss = finder.find(target);
-//                Log.info(mss.toString());
-//                Log.info("time : " + measure.getRecentMeasureTime() + " ms");
                 measure.end();
             }
         }
