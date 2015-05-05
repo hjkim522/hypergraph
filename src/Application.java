@@ -35,6 +35,7 @@ public class Application {
 
     private static void experiment(String dataSet) {
         Log.fileOpen("log-" + dataSet + ".txt");
+        Param.logParam();
 
         commandInitDB("db/hypergraph-" + dataSet);
         commandImportGraph("input/hypergraph-" + dataSet + ".txt");
@@ -95,7 +96,7 @@ public class Application {
             targets.add((long) numNodes - 1); // test last node
 
             Log.info("Querying " + targets.size() + " nodes");
-            
+
             for (Long nodeId : targets) {
                 Node target = graphDb.findNode(Const.LABEL_NODE, Const.PROP_UNIQUE, nodeId);
 

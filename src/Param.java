@@ -5,6 +5,7 @@ public class Param {
     public static final int MAX_MSS = 1024;
 
     public static void logParam() {
-        //Log.init();
+        Log.info("Parameters:");
+        Log.info(" MAX_MSS: " + MAX_MSS);
     }
 }
