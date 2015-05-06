@@ -29,19 +29,10 @@ public class Application {
     }
 
     public static void main(String[] args) {
-        experiment("");
-//        experiment("100");
-//        experiment("100-acyclic");
-//        experiment("100-path");
-//        experiment("1000");
-//        experiment("1000-acyclic");
-//        experiment("1000-path");
-//        experiment("10000");
-//        experiment("10000-acyclic");
-//        experiment("10000-path");
-//        experiment("100000");
-//        experiment("100000-acyclic");
-//        experiment("100000-path");
+        experiment("10000");
+        experiment("20000");
+        experiment("30000");
+        experiment("40000");
     }
 
     private static void experiment(String dataSet) {
@@ -52,13 +43,13 @@ public class Application {
         Log.fileOpen("log" + dataSet + ".txt");
         Param.logParam();
 
-//        commandInitDB("db/hypergraph" + dataSet);
-//        commandImportGraph("input/hypergraph" + dataSet + ".txt");
+        commandInitDB("db/hypergraph" + dataSet);
+        commandImportGraph("input/hypergraph" + dataSet + ".txt");
 
         commandOpenDB("db/hypergraph" + dataSet);
-//        commandBuildMSS();
+        commandBuildMSS();
 //        commandQueryMSS();
-        commandBackwardDiscovery();
+//        commandBackwardDiscovery();
         commandShutdownDB();
 
         Log.fileClose();

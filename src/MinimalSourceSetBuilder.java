@@ -65,7 +65,8 @@ public class MinimalSourceSetBuilder {
     }
 
     private void save() {
-        Measure measure = new Measure("MSS size");
+        Measure measureSize = new Measure("MSS size");
+        Measure measureCardinality = new Measure("MSS cardinality");
         for (Map.Entry<Long, MinimalSourceSet> entry : mssMap.entrySet()) {
             Long id = entry.getKey();
             MinimalSourceSet mss = entry.getValue();
@@ -73,9 +74,11 @@ public class MinimalSourceSetBuilder {
             node.setProperty(Const.PROP_MSS, mss.toString());
 
             Log.debug("MSS(" + id + ") = " + mss.toString());
-            measure.addData(mss.size());
+            measureSize.addData(mss.size());
+            measureCardinality.addData(mss.cardinality());
         }
-        measure.printStatistic();
+        measureSize.printStatistic();
+        measureCardinality.printStatistic();
     }
 
     private void printQueue(Queue<Node> queue) {
@@ -173,7 +176,7 @@ public class MinimalSourceSetBuilder {
             }
 
             // decomposition
-            if (mss.size() > Param.MAX_MSS) {
+            if (mss.cardinality() > Param.MAX_MSS) {
                 // save original mss
                 //mssMap.put(hypernode.getId(), mss);
 

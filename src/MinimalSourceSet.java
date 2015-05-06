@@ -20,7 +20,7 @@ public class MinimalSourceSet {
     public MinimalSourceSet(MinimalSourceSet other) {
         this();
         for (Set<Long> sourceSet : other.mss) {
-            mss.add(sourceSet); //XXX: Set of Long ë„ deep copy í•´ì•¼ë˜ì§€ì•Šë‚˜? ì´ê±° ì•„ë¬´ë˜ë„ sourceSet ìœ¼ë¡œ revise í•˜ëŠ”ê²Œ ë‚˜ì„ê²ƒê°™ì€ë°
+            mss.add(sourceSet); //XXX: Set of Long ?„ deep copy ?•´?•¼?˜ì§??•Š?‚˜? ?´ê±? ?•„ë¬´ë˜?„ sourceSet ?œ¼ë¡? revise ?•˜?Š”ê²? ?‚˜?„ê²ƒê°™???°
         }
     }
 
@@ -100,6 +100,14 @@ public class MinimalSourceSet {
     }
 
     public int size() {
+        int sum = 0;
+        for (Set<Long> s : mss) {
+            sum += s.size();
+        }
+        return sum;
+    }
+
+    public int cardinality() {
         return mss.size();
     }
 
