@@ -17,11 +17,17 @@ public class NaiveBackwardDiscovery implements BackwardDiscovery {
     }
 
     @Override
-    public Set<Node> find(Node t) {
-        return findSourceSet(t);
+    public Set<Long> find(Node t) {
+        Set<Node> sourceSet = findSourceSet(t);
+        Set<Long> result = new HashSet<Long>();
+        for (Node s : sourceSet) {
+            result.add(s.getId());
+        }
+        return result;
     }
 
     //XXX: avoid recursive impl
+    //TODO: must be minimal and minimum..... fuck
     private Set<Node> findSourceSet(Node t) {
         Set<Node> sourceSet = new HashSet<>();
 
