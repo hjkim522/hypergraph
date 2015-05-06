@@ -9,20 +9,16 @@ import java.util.Set;
 /**
  * Created by Hyunjun on 2015-05-06.
  */
-public class NaiveBackwardDiscovery {
+public class NaiveBackwardDiscovery implements BackwardDiscovery {
     private GraphDatabaseService graphDb;
 
     public NaiveBackwardDiscovery() {
         graphDb = Application.getGraphDatabase();
     }
 
-    public Set<Node> find(Node target) {
-        return findSourceSet(target);
-    }
-
-    public Set<Node> find(Set<Node> targets) {
-        //TODO:
-        return null;
+    @Override
+    public Set<Node> find(Node t) {
+        return findSourceSet(t);
     }
 
     //XXX: avoid recursive impl
