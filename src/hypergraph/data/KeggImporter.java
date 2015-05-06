@@ -59,8 +59,8 @@ public class KeggImporter {
             String name = entry.getAttribute("name");
             String type = entry.getAttribute("type");
             String id = entry.getAttribute("id");
-            
-            Log.debug(name + " " + type);
+
+            Log.debug(name);
         }
     }
 }
