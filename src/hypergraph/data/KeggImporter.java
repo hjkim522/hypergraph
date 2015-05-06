@@ -24,11 +24,15 @@ import java.util.Set;
  */
 public class KeggImporter {
     private GraphDatabaseService graphDb;
-    private int fileCount;
+    private int countFile;
+    private int countEntry;
+    private int countRelations;
 
     public KeggImporter() {
         graphDb = Application.getGraphDatabase();
-        fileCount = 0;
+        countFile = 0;
+        countEntry = 0;
+        countRelations = 0;
     }
 
     public void run() {
@@ -36,14 +40,13 @@ public class KeggImporter {
         for (File file : files) {
             if (file.getName().endsWith(".xml")) {
                 handleFile(file);
-                fileCount++;
+                countFile++;
             }
-
-            //XXX: temporal exit
-//            if (fileCount > 0) {
-//                return;
-//            }
         }
+        
+        Log.info("countFile : " + countFile);
+        Log.info("countEntry : " + countEntry);
+        Log.info("countRelations : " + countRelations);
     }
 
     private void handleFile(File file) {
@@ -92,6 +95,7 @@ public class KeggImporter {
         if (node == null) {
             node = graphDb.createNode(Const.LABEL_NODE);
             node.setProperty(Const.PROP_UNIQUE, name);
+            countEntry++;
         }
     }
 
@@ -108,6 +112,7 @@ public class KeggImporter {
         for (Node t : targets) {
             Hyperedge hyperedge = new Hyperedge(sources, t);
             hyperedge.save(graphDb);
+            countRelations++;
         }
     }
 
@@ -145,7 +150,7 @@ public class KeggImporter {
                 }
             }
 
-            Log.debug("numStartable : " + numStartable);
+            Log.info("numStartable : " + numStartable);
             tx.success();
         }
     }

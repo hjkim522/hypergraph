@@ -42,13 +42,13 @@ public class Application {
     }
 
     public static void main(String[] args) {
-//        importKegg();
+        importKegg();
 
-        Log.fileOpen("log-kegg.txt");
-        commandOpenDB("db/kegg");
-        commandBuildMSS();
-        commandShutdownDB();
-        Log.fileClose();
+//        Log.fileOpen("log-kegg.txt");
+//        commandOpenDB("db/kegg");
+//        commandBuildMSS();
+//        commandShutdownDB();
+//        Log.fileClose();
     }
 
     private static void importKegg() {
