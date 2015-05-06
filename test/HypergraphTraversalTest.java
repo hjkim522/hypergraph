@@ -19,17 +19,17 @@ public class HypergraphTraversalTest {
 //        GraphDatabaseService graphDb =  new GraphDatabaseFactory().newEmbeddedDatabase("testdb");
 //
 //        // XXX: importer to db... o......
-//        //SimpleImporter importer = new SimpleImporter("sample.txt");
+//        //hypergraph.util.SimpleImporter importer = new hypergraph.util.SimpleImporter("sample.txt");
 //        //importer.run();
 //
 //        try (Transaction tx = graphDb.beginTx()) {
 //            Set<Node> start = new HashSet<Node>();
-//            start.add(graphDb.findNode(Const.LABEL_NODE, Const.PROP_UNIQUE, 0));
-//            start.add(graphDb.findNode(Const.LABEL_NODE, Const.PROP_UNIQUE, 1));
-//            start.add(graphDb.findNode(Const.LABEL_NODE, Const.PROP_UNIQUE, 2));
-//            start.add(graphDb.findNode(Const.LABEL_NODE, Const.PROP_UNIQUE, 3));
+//            start.add(graphDb.findNode(hypergraph.common.Const.LABEL_NODE, hypergraph.common.Const.PROP_UNIQUE, 0));
+//            start.add(graphDb.findNode(hypergraph.common.Const.LABEL_NODE, hypergraph.common.Const.PROP_UNIQUE, 1));
+//            start.add(graphDb.findNode(hypergraph.common.Const.LABEL_NODE, hypergraph.common.Const.PROP_UNIQUE, 2));
+//            start.add(graphDb.findNode(hypergraph.common.Const.LABEL_NODE, hypergraph.common.Const.PROP_UNIQUE, 3));
 //
-//            HypergraphTraversal traversal = new HypergraphTraversal(node -> {System.out.println(node.getId());});
+//            hypergraph.traversal.HypergraphTraversal traversal = new hypergraph.traversal.HypergraphTraversal(node -> {System.out.println(node.getId());});
 //            traversal.traverse(start);
 //        }
 //

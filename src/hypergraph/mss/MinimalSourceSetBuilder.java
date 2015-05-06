@@ -1,3 +1,9 @@
+package hypergraph.mss;
+
+import hypergraph.*;
+import hypergraph.common.Const;
+import hypergraph.util.Log;
+import hypergraph.util.Measure;
 import org.neo4j.graphdb.*;
 
 import java.util.*;
@@ -40,6 +46,8 @@ public class MinimalSourceSetBuilder {
         statDecomposed = 0;
         totalComputation = 0;
         queueLen = 0;
+
+        Log.info("MSS builder maxMSS = " + maxMSS);
 
         try (Transaction tx = graphDb.beginTx()) {
             // find all startable nodes
@@ -176,7 +184,7 @@ public class MinimalSourceSetBuilder {
             }
 
             // decomposition
-            if (mss.cardinality() > Param.MAX_MSS) {
+            if (mss.cardinality() > maxMSS) {
                 // save original mss
                 //mssMap.put(hypernode.getId(), mss);
 

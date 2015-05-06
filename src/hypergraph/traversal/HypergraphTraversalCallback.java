@@ -1,3 +1,5 @@
+package hypergraph.traversal;
+
 import org.neo4j.graphdb.Node;
 
 /**

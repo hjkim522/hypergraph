@@ -1,4 +1,4 @@
-import org.neo4j.cypher.internal.compiler.v1_9.commands.expressions.Min;
+package hypergraph.mss;
 
 import java.util.HashSet;
 import java.util.Iterator;
@@ -20,7 +20,7 @@ public class MinimalSourceSet {
     public MinimalSourceSet(MinimalSourceSet other) {
         this();
         for (Set<Long> sourceSet : other.mss) {
-            mss.add(sourceSet); //XXX: Set of Long ?„ deep copy ?•´?•¼?˜ì§??•Š?‚˜? ?´ê±? ?•„ë¬´ë˜?„ sourceSet ?œ¼ë¡? revise ?•˜?Š”ê²? ?‚˜?„ê²ƒê°™???°
+            mss.add(sourceSet); //XXX: Set of Long ?ï¿½ï¿½ deep copy ?ï¿½ï¿½?ï¿½ï¿½?ï¿½ï¿½ï¿½??ï¿½ï¿½?ï¿½ï¿½? ?ï¿½ï¿½ï¿½? ?ï¿½ï¿½ë¬´ë˜?ï¿½ï¿½ sourceSet ?ï¿½ï¿½ï¿½? revise ?ï¿½ï¿½?ï¿½ï¿½ï¿½? ?ï¿½ï¿½?ï¿½ï¿½ê²ƒê°™???ï¿½ï¿½
         }
     }
 

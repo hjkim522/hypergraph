@@ -1,3 +1,14 @@
+package hypergraph;
+
+import hypergraph.common.Const;
+import hypergraph.discovery.IndexedBackwardDiscovery;
+import hypergraph.discovery.NaiveBackwardDiscovery;
+import hypergraph.mss.MinimalSourceSet;
+import hypergraph.mss.MinimalSourceSetBuilder;
+import hypergraph.mss.MinimalSourceSetFinder;
+import hypergraph.util.Log;
+import hypergraph.util.Measure;
+import hypergraph.util.SimpleImporter;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
@@ -13,7 +24,7 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Main Application
+ * Main hypergraph.Application
  *
  * Initialize Neo4j as follows
  * http://neo4j.com/docs/stable/tutorials-java-embedded-hello-world.html
@@ -29,10 +40,7 @@ public class Application {
     }
 
     public static void main(String[] args) {
-        experiment("10000");
-        experiment("20000");
-        experiment("30000");
-        experiment("40000");
+        experiment("");
     }
 
     private static void experiment(String dataSet) {
@@ -41,7 +49,6 @@ public class Application {
         }
 
         Log.fileOpen("log" + dataSet + ".txt");
-        Param.logParam();
 
         commandInitDB("db/hypergraph" + dataSet);
         commandImportGraph("input/hypergraph" + dataSet + ".txt");
@@ -74,7 +81,8 @@ public class Application {
     }
 
     private static void commandBuildMSS() {
-        MinimalSourceSetBuilder builder = new MinimalSourceSetBuilder();
+        final int maxMSS = 512;
+        MinimalSourceSetBuilder builder = new MinimalSourceSetBuilder(maxMSS);
         builder.run();
     }
 

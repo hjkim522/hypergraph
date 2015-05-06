@@ -1,3 +1,5 @@
+package hypergraph.common;
+
 import org.neo4j.graphdb.*;
 
 import java.util.HashSet;

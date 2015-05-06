@@ -1,11 +1,12 @@
-import org.neo4j.graphdb.Direction;
+package hypergraph.discovery;
+
+import hypergraph.Application;
+import hypergraph.mss.MinimalSourceSet;
+import hypergraph.mss.MinimalSourceSetFinder;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.Relationship;
 
 import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.Queue;
 import java.util.Set;
 
 /**

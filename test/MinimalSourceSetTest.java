@@ -1,3 +1,4 @@
+import hypergraph.mss.MinimalSourceSet;
 import org.junit.Test;
 
 import java.util.HashSet;

@@ -1,3 +1,5 @@
+package hypergraph.util;
+
 import java.util.LinkedList;
 import java.util.List;
 import java.util.LongSummaryStatistics;
@@ -37,7 +39,7 @@ public class Measure {
 
     public void printStatistic() {
         LongSummaryStatistics stat = list.stream().mapToLong((x)->x).summaryStatistics();
-        Log.info("Measure - " + name);
+        Log.info("hypergraph.util.Measure - " + name);
         Log.info(" average : " + stat.getAverage());
         Log.info(" sum : " + stat.getSum());
         Log.info(" max : " + stat.getMax());
