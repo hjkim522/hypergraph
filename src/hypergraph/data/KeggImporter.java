@@ -13,5 +13,9 @@ public class KeggImporter {
         graphDb = Application.getGraphDatabase();
     }
 
+    public void run() {
+        //TODO:
+    }
+
     
 }
