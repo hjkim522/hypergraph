@@ -4,6 +4,8 @@ import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.Set;
 
 /**
@@ -11,49 +13,70 @@ import java.util.Set;
  */
 public class NaiveBackwardDiscovery implements BackwardDiscovery {
     private GraphDatabaseService graphDb;
+    private Set<Long> visited;
 
     public NaiveBackwardDiscovery() {
         graphDb = Application.getGraphDatabase();
+        visited = new HashSet<>();
     }
 
     @Override
     public Set<Long> find(Node t) {
-        Set<Node> sourceSet = findSourceSet(t);
+        Set<Node> targets = new HashSet<>();
+        targets.add(t);
+        Set<Node> sourceSet = findWithTraversal(targets);
         Set<Long> result = new HashSet<Long>();
         for (Node s : sourceSet) {
             result.add(s.getId());
         }
+
+        //TODO: find minimal
+
         return result;
     }
 
-    //XXX: avoid recursive impl
-    //TODO: must be minimal and minimum..... fuck
-    private Set<Node> findSourceSet(Node t) {
-        Set<Node> sourceSet = new HashSet<>();
+    private Set<Node> findWithTraversal(Set<Node> targets) {
+        Queue<Node> queue = new LinkedList<Node>();
+        Set<Node> result = new HashSet<>();
 
-        // base case
-        if (t.hasLabel(Const.LABEL_STARTABLE)) {
-            sourceSet.add(t);
-            return sourceSet;
+        for (Node t : targets) {
+            setVisited(t);
+            queue.add(t);
         }
 
-        // get backward star
-        Set<Node> sources = new HashSet<>();
-        Iterable<Relationship> rels = t.getRelationships(Direction.INCOMING, Const.REL_TO_TARGET);
-        for (Relationship rel : rels) {
-            Node h = rel.getEndNode(); // pseudo-hypernode
+        while (!queue.isEmpty()) {
+            Node v = queue.poll();
 
-            Iterable<Relationship> sourceRels = h.getRelationships(Direction.INCOMING, Const.REL_FROM_SOURCE);
-            for (Relationship sourceRel : sourceRels) {
-                Node s = rel.getEndNode();
-                sources.add(s);
+            Iterable<Relationship> rels = v.getRelationships(Direction.INCOMING, Const.REL_TO_TARGET);
+            for (Relationship rel : rels) {
+                Node h = rel.getStartNode();
+
+                // get sources
+                Iterable<Relationship> sourceRels = h.getRelationships(Direction.INCOMING, Const.REL_FROM_SOURCE);
+                for (Relationship sourceRel : sourceRels) {
+                    Node s = sourceRel.getStartNode();
+                    if (isVisited(s))
+                        continue;;
+                    setVisited(s);
+
+                    if (s.hasLabel(Const.LABEL_STARTABLE)) {
+                        result.add(s);
+                    }
+                    else {
+                        queue.add(s);
+                    }
+                }
             }
         }
 
-        for (Node s : sources) {
-            sourceSet.addAll(findSourceSet(s));
-        }
+        return result;
+    }
 
-        return sourceSet;
+    private void setVisited(Node node) {
+        visited.add(node.getId());
+    }
+
+    private boolean isVisited(Node node) {
+        return visited.contains(node.getId());
     }
 }

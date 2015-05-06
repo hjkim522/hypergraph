@@ -29,18 +29,18 @@ public class Application {
     }
 
     public static void main(String[] args) {
-//        experiment("");
-        experiment("100");
-        experiment("100-acyclic");
+        experiment("");
+//        experiment("100");
+//        experiment("100-acyclic");
 //        experiment("100-path");
-        experiment("1000");
-        experiment("1000-acyclic");
+//        experiment("1000");
+//        experiment("1000-acyclic");
 //        experiment("1000-path");
-        experiment("10000");
-        experiment("10000-acyclic");
+//        experiment("10000");
+//        experiment("10000-acyclic");
 //        experiment("10000-path");
-        experiment("100000");
-        experiment("100000-acyclic");
+//        experiment("100000");
+//        experiment("100000-acyclic");
 //        experiment("100000-path");
     }
 
@@ -52,12 +52,13 @@ public class Application {
         Log.fileOpen("log" + dataSet + ".txt");
         Param.logParam();
 
-        commandInitDB("db/hypergraph" + dataSet);
-        commandImportGraph("input/hypergraph" + dataSet + ".txt");
+//        commandInitDB("db/hypergraph" + dataSet);
+//        commandImportGraph("input/hypergraph" + dataSet + ".txt");
 
         commandOpenDB("db/hypergraph" + dataSet);
-        commandBuildMSS();
+//        commandBuildMSS();
 //        commandQueryMSS();
+        commandBackwardDiscovery();
         commandShutdownDB();
 
         Log.fileClose();
@@ -123,6 +124,26 @@ public class Application {
         }
 
         measure.printStatistic();
+    }
+
+    private static void commandBackwardDiscovery() {
+        try (Transaction tx = graphDb.beginTx()) {
+            // get number of nodes from meta node
+            Node meta = graphDb.findNodes(Const.LABEL_META).next();
+            int numNodes = (int) meta.getProperty(Const.PROP_COUNT);
+
+            Node t = graphDb.findNode(Const.LABEL_NODE, Const.PROP_UNIQUE, numNodes - 2);
+            NaiveBackwardDiscovery naiveBackwardDiscovery = new NaiveBackwardDiscovery();
+            IndexedBackwardDiscovery indexedBackwardDiscovery = new IndexedBackwardDiscovery();
+
+            Set<Long> r1 = naiveBackwardDiscovery.find(t);
+            Set<Long> r2 = indexedBackwardDiscovery.find(t);
+
+            // compare result
+            Log.info("backward discovery results");
+            Log.info("naive: " + r1.toString());
+            Log.info("index: " + r2.toString());
+        }
     }
 
     private static void registerShutdownHook(final GraphDatabaseService graphDb) {

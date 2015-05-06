@@ -1,6 +1,11 @@
+import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Relationship;
 
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.Set;
 
 /**
@@ -27,6 +32,9 @@ public class IndexedBackwardDiscovery implements BackwardDiscovery {
                 minimumCardinality = s.size();
             }
         }
+
+        if (minimum == null)
+            return new HashSet<>();
 
         return minimum;
     }
