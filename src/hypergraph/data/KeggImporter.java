@@ -43,7 +43,9 @@ public class KeggImporter {
                 countFile++;
             }
         }
-        
+
+        // TODO: handler undefined, check is same node or unmained anonemous node
+
         Log.info("countFile : " + countFile);
         Log.info("countEntry : " + countEntry);
         Log.info("countRelations : " + countRelations);
@@ -143,10 +145,13 @@ public class KeggImporter {
             ResourceIterator<Node> iter = graphDb.findNodes(Const.LABEL_NODE);
 
             while (iter.hasNext()) {
-                if (random.nextInt(100) < 10) {
+//                Log.debug(random.nextInt(100) + " ");
+                if (random.nextInt(100) > 90) {
                     Node n = iter.next();
                     n.addLabel(Const.LABEL_STARTABLE);
                     numStartable++;
+                } else {
+                    iter.next();
                 }
             }
 

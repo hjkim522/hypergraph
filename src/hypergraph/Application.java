@@ -52,10 +52,11 @@ public class Application {
     }
 
     private static void importKegg() {
-        commandInitDB("db/kegg");
+//        commandInitDB("db/kegg");
+        commandOpenDB("db/kegg");
 
         KeggImporter importer = new KeggImporter();
-        importer.run();
+//        importer.run();
         importer.markStartables();
 
 //        KeggStatistic stat = new KeggStatistic();
