@@ -1,6 +1,7 @@
 package hypergraph;
 
 import hypergraph.common.Const;
+import hypergraph.data.KeggImporter;
 import hypergraph.discovery.IndexedBackwardDiscovery;
 import hypergraph.discovery.NaiveBackwardDiscovery;
 import hypergraph.mss.MinimalSourceSet;
@@ -40,7 +41,14 @@ public class Application {
     }
 
     public static void main(String[] args) {
-        experiment("");
+        importKegg();
+    }
+
+    private static void importKegg() {
+        commandInitDB("db/kegg");
+        KeggImporter importer = new KeggImporter();
+        importer.run();
+        commandShutdownDB();
     }
 
     private static void experiment(String dataSet) {
