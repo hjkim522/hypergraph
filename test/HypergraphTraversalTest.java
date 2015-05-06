@@ -19,7 +19,7 @@ public class HypergraphTraversalTest {
 //        GraphDatabaseService graphDb =  new GraphDatabaseFactory().newEmbeddedDatabase("testdb");
 //
 //        // XXX: importer to db... o......
-//        //hypergraph.util.SimpleImporter importer = new hypergraph.util.SimpleImporter("sample.txt");
+//        //hypergraph.data.SimpleImporter importer = new hypergraph.data.SimpleImporter("sample.txt");
 //        //importer.run();
 //
 //        try (Transaction tx = graphDb.beginTx()) {

@@ -1,4 +1,4 @@
-package hypergraph.util;
+package hypergraph.data;
 
 import hypergraph.Application;
 import hypergraph.common.Const;
@@ -34,7 +34,7 @@ public class SimpleImporter {
     private String filename;
     private GraphDatabaseService graphDb;
 
-    // hypergraph.util.SimpleImporter allows in-memory construction only
+    // hypergraph.data.SimpleImporter allows in-memory construction only
     // NOTE: If hypergraph size exceeds memory size then use unique index of neo4j
     private Node nodes[];
 
@@ -44,7 +44,7 @@ public class SimpleImporter {
     }
 
     public void run() {
-        Log.debug("hypergraph.util.SimpleImporter START " + filename);
+        Log.debug("hypergraph.data.SimpleImporter START " + filename);
 
         try (FileReader fr = new FileReader(filename)) {
             BufferedReader br = new BufferedReader(fr);
@@ -62,7 +62,7 @@ public class SimpleImporter {
             e.printStackTrace();
         }
 
-        Log.debug("hypergraph.util.SimpleImporter DONE");
+        Log.debug("hypergraph.data.SimpleImporter DONE");
     }
 
     // insert n nodes

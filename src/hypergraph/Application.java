@@ -8,7 +8,7 @@ import hypergraph.mss.MinimalSourceSetBuilder;
 import hypergraph.mss.MinimalSourceSetFinder;
 import hypergraph.util.Log;
 import hypergraph.util.Measure;
-import hypergraph.util.SimpleImporter;
+import hypergraph.data.SimpleImporter;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
