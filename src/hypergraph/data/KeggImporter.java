@@ -3,6 +3,7 @@ package hypergraph.data;
 import hypergraph.Application;
 import hypergraph.common.Const;
 import hypergraph.common.Hyperedge;
+import hypergraph.common.HypergraphDatabase;
 import hypergraph.util.Log;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
@@ -28,7 +29,7 @@ public class KeggImporter {
     private int countReactions;
 
     public KeggImporter() {
-        graphDb = Application.getGraphDatabase();
+        graphDb = HypergraphDatabase.getGraphDatabase();
         countFile = 0;
         countEntry = 0;
         countRelations = 0;
@@ -43,6 +44,8 @@ public class KeggImporter {
                 countFile++;
             }
         }
+
+        markStartables();
 
         // TODO: handler undefined, check is same node or unmained anonemous node
 
@@ -179,8 +182,7 @@ public class KeggImporter {
         return set;
     }
 
-    //XXX: temporal impl
-    public void markStartables() {
+    private void markStartables() {
         try (Transaction tx = graphDb.beginTx()) {
             int numStartable = 0;
 
@@ -189,7 +191,7 @@ public class KeggImporter {
 
             while (iter.hasNext()) {
                 Node n = iter.next();
-//                if (random.nextInt(100) > 90) {
+
                 if (n.getProperty("type").equals("compound")) {
                     n.addLabel(Const.LABEL_STARTABLE);
                     numStartable++;

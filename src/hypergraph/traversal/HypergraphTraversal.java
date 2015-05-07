@@ -2,6 +2,7 @@ package hypergraph.traversal;
 
 import hypergraph.Application;
 import hypergraph.common.Const;
+import hypergraph.common.HypergraphDatabase;
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
@@ -25,7 +26,7 @@ public class HypergraphTraversal {
     }
 
     public HypergraphTraversal(HypergraphTraversalCallback callback) {
-        this.graphDb = Application.getGraphDatabase();
+        this.graphDb = HypergraphDatabase.getGraphDatabase();
         this.visited = new HashSet<Long>();
         this.callback = callback;
     }

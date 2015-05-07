@@ -1,6 +1,7 @@
 package hypergraph;
 
 import hypergraph.common.Const;
+import hypergraph.common.HypergraphDatabase;
 import hypergraph.data.KeggImporter;
 import hypergraph.data.KeggStatistic;
 import hypergraph.discovery.IndexedBackwardDiscovery;
@@ -34,35 +35,23 @@ import java.util.concurrent.TimeUnit;
  * Created by Hyunjun on 2015-04-15.
  */
 public class Application {
-    private static GraphDatabaseService graphDb = null;
-    private static Thread hook = null;
-
-    public static GraphDatabaseService getGraphDatabase() {
-        return graphDb;
-    }
-
     public static void main(String[] args) {
-        Log.fileOpen("log-kegg.txt");
-        importKegg();
-
-//        commandOpenDB("db/kegg");
-        commandBuildMSS();
-        commandShutdownDB();
-        Log.fileClose();
+        kegg();
     }
 
-    private static void importKegg() {
-        commandInitDB("db/kegg");
-//        commandOpenDB("db/kegg");
+    private static void kegg() {
+        Log.init("log-kegg.txt");
+        HypergraphDatabase.init("db/kegg");
+        HypergraphDatabase.open("db/kegg");
 
         KeggImporter importer = new KeggImporter();
         importer.run();
-        importer.markStartables();
 
-//        KeggStatistic stat = new KeggStatistic();
-//        stat.run();
+        MinimalSourceSetBuilder builder = new MinimalSourceSetBuilder();
+        builder.run();
 
-//        commandShutdownDB();
+        HypergraphDatabase.close();
+        Log.close();
     }
 
     private static void experiment(String dataSet) {
@@ -70,51 +59,21 @@ public class Application {
             dataSet = "-" + dataSet;
         }
 
-        Log.fileOpen("log" + dataSet + ".txt");
+        Log.init("log" + dataSet + ".txt");
+        HypergraphDatabase.init("db/hypergraph" + dataSet);
 
-        commandInitDB("db/hypergraph" + dataSet);
-        commandImportGraph("input/hypergraph" + dataSet + ".txt");
-
-        commandOpenDB("db/hypergraph" + dataSet);
-        commandBuildMSS();
-//        commandQueryMSS();
-//        commandBackwardDiscovery();
-        commandShutdownDB();
-
-        Log.fileClose();
-    }
-
-    private static void commandInitDB(String path) {
-        deleteDatabase(path);
-        commandOpenDB(path);
-        createIndex();
-    }
-
-    private static void commandOpenDB(String path) {
-        if (graphDb == null) { //XXX: for convenience
-            graphDb = new GraphDatabaseFactory().newEmbeddedDatabase(path);
-            registerShutdownHook(graphDb);
-        }
-    }
-
-    private static void commandImportGraph(String input) {
-        SimpleImporter importer = new SimpleImporter(input);
+        SimpleImporter importer = new SimpleImporter("input/hypergraph" + dataSet + ".txt");
         importer.run();
-    }
 
-    private static void commandBuildMSS() {
-        final int maxMSS = 512;
-        MinimalSourceSetBuilder builder = new MinimalSourceSetBuilder(maxMSS);
+        MinimalSourceSetBuilder builder = new MinimalSourceSetBuilder();
         builder.run();
+
+        HypergraphDatabase.close();
+        Log.close();
     }
 
-    private static void commandShutdownDB() {
-        removeShutdownHook();
-        graphDb.shutdown();
-        graphDb = null;
-    }
-
-    private static void commandQueryMSS() {
+    private static void query() {
+        GraphDatabaseService graphDb = HypergraphDatabase.getGraphDatabase();
         Random random = new Random(0);
         Set<Long> targets = new HashSet<>();
         Measure measure = new Measure("Query MSS");
@@ -147,7 +106,8 @@ public class Application {
         measure.printStatistic();
     }
 
-    private static void commandBackwardDiscovery() {
+    private static void backwardDiscovery() {
+        GraphDatabaseService graphDb = HypergraphDatabase.getGraphDatabase();
         try (Transaction tx = graphDb.beginTx()) {
             // get number of nodes from meta node
             Node meta = graphDb.findNodes(Const.LABEL_META).next();
@@ -167,45 +127,4 @@ public class Application {
         }
     }
 
-    private static void registerShutdownHook(final GraphDatabaseService graphDb) {
-        // Registers a shutdown hook for the Neo4j instance so that it
-        // shuts down nicely when the VM exits (even if you "Ctrl-C" the
-        // running application).
-        Runtime.getRuntime().addShutdownHook(hook = new Thread() {
-            @Override
-            public void run() {
-                graphDb.shutdown();
-            }
-        });
-    }
-
-    private static void removeShutdownHook() {
-        Runtime.getRuntime().removeShutdownHook(hook);
-        hook = null;
-    }
-
-    private static void deleteDatabase(String path) {
-        try {
-            FileUtils.deleteRecursively(new File(path));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    // This only needs to be done once
-    private static void createIndex() {
-        IndexDefinition indexDefinition;
-        try (Transaction tx = graphDb.beginTx()) {
-            Schema schema = graphDb.schema();
-            indexDefinition = schema.indexFor(Const.LABEL_NODE)
-                    .on(Const.PROP_UNIQUE)
-                    .create();
-            tx.success();
-        }
-
-        try (Transaction tx = graphDb.beginTx()) {
-            Schema schema = graphDb.schema();
-            schema.awaitIndexOnline(indexDefinition, 10, TimeUnit.SECONDS);
-        }
-    }
 }

@@ -24,7 +24,7 @@ public class Log {
     private static FileWriter fw = null;
     private static BufferedWriter out = null;
 
-    public static void fileOpen(String logFileName) {
+    public static void init(String logFileName) {
         try {
             new File("log").mkdir();
             fw = new FileWriter("log/" + logFileName);
@@ -34,7 +34,7 @@ public class Log {
         }
     }
 
-    public static void fileClose() {
+    public static void close() {
         try {
             out.close();
             fw.close();

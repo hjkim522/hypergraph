@@ -2,6 +2,7 @@ package hypergraph.mss;
 
 import hypergraph.*;
 import hypergraph.common.Const;
+import hypergraph.common.HypergraphDatabase;
 import hypergraph.util.Log;
 import hypergraph.util.Measure;
 import org.neo4j.graphdb.*;
@@ -34,7 +35,7 @@ public class MinimalSourceSetBuilder {
 
     public MinimalSourceSetBuilder(int maxMSS) {
         this.maxMSS = maxMSS;
-        graphDb = Application.getGraphDatabase();
+        graphDb = HypergraphDatabase.getGraphDatabase();
         mssMap = new HashMap<>();
         visited = new HashSet<>();
         computed = new HashSet<>();

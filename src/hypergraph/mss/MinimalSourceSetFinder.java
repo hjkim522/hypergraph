@@ -2,6 +2,7 @@ package hypergraph.mss;
 
 import hypergraph.Application;
 import hypergraph.common.Const;
+import hypergraph.common.HypergraphDatabase;
 import hypergraph.util.Log;
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -20,7 +21,7 @@ public class MinimalSourceSetFinder {
     private static GraphDatabaseService graphDb;
 
     public MinimalSourceSetFinder() {
-        graphDb = Application.getGraphDatabase();
+        graphDb = HypergraphDatabase.getGraphDatabase();
     }
 
     public MinimalSourceSet find(Node target) {

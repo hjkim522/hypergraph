@@ -3,6 +3,7 @@ package hypergraph.data;
 import hypergraph.Application;
 import hypergraph.common.Const;
 import hypergraph.common.Hyperedge;
+import hypergraph.common.HypergraphDatabase;
 import hypergraph.util.Log;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
@@ -40,7 +41,7 @@ public class SimpleImporter {
 
     public SimpleImporter(String filename) {
         this.filename = filename;
-        this.graphDb = Application.getGraphDatabase();
+        this.graphDb = HypergraphDatabase.getGraphDatabase();
     }
 
     public void run() {

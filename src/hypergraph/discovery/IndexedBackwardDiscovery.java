@@ -1,6 +1,7 @@
 package hypergraph.discovery;
 
 import hypergraph.Application;
+import hypergraph.common.HypergraphDatabase;
 import hypergraph.mss.MinimalSourceSet;
 import hypergraph.mss.MinimalSourceSetFinder;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -16,7 +17,7 @@ public class IndexedBackwardDiscovery implements BackwardDiscovery {
     private GraphDatabaseService graphDb;
 
     public IndexedBackwardDiscovery() {
-        graphDb = Application.getGraphDatabase();
+        graphDb = HypergraphDatabase.getGraphDatabase();
     }
 
     @Override
