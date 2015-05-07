@@ -10,18 +10,26 @@ import java.util.Set;
  */
 public class Hyperedge {
     private Set<Node> source;
-    private Node target;
+    private Set<Node> target;
     private Node hypernode;
 
     public Hyperedge() {
         source = new HashSet<Node>();
-        target = null;
+        target = new HashSet<Node>();
         hypernode = null;
     }
 
-    public Hyperedge(Set<Node> s, Node t) {
+    public Hyperedge(Set<Node> s, Set<Node> t) {
         source = s;
         target = t;
+        hypernode = null;
+    }
+
+    @Deprecated
+    public Hyperedge(Set<Node> s, Node t) {
+        source = s;
+        target = new HashSet<Node>();
+        target.add(t);
         hypernode = null;
     }
 
@@ -29,8 +37,13 @@ public class Hyperedge {
         source.add(node);
     }
 
+    public void addTarget(Node node) {
+        target.add(node);
+    }
+
+    @Deprecated
     public void setTarget(Node node) {
-        target = node;
+        addTarget(node);
     }
 
     public void save(GraphDatabaseService graphDb) {
@@ -43,6 +56,8 @@ public class Hyperedge {
         }
 
         // create an edge from hypernode to target
-        hypernode.createRelationshipTo(target, Const.REL_TO_TARGET);
+        for (Node t : target) {
+            hypernode.createRelationshipTo(t, Const.REL_TO_TARGET);
+        }
     }
 }

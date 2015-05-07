@@ -22,6 +22,25 @@ import java.util.*;
  * Created by hyunjun on 2015. 5. 7..
  */
 public class KeggImporter {
+    private class KeggEntry {
+        String id;
+        String name;
+        String type;
+
+        public KeggEntry(Element entry) {
+
+        }
+
+    }
+
+    private class KeggRelation {
+
+    }
+
+    private class KeggReaction {
+
+    }
+
     private GraphDatabaseService graphDb;
     private int countFile;
     private int countEntry;
@@ -128,6 +147,14 @@ public class KeggImporter {
                 node.setProperty("type", type);
                 countEntry++;
             }
+        }
+    }
+
+    private void insertGroup(Map<String, String> entryMap, Element group) {
+        NodeList components = group.getElementsByTagName("component");
+        for (int i = 0; i < components.getLength(); i++) {
+            Element component = (Element) components.item(i);
+            String id = component.getAttribute("id");
         }
     }
 
