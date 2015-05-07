@@ -126,10 +126,10 @@ public class MinimalSourceSetBuilder {
             }
 
             // get forward star
-            Iterable<Relationship> rels = s.getRelationships(Direction.OUTGOING, Const.REL_FROM_SOURCE);
-            for (Relationship rel : rels) {
+            Iterable<Relationship> fromSources = s.getRelationships(Direction.OUTGOING, Const.REL_FROM_SOURCE);
+            for (Relationship fromSource : fromSources) {
                 // get pseudo hypernode and check enabled
-                Node h = rel.getEndNode();
+                Node h = fromSource.getEndNode();
 
                 // skip if already computed and not modified
                 if (isComputed(h))
@@ -143,22 +143,28 @@ public class MinimalSourceSetBuilder {
                 setComputed(h);
 
                 // get target node
-                Node t = h.getSingleRelationship(Const.REL_TO_TARGET, Direction.OUTGOING).getEndNode();
-                setVisited(t);
-                Log.debug("add target " + t.getId());
+                // Node t = h.getSingleRelationship(Const.REL_TO_TARGET, Direction.OUTGOING).getEndNode();
+                // modified to support multiple target nodes
+                Iterable<Relationship> toTargets = h.getRelationships(Direction.OUTGOING, Const.REL_TO_TARGET);
+                for (Relationship toTarget : toTargets) {
+                    Node t = toTarget.getEndNode();
 
-                // calculate and update mss
-                MinimalSourceSet mssHyperedge = computeMinimalSourceSet(h);
-                MinimalSourceSet mssTarget = getMinimalSourceSet(t);
-                totalComputation++;
+                    setVisited(t);
+                    Log.debug("add target " + t.getId());
 
-                boolean modified = mssTarget.addAll(mssHyperedge);
-                if (modified) {
-                    if (queue.contains(t)) {
-                        queue.remove(t);
-                        Log.debug("already contains node " + t.getId());
+                    // calculate and update mss
+                    MinimalSourceSet mssHyperedge = computeMinimalSourceSet(h);
+                    MinimalSourceSet mssTarget = getMinimalSourceSet(t);
+                    totalComputation++;
+
+                    boolean modified = mssTarget.addAll(mssHyperedge);
+                    if (modified) {
+                        if (queue.contains(t)) {
+                            queue.remove(t);
+                            Log.debug("already contains node " + t.getId());
+                        }
+                        queue.add(t);
                     }
-                    queue.add(t);
                 }
             }
         }

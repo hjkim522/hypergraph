@@ -16,6 +16,9 @@ import java.util.Set;
 /**
  * Created by Hyunjun on 2015-05-06.
  */
+//XXX: not implemented yet
+//XXX: have to support multiple targets
+@Deprecated
 public class BackwardTraversal {
     private GraphDatabaseService graphDb;
     private Set<Long> visited;

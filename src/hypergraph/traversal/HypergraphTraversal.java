@@ -45,10 +45,10 @@ public class HypergraphTraversal {
             Node v = queue.poll();
 
             // get connected hyperedges
-            Iterable<Relationship> rels = v.getRelationships(Direction.OUTGOING, Const.REL_FROM_SOURCE);
-            for (Relationship rel : rels) {
-                // pseudo hypernode - XXX: considering Node.getHyperedges()
-                Node h = rel.getEndNode();
+            Iterable<Relationship> fromSources = v.getRelationships(Direction.OUTGOING, Const.REL_FROM_SOURCE);
+            for (Relationship fromSource : fromSources) {
+                // get pseudo hypernode
+                Node h = fromSource.getEndNode();
                 if (isVisited(h))
                     continue;
                 else if (!isEnabled(h))
@@ -57,11 +57,16 @@ public class HypergraphTraversal {
                     setVisited(h);
 
                 // get single target node
-                Node t = h.getSingleRelationship(Const.REL_TO_TARGET, Direction.OUTGOING).getEndNode();
-                if (!isVisited(t)) {
-                    setVisited(t);
-                    queue.add(t);
-                    callback.onVisit(t);
+                // Node t = h.getSingleRelationship(Const.REL_TO_TARGET, Direction.OUTGOING).getEndNode();
+                // modified to support multiple target nodes
+                Iterable<Relationship> toTargets = h.getRelationships(Direction.OUTGOING, Const.REL_TO_TARGET);
+                for (Relationship toTarget : toTargets) {
+                    Node t = toTarget.getEndNode();
+                    if (!isVisited(t)) {
+                        setVisited(t);
+                        queue.add(t);
+                        callback.onVisit(t);
+                    }
                 }
             }
         }

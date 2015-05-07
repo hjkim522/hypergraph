@@ -13,6 +13,8 @@ import java.util.*;
 /**
  * Created by Hyunjun on 2015-05-06.
  */
+
+//XXX: not implemented yet
 public class NaiveBackwardDiscovery implements BackwardDiscovery {
     private GraphDatabaseService graphDb;
     private Set<Long> visited;
