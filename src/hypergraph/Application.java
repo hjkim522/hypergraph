@@ -13,6 +13,7 @@ import hypergraph.util.Measure;
 import hypergraph.data.SimpleImporter;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.ResourceIterator;
 import org.neo4j.graphdb.Transaction;
 
 import java.util.HashSet;
@@ -29,8 +30,37 @@ import java.util.Set;
  */
 public class Application {
     public static void main(String[] args) {
-        keggImport();
+//        keggImport();
+        keggQuery();
 //        experiment("100-path");
+    }
+
+    private static void keggQuery() {
+        Log.init("log-kegg-query.txt");
+        HypergraphDatabase.open("db/kegg");
+        GraphDatabaseService graphDb = HypergraphDatabase.getGraphDatabase();
+        Measure measure = new Measure("Query MSS");
+
+        try (Transaction tx = graphDb.beginTx()) {
+            ResourceIterator<Node> nodes = graphDb.findNodes(Const.LABEL_NODE);
+
+            while (nodes.hasNext()) {
+                Node node = nodes.next();
+
+                // query 10%
+                if (Math.random() < 0.9)
+                    continue;
+
+                measure.start();
+                MinimalSourceSetFinder finder = new MinimalSourceSetFinder();
+                MinimalSourceSet mss = finder.find(node);
+                measure.end();
+            }
+        }
+
+        measure.printStatistic();
+        HypergraphDatabase.close();
+        Log.close();
     }
 
     private static void keggTest() {
