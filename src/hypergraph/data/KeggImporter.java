@@ -105,23 +105,29 @@ public class KeggImporter {
     }
 
     private void insertEntry(Map<String, String> entryMap, Element entry) {
-        String name = entry.getAttribute("name");
+        String nameSeq = entry.getAttribute("name");
         String type = entry.getAttribute("type");
         String id = entry.getAttribute("id");
 
-        Log.debug("insertEntry " + name);
+        Log.debug("insertEntry " + nameSeq);
+        entryMap.put(id, nameSeq);
 
-        // insert into map
-        assert entryMap.containsKey(id);
-        entryMap.put(id, name);
+        //TODO: handle undefined
+        //TODO: handle group.... fuck
 
-        // insert node
-        Node node = graphDb.findNode(Const.LABEL_NODE, Const.PROP_UNIQUE, name);
-        if (node == null) {
-            node = graphDb.createNode(Const.LABEL_NODE);
-            node.setProperty(Const.PROP_UNIQUE, name);
-            node.setProperty("type", type);
-            countEntry++;
+        String[] names = nameSeq.split(" ");
+        for (String name : names) {
+            // insert into map
+            assert entryMap.containsKey(id);
+
+            // insert node
+            Node node = graphDb.findNode(Const.LABEL_NODE, Const.PROP_UNIQUE, name);
+            if (node == null) {
+                node = graphDb.createNode(Const.LABEL_NODE);
+                node.setProperty(Const.PROP_UNIQUE, name);
+                node.setProperty("type", type);
+                countEntry++;
+            }
         }
     }
 
@@ -131,18 +137,33 @@ public class KeggImporter {
         String name1 = entryMap.get(entry1);
         String name2 = entryMap.get(entry2);
 
-        Node node1 = graphDb.findNode(Const.LABEL_NODE, Const.PROP_UNIQUE, name1);
-        Node node2 = graphDb.findNode(Const.LABEL_NODE, Const.PROP_UNIQUE, name2);
-
         // TODO: handle activate and inhibit.... fuck
         NodeList subtypes = relation.getElementsByTagName("subtype");
 
+        Set<Node> sources = constructNodeSet(name1);
+        Set<Node> targets = constructNodeSet(name2);
 
-        Hyperedge hyperedge = new Hyperedge();
-        hyperedge.addSource(node1);
-        hyperedge.setTarget(node2);
-        hyperedge.save(graphDb);
-        countRelations++;
+        // insert hyperedges
+        for (Node t : targets) {
+            Hyperedge hyperedge = new Hyperedge(sources, t);
+            hyperedge.save(graphDb);
+            countRelations++;
+        }
+    }
+
+    private Set<Node> constructNodeSet(String nameSeq) {
+        Set<Node> set = new HashSet<Node>();
+        String[] names = nameSeq.split(" ");
+        for (String name : names) {
+            Node node = graphDb.findNode(Const.LABEL_NODE, Const.PROP_UNIQUE, name);
+            if (node == null) {
+                Log.warn("null node2");
+                continue;
+            } else {
+                set.add(node);
+            }
+        }
+        return set;
     }
 
     private void insertReaction(Map<String, String> entryMap, Element reaction) {
@@ -153,8 +174,6 @@ public class KeggImporter {
         Set<Node> targets = constructNodeSet(products);
 
         Log.debug("insertReaction " + reaction.getAttribute("id"));
-
-
 
         // insert hyperedges
         for (Node t : targets) {
