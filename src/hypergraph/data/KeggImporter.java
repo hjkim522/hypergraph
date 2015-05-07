@@ -6,6 +6,7 @@ import hypergraph.common.Hyperedge;
 import hypergraph.util.Log;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.ResourceIterator;
 import org.neo4j.graphdb.Transaction;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -15,6 +16,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.File;
 import java.util.HashSet;
+import java.util.Random;
 import java.util.Set;
 
 /**
@@ -125,5 +127,26 @@ public class KeggImporter {
             }
         }
         return set;
+    }
+
+    //XXX: temporal impl
+    public void markStartables() {
+        try (Transaction tx = graphDb.beginTx()) {
+            int numStartable = 0;
+
+            Random random = new Random(0);
+            ResourceIterator<Node> iter = graphDb.findNodes(Const.LABEL_NODE);
+
+            while (iter.hasNext()) {
+                if (random.nextInt(100) < 10) {
+                    Node n = iter.next();
+                    n.addLabel(Const.LABEL_STARTABLE);
+                    numStartable++;
+                }
+            }
+
+            Log.debug("numStartable : " + numStartable);
+            tx.success();
+        }
     }
 }
