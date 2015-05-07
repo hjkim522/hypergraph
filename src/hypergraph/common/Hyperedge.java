@@ -19,6 +19,12 @@ public class Hyperedge {
         hypernode = null;
     }
 
+    public Hyperedge(Set<Node> s, Node t) {
+        source = s;
+        target = t;
+        hypernode = null;
+    }
+
     public void addSource(Node node) {
         source.add(node);
     }
