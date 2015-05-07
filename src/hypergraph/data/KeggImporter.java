@@ -180,8 +180,6 @@ public class KeggImporter {
 
         markStartables();
 
-        // TODO: handler undefined, check is same node or unmained anonemous node
-
         Log.info("countFile : " + countFile);
         Log.info("countEntry : " + countEntry);
         Log.info("countRelations : " + countRelations);
