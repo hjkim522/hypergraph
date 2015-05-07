@@ -1,5 +1,6 @@
 package hypergraph;
 
+import com.sun.corba.se.impl.naming.cosnaming.TransientNameServer;
 import hypergraph.common.Const;
 import hypergraph.common.HypergraphDatabase;
 import hypergraph.data.KeggImporter;
@@ -36,10 +37,24 @@ import java.util.concurrent.TimeUnit;
  */
 public class Application {
     public static void main(String[] args) {
-        kegg();
+        keggTest();
     }
 
-    private static void kegg() {
+    private static void keggTest() {
+        HypergraphDatabase.open("db/kegg");
+        GraphDatabaseService graphDb = HypergraphDatabase.getGraphDatabase();
+
+        try (Transaction tx = graphDb.beginTx()) {
+            Node node = graphDb.findNode(Const.LABEL_NODE, Const.PROP_UNIQUE, "hsa:36");
+
+            MinimalSourceSetFinder finder = new MinimalSourceSetFinder();
+            MinimalSourceSet mss = finder.find(node);
+        }
+
+        HypergraphDatabase.close();
+    }
+
+    private static void keggImport() {
         Log.init("log-kegg.txt");
         HypergraphDatabase.init("db/kegg");
         HypergraphDatabase.open("db/kegg");
