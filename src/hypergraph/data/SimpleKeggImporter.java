@@ -153,8 +153,6 @@ public class SimpleKeggImporter {
 
         Log.debug("insertReaction " + reaction.getAttribute("id"));
 
-
-
         // insert hyperedges
         for (Node t : targets) {
             Hyperedge hyperedge = new Hyperedge(sources, t);

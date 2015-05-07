@@ -1,5 +1,6 @@
 package hypergraph.common;
 
+import hypergraph.util.Log;
 import org.neo4j.graphdb.*;
 
 import java.util.HashSet;
@@ -47,6 +48,16 @@ public class Hyperedge {
     }
 
     public void save(GraphDatabaseService graphDb) {
+        // check error
+        if (source == null || source.isEmpty()) {
+            Log.debug("empty source");
+            return;
+        }
+        if (target == null || target.isEmpty()) {
+            Log.debug("empty target");
+            return;
+        }
+
         // create a pseudo hypernode
         hypernode = graphDb.createNode(Const.LABEL_HYPERNODE);
 

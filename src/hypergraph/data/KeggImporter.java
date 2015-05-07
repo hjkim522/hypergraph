@@ -19,26 +19,139 @@ import java.io.File;
 import java.util.*;
 
 /**
+ * Examples are from hsa00010.xml
  * Created by hyunjun on 2015. 5. 7..
  */
 public class KeggImporter {
+    /*
+     * Example of kegg entry
+     * <entry id="44" name="ko:K13970 ko:K13971 ko:K13972" type="ortholog"
+     *   link="http://www.kegg.jp/dbget-bin/www_bget?K13970+K13971+K13972">
+     *   <graphics name="K13970..." fgcolor="#000000" bgcolor="#FFFFFF"
+     *       type="rectangle" x="804" y="1181" width="46" height="17"/>
+     * </entry>
+     * <entry id="90" name="undefined" type="group">
+     *   <graphics fgcolor="#000000" bgcolor="#FFFFFF"
+     *     type="rectangle" x="902" y="521" width="46" height="34"/>
+     *   <component id="18"/>
+     *   <component id="31"/>
+     * </entry>
+     */
     private class KeggEntry {
-        String id;
-        String name;
-        String type;
+        public String id;
+        public String name;
+        public String type;
 
-        public KeggEntry(Element entry) {
+        public Set<String> nameSet = null;
 
+        public KeggEntry(Element entry, Map<String, KeggEntry> entryMap) {
+            id = entry.getAttribute("id");
+            name = entry.getAttribute("name");
+            type = entry.getAttribute("type");
+
+            // construct nameSet
+            nameSet = new HashSet<>();
+
+            if (type.equals("group")) {
+                NodeList components = entry.getElementsByTagName("component");
+                for (int i = 0; i < components.getLength(); i++) {
+                    Element component = (Element) components.item(i);
+                    String id = component.getAttribute("id");
+                    KeggEntry componentEntry = entryMap.get(id);
+                    nameSet.addAll(componentEntry.nameSet);
+                }
+            }
+            else {
+                String[] names = name.split(" ");
+                for (String n : names) {
+                    nameSet.add(n);
+                }
+            }
         }
 
+        public void save(GraphDatabaseService graphDb) {
+            for (String name : nameSet) {
+                Node node = graphDb.findNode(Const.LABEL_NODE, Const.PROP_UNIQUE, name);
+                if (node == null) {
+                    node = graphDb.createNode(Const.LABEL_NODE);
+                    node.setProperty(Const.PROP_UNIQUE, name);
+                    node.setProperty("type", type);
+                    countEntry++;
+                }
+            }
+        }
     }
 
+    /*
+     * Example of kegg relation
+     * <relation entry1="55" entry2="60" type="ECrel">
+     *   <subtype name="compound" value="57"/>
+     *   <subtype name="activation" value="--&gt;"/>
+     *   <subtype name="indirect effect" value="..&gt;"/>
+     * </relation>
+     */
+    //TODO: handle subtypes
     private class KeggRelation {
+        KeggEntry entry1;
+        KeggEntry entry2;
 
+        public KeggRelation(Element relation, Map<String, KeggEntry> entryMap) {
+            String entryId1 = relation.getAttribute("entry1");
+            String entryId2 = relation.getAttribute("entry2");
+            entry1 = entryMap.get(entryId1);
+            entry2 = entryMap.get(entryId2);
+        }
+
+        public void save(GraphDatabaseService graphDb) {
+            Set<Node> sources = namesToNodes(graphDb, entry1.nameSet);
+            Set<Node> targets = namesToNodes(graphDb, entry2.nameSet);
+            Hyperedge hyperedge = new Hyperedge(sources, targets);
+            hyperedge.save(graphDb);
+            countRelations++;
+        }
     }
 
+    /*
+     * Example of kegg reaction
+     * All entries are compound <- tested!
+     * <reaction id="100" name="rn:R03991" type="reversible">
+     *   <substrate id="191" name="cpd:C00024"/>
+     *   <substrate id="158" name="cpd:C02593"/>
+     *   <product id="163" name="cpd:C00010"/>
+     *   <product id="164" name="cpd:C05259"/>
+     * </reaction>
+     */
     private class KeggReaction {
+        Set<String> sourceNames;
+        Set<String> targetNames;
 
+        public KeggReaction(Element reaction, Map<String, KeggEntry> entryMap) {
+            NodeList substrates = reaction.getElementsByTagName("substrate");
+            NodeList products = reaction.getElementsByTagName("product");
+            sourceNames = constructNameSet(substrates, entryMap);
+            targetNames = constructNameSet(products, entryMap);
+        }
+
+        private Set<String> constructNameSet(NodeList list, Map<String, KeggEntry> entryMap) {
+            Set<String> result = new HashSet<String>();
+            for (int i = 0; i < list.getLength(); i++) {
+                Element elem = (Element) list.item(i);
+                String id = elem.getAttribute("id");
+                String name = elem.getAttribute("name");
+
+                KeggEntry entry = entryMap.get(id);
+                result.addAll(entry.nameSet);
+            }
+            return result;
+        }
+
+        public void save(GraphDatabaseService graphDb) {
+            Set<Node> sources = namesToNodes(graphDb, sourceNames);
+            Set<Node> targets = namesToNodes(graphDb, targetNames);
+            Hyperedge hyperedge = new Hyperedge(sources, targets);
+            hyperedge.save(graphDb);
+            countReactions++;
+        }
     }
 
     private GraphDatabaseService graphDb;
@@ -62,6 +175,7 @@ public class KeggImporter {
                 handleFile(file);
                 countFile++;
             }
+            if (countFile == 3) break;
         }
 
         markStartables();
@@ -88,144 +202,48 @@ public class KeggImporter {
     }
 
     private void handleDocument(Document doc) {
-        Element root = doc.getDocumentElement();
-        NodeList entries = root.getElementsByTagName("entry");
-        NodeList relations = root.getElementsByTagName("relation");
-        NodeList reactions = root.getElementsByTagName("reaction");
-
-        Map<String, String> entryMap = new HashMap<>();
-
-        // insert entries
         try (Transaction tx = graphDb.beginTx()) {
+            Element root = doc.getDocumentElement();
+            NodeList entries = root.getElementsByTagName("entry");
+            NodeList relations = root.getElementsByTagName("relation");
+            NodeList reactions = root.getElementsByTagName("reaction");
+
+            Map<String, KeggEntry> entryMap = new HashMap<>();
+
+            // parse entry
             for (int i = 0; i < entries.getLength(); i++) {
-                Element entry = (Element) entries.item(i);
-                insertEntry(entryMap, entry);
+                KeggEntry entry = new KeggEntry((Element) entries.item(i), entryMap);
+                entryMap.put(entry.id, entry);
+                entry.save(graphDb);
             }
-            tx.success();
-        }
 
-        // insert relations
-        try (Transaction tx = graphDb.beginTx()) {
+            // parse relation
             for (int i = 0; i < relations.getLength(); i++) {
-                Element relation = (Element) relations.item(i);
-                insertRelation(entryMap, relation);
+                KeggRelation relation = new KeggRelation((Element) relations.item(i), entryMap);
+                relation.save(graphDb);
             }
-            tx.success();
-        }
 
-        // insert reactions
-        try (Transaction tx = graphDb.beginTx()) {
+            // parse reactions
             for (int i = 0; i < reactions.getLength(); i++) {
-                Element reaction = (Element) reactions.item(i);
-                insertReaction(entryMap, reaction);
+                KeggReaction reaction = new KeggReaction((Element) reactions.item(i), entryMap);
+                reaction.save(graphDb);
             }
+
             tx.success();
         }
     }
 
-    private void insertEntry(Map<String, String> entryMap, Element entry) {
-        String nameSeq = entry.getAttribute("name");
-        String type = entry.getAttribute("type");
-        String id = entry.getAttribute("id");
-
-        Log.debug("insertEntry " + nameSeq);
-        entryMap.put(id, nameSeq);
-
-        //TODO: handle undefined
-        //TODO: handle group.... fuck
-
-        String[] names = nameSeq.split(" ");
-        for (String name : names) {
-            // insert into map
-            assert entryMap.containsKey(id);
-
-            // insert node
-            Node node = graphDb.findNode(Const.LABEL_NODE, Const.PROP_UNIQUE, name);
-            if (node == null) {
-                node = graphDb.createNode(Const.LABEL_NODE);
-                node.setProperty(Const.PROP_UNIQUE, name);
-                node.setProperty("type", type);
-                countEntry++;
-            }
-        }
-    }
-
-    private void insertGroup(Map<String, String> entryMap, Element group) {
-        NodeList components = group.getElementsByTagName("component");
-        for (int i = 0; i < components.getLength(); i++) {
-            Element component = (Element) components.item(i);
-            String id = component.getAttribute("id");
-        }
-    }
-
-    private void insertRelation(Map<String, String> entryMap, Element relation) {
-        String entry1 = relation.getAttribute("entry1");
-        String entry2 = relation.getAttribute("entry2");
-        String name1 = entryMap.get(entry1);
-        String name2 = entryMap.get(entry2);
-
-        // TODO: handle activate and inhibit.... fuck
-        NodeList subtypes = relation.getElementsByTagName("subtype");
-
-        Set<Node> sources = constructNodeSet(name1);
-        Set<Node> targets = constructNodeSet(name2);
-
-        // insert hyperedges
-        for (Node t : targets) {
-            Hyperedge hyperedge = new Hyperedge(sources, t);
-            hyperedge.save(graphDb);
-            countRelations++;
-        }
-    }
-
-    private Set<Node> constructNodeSet(String nameSeq) {
-        Set<Node> set = new HashSet<Node>();
-        String[] names = nameSeq.split(" ");
+    private Set<Node> namesToNodes(GraphDatabaseService graphDb, Set<String> names) {
+        Set<Node> nodeSet = new HashSet<>();
         for (String name : names) {
             Node node = graphDb.findNode(Const.LABEL_NODE, Const.PROP_UNIQUE, name);
             if (node == null) {
-                Log.warn("null node2");
-                continue;
+                Log.debug("null node");
             } else {
-                set.add(node);
+                nodeSet.add(node);
             }
         }
-        return set;
-    }
-
-    private void insertReaction(Map<String, String> entryMap, Element reaction) {
-        NodeList substrates = reaction.getElementsByTagName("substrate");
-        NodeList products = reaction.getElementsByTagName("product");
-
-        Set<Node> sources = constructNodeSet(substrates);
-        Set<Node> targets = constructNodeSet(products);
-
-        Log.debug("insertReaction " + reaction.getAttribute("id"));
-
-        // insert hyperedges
-        for (Node t : targets) {
-            Hyperedge hyperedge = new Hyperedge(sources, t);
-            hyperedge.save(graphDb);
-            countReactions++;
-        }
-    }
-
-    private Set<Node> constructNodeSet(NodeList list) {
-        Set<Node> set = new HashSet<Node>();
-        for (int i = 0; i < list.getLength(); i++) {
-            Element elem = (Element) list.item(i);
-            String name = elem.getAttribute("name");
-            Log.debug(name);
-
-            Node node = graphDb.findNode(Const.LABEL_NODE, Const.PROP_UNIQUE, name);
-            if (node == null) {
-                Log.warn("null node");
-                continue;
-            } else {
-                set.add(node);
-            }
-        }
-        return set;
+        return nodeSet;
     }
 
     private void markStartables() {

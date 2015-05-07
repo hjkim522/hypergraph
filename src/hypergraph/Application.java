@@ -1,10 +1,8 @@
 package hypergraph;
 
-import com.sun.corba.se.impl.naming.cosnaming.TransientNameServer;
 import hypergraph.common.Const;
 import hypergraph.common.HypergraphDatabase;
 import hypergraph.data.KeggImporter;
-import hypergraph.data.KeggStatistic;
 import hypergraph.discovery.IndexedBackwardDiscovery;
 import hypergraph.discovery.NaiveBackwardDiscovery;
 import hypergraph.mss.MinimalSourceSet;
@@ -16,16 +14,10 @@ import hypergraph.data.SimpleImporter;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
-import org.neo4j.graphdb.factory.GraphDatabaseFactory;
-import org.neo4j.graphdb.schema.IndexDefinition;
-import org.neo4j.graphdb.schema.Schema;
-import org.neo4j.io.fs.FileUtils;
 
-import java.io.File;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Main hypergraph.Application
@@ -37,7 +29,8 @@ import java.util.concurrent.TimeUnit;
  */
 public class Application {
     public static void main(String[] args) {
-        experiment("100-path");
+        keggImport();
+//        experiment("100-path");
     }
 
     private static void keggTest() {
