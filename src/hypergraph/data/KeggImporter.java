@@ -15,9 +15,7 @@ import org.w3c.dom.NodeList;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.File;
-import java.util.HashSet;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by hyunjun on 2015. 5. 7..
@@ -27,12 +25,14 @@ public class KeggImporter {
     private int countFile;
     private int countEntry;
     private int countRelations;
+    private int countReactions;
 
     public KeggImporter() {
         graphDb = Application.getGraphDatabase();
         countFile = 0;
         countEntry = 0;
         countRelations = 0;
+        countReactions = 0;
     }
 
     public void run() {
@@ -49,6 +49,7 @@ public class KeggImporter {
         Log.info("countFile : " + countFile);
         Log.info("countEntry : " + countEntry);
         Log.info("countRelations : " + countRelations);
+        Log.info("countReactions : " + countReactions);
     }
 
     private void handleFile(File file) {
@@ -67,41 +68,81 @@ public class KeggImporter {
     private void handleDocument(Document doc) {
         Element root = doc.getDocumentElement();
         NodeList entries = root.getElementsByTagName("entry");
+        NodeList relations = root.getElementsByTagName("relation");
         NodeList reactions = root.getElementsByTagName("reaction");
 
+        Map<String, String> entryMap = new HashMap<>();
+
+        // insert entries
         try (Transaction tx = graphDb.beginTx()) {
             for (int i = 0; i < entries.getLength(); i++) {
                 Element entry = (Element) entries.item(i);
-                insertEntry(entry);
+                insertEntry(entryMap, entry);
             }
             tx.success();
         }
 
+        // insert relations
+        try (Transaction tx = graphDb.beginTx()) {
+            for (int i = 0; i < relations.getLength(); i++) {
+                Element relation = (Element) relations.item(i);
+                insertRelation(entryMap, relation);
+            }
+            tx.success();
+        }
+
+        // insert reactions
         try (Transaction tx = graphDb.beginTx()) {
             for (int i = 0; i < reactions.getLength(); i++) {
                 Element reaction = (Element) reactions.item(i);
-                insertReaction(reaction);
+                insertReaction(entryMap, reaction);
             }
             tx.success();
         }
     }
 
-    private void insertEntry(Element entry) {
+    private void insertEntry(Map<String, String> entryMap, Element entry) {
         String name = entry.getAttribute("name");
         String type = entry.getAttribute("type");
+        String id = entry.getAttribute("id");
 
         Log.debug("insertEntry " + name);
+
+        // insert into map
+        assert entryMap.containsKey(id);
+        entryMap.put(id, name);
 
         // insert node
         Node node = graphDb.findNode(Const.LABEL_NODE, Const.PROP_UNIQUE, name);
         if (node == null) {
             node = graphDb.createNode(Const.LABEL_NODE);
             node.setProperty(Const.PROP_UNIQUE, name);
+            node.setProperty("type", type);
             countEntry++;
         }
     }
 
-    private void insertReaction(Element reaction) {
+    private void insertRelation(Map<String, String> entryMap, Element relation) {
+        String entry1 = relation.getAttribute("entry1");
+        String entry2 = relation.getAttribute("entry2");
+        String name1 = entryMap.get(entry1);
+        String name2 = entryMap.get(entry2);
+
+        Node node1 = graphDb.findNode(Const.LABEL_NODE, Const.PROP_UNIQUE, name1);
+        Node node2 = graphDb.findNode(Const.LABEL_NODE, Const.PROP_UNIQUE, name2);
+
+        // TODO: handle activate and inhibit.... fuck
+        NodeList subtypes = relation.getElementsByTagName("subtype");
+
+
+        Hyperedge hyperedge = new Hyperedge();
+        hyperedge.addSource(node1);
+        hyperedge.setTarget(node2);
+        hyperedge.save(graphDb);
+        countRelations++;
+    }
+
+    private void insertReaction(Map<String, String> entryMap, Element reaction) {
         NodeList substrates = reaction.getElementsByTagName("substrate");
         NodeList products = reaction.getElementsByTagName("product");
 
@@ -110,11 +151,13 @@ public class KeggImporter {
 
         Log.debug("insertReaction " + reaction.getAttribute("id"));
 
+
+
         // insert hyperedges
         for (Node t : targets) {
             Hyperedge hyperedge = new Hyperedge(sources, t);
             hyperedge.save(graphDb);
-            countRelations++;
+            countReactions++;
         }
     }
 
@@ -145,13 +188,11 @@ public class KeggImporter {
             ResourceIterator<Node> iter = graphDb.findNodes(Const.LABEL_NODE);
 
             while (iter.hasNext()) {
-//                Log.debug(random.nextInt(100) + " ");
-                if (random.nextInt(100) > 90) {
-                    Node n = iter.next();
+                Node n = iter.next();
+//                if (random.nextInt(100) > 90) {
+                if (n.getProperty("type").equals("compound")) {
                     n.addLabel(Const.LABEL_STARTABLE);
                     numStartable++;
-                } else {
-                    iter.next();
                 }
             }
 

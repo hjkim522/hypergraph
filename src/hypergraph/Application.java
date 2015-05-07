@@ -42,27 +42,27 @@ public class Application {
     }
 
     public static void main(String[] args) {
+        Log.fileOpen("log-kegg.txt");
         importKegg();
 
-//        Log.fileOpen("log-kegg.txt");
 //        commandOpenDB("db/kegg");
-//        commandBuildMSS();
-//        commandShutdownDB();
-//        Log.fileClose();
+        commandBuildMSS();
+        commandShutdownDB();
+        Log.fileClose();
     }
 
     private static void importKegg() {
-//        commandInitDB("db/kegg");
-        commandOpenDB("db/kegg");
+        commandInitDB("db/kegg");
+//        commandOpenDB("db/kegg");
 
         KeggImporter importer = new KeggImporter();
-//        importer.run();
+        importer.run();
         importer.markStartables();
 
 //        KeggStatistic stat = new KeggStatistic();
 //        stat.run();
 
-        commandShutdownDB();
+//        commandShutdownDB();
     }
 
     private static void experiment(String dataSet) {
