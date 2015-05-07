@@ -49,11 +49,11 @@ public class Application {
 
     private static void keggImport() {
         Log.init("log-kegg.txt");
-        HypergraphDatabase.init("db/kegg");
+//        HypergraphDatabase.init("db/kegg");
         HypergraphDatabase.open("db/kegg");
 
-        KeggImporter importer = new KeggImporter();
-        importer.run();
+//        KeggImporter importer = new KeggImporter();
+//        importer.run();
 
         MinimalSourceSetBuilder builder = new MinimalSourceSetBuilder();
         builder.run();

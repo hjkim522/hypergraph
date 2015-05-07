@@ -142,6 +142,9 @@ public class MinimalSourceSetBuilder {
                 // mark given hyperedge as computed
                 setComputed(h);
 
+                // calculate mss of hyperedge
+                MinimalSourceSet mssHyperedge = computeMinimalSourceSet(h);
+
                 // get target node
                 // Node t = h.getSingleRelationship(Const.REL_TO_TARGET, Direction.OUTGOING).getEndNode();
                 // modified to support multiple target nodes
@@ -153,7 +156,6 @@ public class MinimalSourceSetBuilder {
                     Log.debug("add target " + t.getId());
 
                     // calculate and update mss
-                    MinimalSourceSet mssHyperedge = computeMinimalSourceSet(h);
                     MinimalSourceSet mssTarget = getMinimalSourceSet(t);
                     totalComputation++;
 
