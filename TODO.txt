@@ -1,0 +1,3 @@
+Optimize below;
+cycle, direct cycle,
+multiple edges

@@ -183,7 +183,7 @@ public class KeggImporter {
                 handleFile(file);
                 countFile++;
             }
-//            if (countFile == 3) break;
+            if (countFile == 10) break;
         }
 
         markStartables();
