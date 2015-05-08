@@ -33,13 +33,20 @@ public class Application {
 
     public static void main(String[] args) {
 
-        Runnable runnable = () -> {
-            Node node = graphDb.findNode(Const.LABEL_NODE, Const.PROP_UNIQUE, "hsa:36");
-            MinimalSourceSetFinder finder = new MinimalSourceSetFinder();
-            MinimalSourceSet mss = finder.find(node);
-        };
+        keggImport();
 
-        executeTx("kegg", "db/kegg", false, runnable);
+//        MinimalSourceSetBuilder builder = new MinimalSourceSetBuilder(100000);
+//        builder.run();
+//    });execute("kegg-test", "db/kegg", false, () -> {
+
+
+//        executeTx("kegg", "db/kegg", false, () -> {
+//            Node node = graphDb.findNode(Const.LABEL_NODE, Const.PROP_UNIQUE, "cpd:C00011");
+//            Log.debug("node id " + node.getId());
+//            MinimalSourceSetFinder finder = new MinimalSourceSetFinder();
+//            MinimalSourceSet mss = finder.find(node);
+//        });
+
     }
 
     private static void execute(String log, String db, boolean init, Runnable runnable) {
@@ -70,7 +77,7 @@ public class Application {
             KeggImporter importer = new KeggImporter();
             importer.run();
 
-            MinimalSourceSetBuilder builder = new MinimalSourceSetBuilder();
+            MinimalSourceSetBuilder builder = new MinimalSourceSetBuilder(100000);
             builder.run();
         };
 
