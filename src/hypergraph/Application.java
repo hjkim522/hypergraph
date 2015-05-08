@@ -30,7 +30,7 @@ import java.util.Set;
  */
 public class Application {
     public static void main(String[] args) {
-//        keggImport();
+        keggImport();
         keggQuery();
 //        experiment("100-path");
     }
@@ -47,8 +47,8 @@ public class Application {
             while (nodes.hasNext()) {
                 Node node = nodes.next();
 
-                // query 10%
-                if (Math.random() < 0.9)
+                // query 1%
+                if (Math.random() < 0.99)
                     continue;
 
                 measure.start();
@@ -79,11 +79,11 @@ public class Application {
 
     private static void keggImport() {
         Log.init("log-kegg.txt");
-//        HypergraphDatabase.init("db/kegg");
+        HypergraphDatabase.init("db/kegg");
         HypergraphDatabase.open("db/kegg");
 
-//        KeggImporter importer = new KeggImporter();
-//        importer.run();
+        KeggImporter importer = new KeggImporter();
+        importer.run();
 
         MinimalSourceSetBuilder builder = new MinimalSourceSetBuilder();
         builder.run();

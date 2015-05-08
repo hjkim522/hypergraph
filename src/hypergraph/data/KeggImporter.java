@@ -103,6 +103,10 @@ public class KeggImporter {
         }
 
         public void save(GraphDatabaseService graphDb) {
+            //XXX: skip large relation
+            if (entry1.nameSet.size() > 5 || entry2.nameSet.size() > 5)
+                return;
+
             Set<Node> sources = namesToNodes(graphDb, entry1.nameSet);
             Set<Node> targets = namesToNodes(graphDb, entry2.nameSet);
             Hyperedge hyperedge = new Hyperedge(sources, targets);
@@ -146,6 +150,10 @@ public class KeggImporter {
         }
 
         public void save(GraphDatabaseService graphDb) {
+            //XXX: skip large relation
+            if (sourceNames.size() > 5 || targetNames.size() > 5)
+                return;
+
             Set<Node> sources = namesToNodes(graphDb, sourceNames);
             Set<Node> targets = namesToNodes(graphDb, targetNames);
             Hyperedge hyperedge = new Hyperedge(sources, targets);
