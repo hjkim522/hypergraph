@@ -1,6 +1,7 @@
 /.idea
 /db
 /out
+/log
 *.iml
 .DS_Store
 hypergraph*.txt

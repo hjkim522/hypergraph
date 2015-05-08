@@ -27,7 +27,7 @@ public class Log {
     public static void init(String logFileName) {
         try {
             new File("log").mkdir();
-            fw = new FileWriter("log/" + logFileName);
+            fw = new FileWriter("log/" + logFileName + ".txt");
             out = new BufferedWriter(fw);
         } catch (Exception e) {
             e.printStackTrace();

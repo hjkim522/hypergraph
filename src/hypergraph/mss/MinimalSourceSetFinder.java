@@ -24,24 +24,22 @@ public class MinimalSourceSetFinder {
         graphDb = HypergraphDatabase.getGraphDatabase();
     }
 
+    public MinimalSourceSet find2(Node target) {
+        MinimalSourceSet mss = getMinimalSourceSet(target);
+        return null;
+    }
+
+    //XXX: bad impl
     public MinimalSourceSet find(Node target) {
         MinimalSourceSet mss = getMinimalSourceSet(target);
 
-        Log.debug("mss len = " + mss.cardinality());
-        Log.debug(mss.toString());
-        needReconstruction(mss);
-
         // Naive implementation
-        while (needReconstruction(mss)) {
-            Log.debug("mss len = " + mss.cardinality());
-            Log.debug(mss.toString());
+        long decomposedId = needReconstruction(mss);
+        while (decomposedId > 0) {
             mss = reconstruct(mss);
+//            mss = reconstruct(mss, decomposedId);
+            decomposedId = needReconstruction(mss);
         }
-
-        // check final result
-        Log.debug("mss len = " + mss.cardinality());
-        Log.debug(mss.toString());
-        needReconstruction(mss);
 
         return mss;
     }
@@ -50,6 +48,30 @@ public class MinimalSourceSetFinder {
         if (!target.hasProperty(Const.PROP_MSS))
             return new MinimalSourceSet();
         return MinimalSourceSet.valueOf((String) target.getProperty(Const.PROP_MSS));
+    }
+
+    private MinimalSourceSet reconstruct(MinimalSourceSet mss, long decomposedId) {
+        MinimalSourceSet mss1 = new MinimalSourceSet();
+        MinimalSourceSet mss2 = new MinimalSourceSet();
+
+        for (Set<Long> s : mss.getMSS()) {
+            if (s.contains(decomposedId)) {
+                Set<Long> t = new HashSet<>(s);
+                t.remove(decomposedId);
+                mss1.getMSS().add(t);
+            } else {
+                mss2.getMSS().add(s);
+            }
+        }
+
+        if (mss1.cardinality() != 0) {
+//            Node d = graphDb.getNodeById(decomposedId);
+//            MinimalSourceSet mss3 = computeMinimalSourceSet(d);
+//            mss3.removeContains(decomposedId);
+//            mss2.addAll(mss3.cartesian(mss1));
+        }
+
+        return mss2;
     }
 
     private MinimalSourceSet reconstruct(MinimalSourceSet mss) {
@@ -61,20 +83,17 @@ public class MinimalSourceSetFinder {
 
                 // if decomposed
                 if (v.hasLabel(Const.LABEL_HYPERNODE)) {
-                    MinimalSourceSet mssV = computeMinimalSourceSet(v);
 
-                    // get cartesian
-                    if (s.size() > 1) {
-                        Set<Long> sv = new HashSet<>(s);
-                        sv.remove(nodeId);
-                        MinimalSourceSet mssSv = new MinimalSourceSet(sv);
-                        mssV = mssSv.cartesian(mssV);
+                    if (s.size() == 1) {
+                        MinimalSourceSet mssV = computeMinimalSourceSet(v);
+                        recon.addAll(mssV);
+                        recon.removeContains(v.getId());
+                        return recon;
                     }
 
-                    // remove s and then add recon
-                    recon.getMSS().remove(s); //XXX: ?��?��것같???��
-                    recon.addAll(mssV);
-                    return recon;
+                    else {
+                        return reconstruct(mss, v.getId());
+                    }
                 }
             }
         }
@@ -82,18 +101,22 @@ public class MinimalSourceSetFinder {
         return recon;
     }
 
-    private boolean needReconstruction(MinimalSourceSet mss) {
+    private long needReconstruction(MinimalSourceSet mss) {
+        Log.debug("call needReconstruction of mss(" + mss.cardinality() + "):");
+        Log.debug(mss.toString());
+
         for (Set<Long> s : mss.getMSS()) {
             for (Long nodeId : s) {
                 Node v = graphDb.getNodeById(nodeId);
                 if (v.hasLabel(Const.LABEL_HYPERNODE)) {
                     Log.debug("needs recon at " + nodeId);
-                    return true;
+                    Log.debug("of " + s);
+                    return nodeId;
                 }
             }
         }
         Log.debug("reconstructed!");
-        return false;
+        return -1;
     }
 
     private MinimalSourceSet computeMinimalSourceSet(Node hypernode) {
@@ -107,6 +130,10 @@ public class MinimalSourceSetFinder {
                 mss = mss.cartesian(getMinimalSourceSet(s));
             }
         }
+        Log.debug("computeMinimalSourceSet");
+        Log.debug("hypernode mss len = " + mss.cardinality());
+        Log.debug(mss.toString());
+
         return mss;
 
         // Get from saved result

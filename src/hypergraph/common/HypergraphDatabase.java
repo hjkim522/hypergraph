@@ -27,11 +27,12 @@ public class HypergraphDatabase {
         createIndex();
     }
 
-    public static void open(String path) {
+    public static GraphDatabaseService open(String path) {
         if (graphDb == null) {
             graphDb = new GraphDatabaseFactory().newEmbeddedDatabase(path);
             registerShutdownHook(graphDb);
         }
+        return graphDb;
     }
 
     public static void close() {

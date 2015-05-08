@@ -1,5 +1,7 @@
 package hypergraph.mss;
 
+import hypergraph.util.Log;
+
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -77,6 +79,18 @@ public class MinimalSourceSet {
         Set<Long> sourceSet = new HashSet<>();
         sourceSet.add(nodeId);
         return addSourceSet(sourceSet);
+    }
+
+    public void removeContains(Long nodeId) {
+        Iterator<Set<Long>> iter = mss.iterator();
+        while (iter.hasNext()) {
+            Set<Long> s = iter.next();
+            if (s.contains(nodeId)) {
+                //if (s.size() != 1) Log.error("not 1");
+                iter.remove();
+                //break;
+            }
+        }
     }
 
     public MinimalSourceSet union(MinimalSourceSet other) {
