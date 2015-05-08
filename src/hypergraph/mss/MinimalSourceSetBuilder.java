@@ -166,6 +166,7 @@ public class MinimalSourceSetBuilder {
                             Log.debug("already contains node " + t.getId());
                         }
                         queue.add(t);
+                        unsetComputed(t);
                     }
                 }
             }
