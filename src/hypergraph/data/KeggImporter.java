@@ -109,6 +109,7 @@ public class KeggImporter {
 
             Set<Node> sources = namesToNodes(graphDb, entry1.nameSet);
             Set<Node> targets = namesToNodes(graphDb, entry2.nameSet);
+            //targets.removeAll(sources); // avoid loop
             Hyperedge hyperedge = new Hyperedge(sources, targets);
             hyperedge.save(graphDb);
             countRelations++;
@@ -156,6 +157,7 @@ public class KeggImporter {
 
             Set<Node> sources = namesToNodes(graphDb, sourceNames);
             Set<Node> targets = namesToNodes(graphDb, targetNames);
+            //targets.removeAll(sources); // avoid loop
             Hyperedge hyperedge = new Hyperedge(sources, targets);
             hyperedge.save(graphDb);
             countReactions++;
@@ -183,7 +185,7 @@ public class KeggImporter {
                 handleFile(file);
                 countFile++;
             }
-            if (countFile == 10) break;
+//            if (countFile == 10) break;
         }
 
         markStartables();
@@ -256,11 +258,13 @@ public class KeggImporter {
         try (Transaction tx = graphDb.beginTx()) {
             int numStartable = 0;
 
-            Random random = new Random(0);
             ResourceIterator<Node> iter = graphDb.findNodes(Const.LABEL_NODE);
 
             while (iter.hasNext()) {
                 Node n = iter.next();
+
+//                if (Math.random() > 0.1)
+//                    continue;
 
                 if (n.getProperty("type").equals("compound")) {
                     n.addLabel(Const.LABEL_STARTABLE);

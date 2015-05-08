@@ -47,6 +47,10 @@ public class Hyperedge {
         addTarget(node);
     }
 
+    public Node getHypernode() {
+        return hypernode;
+    }
+
     public void save(GraphDatabaseService graphDb) {
         // check error
         if (source == null || source.isEmpty()) {

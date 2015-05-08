@@ -1,3 +1,9 @@
 Optimize below;
 cycle, direct cycle,
 multiple edges
+
+
+
+1.mark decomposed hypernodes so that avoid duplications
+2.latter compute once and set an attr
+

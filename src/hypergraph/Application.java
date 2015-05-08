@@ -77,7 +77,7 @@ public class Application {
             KeggImporter importer = new KeggImporter();
             importer.run();
 
-            MinimalSourceSetBuilder builder = new MinimalSourceSetBuilder(100000);
+            MinimalSourceSetBuilder builder = new MinimalSourceSetBuilder(1500);
             builder.run();
         };
 
