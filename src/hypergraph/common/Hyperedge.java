@@ -113,8 +113,6 @@ public class Hyperedge {
             e.target = new HashSet<>();
             e.hypernode = h;
 
-            Log.debug("hypernode " + h.getId());
-
             // make target set
             Iterable<Relationship> rels = h.getRelationships(Direction.OUTGOING, Const.REL_TO_TARGET);
             for (Relationship rel : rels) {
