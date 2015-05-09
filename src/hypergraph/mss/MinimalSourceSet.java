@@ -22,7 +22,7 @@ public class MinimalSourceSet {
     public MinimalSourceSet(MinimalSourceSet other) {
         this();
         for (Set<Long> sourceSet : other.mss) {
-            mss.add(sourceSet); //XXX: Set of Long ?�� deep copy ?��?��?���??��?��? ?���? ?��무래?�� sourceSet ?���? revise ?��?���? ?��?��것같???��
+            mss.add(sourceSet);
         }
     }
 

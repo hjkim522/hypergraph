@@ -183,6 +183,11 @@ public class MinimalSourceSetBuilder {
     }
 
     private MinimalSourceSet computeMinimalSourceSet(Node hypernode) {
+        // check already decomposed
+        if (hypernode.hasProperty("decomposed")) {
+            return new MinimalSourceSet(hypernode.getId());
+        }
+
         MinimalSourceSet mss = null;
         Iterable<Relationship> rels = hypernode.getRelationships(Direction.INCOMING, Const.REL_FROM_SOURCE);
         for (Relationship rel : rels) {
@@ -195,16 +200,9 @@ public class MinimalSourceSetBuilder {
 
             // decomposition
             if (mss.cardinality() > maxMSS) {
-                // save original mss
-                //mssMap.put(hypernode.getId(), mss);
-
-                // create single element mss
-                Set<Long> sourceSet = new HashSet<>();
-                sourceSet.add(hypernode.getId());
-                mss = new MinimalSourceSet();
-                mss.addSourceSet(sourceSet);
+                hypernode.setProperty("decomposed", true);
                 statDecomposed++;
-                return mss;
+                return new MinimalSourceSet(hypernode.getId());
             }
         }
         return mss;
