@@ -111,8 +111,10 @@ public class KeggImporter {
             Set<Node> targets = namesToNodes(graphDb, entry2.nameSet);
             //targets.removeAll(sources); // avoid loop
             Hyperedge hyperedge = new Hyperedge(sources, targets);
-            hyperedge.save(graphDb);
-            countRelations++;
+            if (!isDuplicated(hyperedge)) {
+                hyperedge.save(graphDb);
+                countRelations++;
+            }
         }
     }
 
@@ -159,8 +161,10 @@ public class KeggImporter {
             Set<Node> targets = namesToNodes(graphDb, targetNames);
             //targets.removeAll(sources); // avoid loop
             Hyperedge hyperedge = new Hyperedge(sources, targets);
-            hyperedge.save(graphDb);
-            countReactions++;
+            if (!isDuplicated(hyperedge)) {
+                hyperedge.save(graphDb);
+                countReactions++;
+            }
         }
     }
 
@@ -185,7 +189,7 @@ public class KeggImporter {
                 handleFile(file);
                 countFile++;
             }
-//            if (countFile == 10) break;
+            if (countFile == 10) break;
         }
 
         markStartables();
@@ -263,8 +267,8 @@ public class KeggImporter {
             while (iter.hasNext()) {
                 Node n = iter.next();
 
-//                if (Math.random() > 0.1)
-//                    continue;
+                if (Math.random() > 0.1)
+                    continue;
 
                 if (n.getProperty("type").equals("compound")) {
                     n.addLabel(Const.LABEL_STARTABLE);
@@ -275,5 +279,15 @@ public class KeggImporter {
             Log.info("numStartable : " + numStartable);
             tx.success();
         }
+    }
+
+    private boolean isDuplicated(Hyperedge hyperedge) {
+        Set<Hyperedge> hyperedges = Hyperedge.getHyperedgesFrom(hyperedge.getSource());
+        for (Hyperedge e : hyperedges) {
+            if (e.getTarget().containsAll(hyperedge.getTarget())) {
+                return true;
+            }
+        }
+        return false;
     }
 }

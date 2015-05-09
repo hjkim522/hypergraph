@@ -106,7 +106,7 @@ public class SimpleImporter {
         }
 
         int targetIdx = Integer.valueOf(targetStr);
-        hyperedge.setTarget(nodes[targetIdx]);
+        hyperedge.addTarget(nodes[targetIdx]);
 
         try (Transaction tx = graphDb.beginTx()) {
             hyperedge.save(graphDb);

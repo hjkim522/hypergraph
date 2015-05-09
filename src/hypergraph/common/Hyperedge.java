@@ -2,8 +2,11 @@ package hypergraph.common;
 
 import hypergraph.util.Log;
 import org.neo4j.graphdb.*;
+import org.neo4j.graphdb.index.ReadableIndex;
 
+import javax.management.relation.Relation;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 /**
@@ -42,13 +45,12 @@ public class Hyperedge {
         target.add(node);
     }
 
-    @Deprecated
-    public void setTarget(Node node) {
-        addTarget(node);
+    public Set<Node> getSource() {
+        return source;
     }
 
-    public Node getHypernode() {
-        return hypernode;
+    public Set<Node> getTarget() {
+        return target;
     }
 
     public void save(GraphDatabaseService graphDb) {
@@ -74,5 +76,50 @@ public class Hyperedge {
         for (Node t : target) {
             hypernode.createRelationshipTo(t, Const.REL_TO_TARGET);
         }
+    }
+
+    public static Set<Hyperedge> getHyperedgesFrom(Set<Node> source) {
+        Set<Node> hypernodes = null;
+
+        for (Node s : source) {
+            Set<Node> intermediate = new HashSet<>();
+
+            // get forward star
+            Iterable<Relationship> rels = s.getRelationships(Direction.OUTGOING, Const.REL_FROM_SOURCE);
+            for (Relationship rel : rels) {
+                // get pseudo hypernode and check enabled
+                Node h = rel.getEndNode();
+
+                // check source size
+                if (source.size() == h.getDegree(Const.REL_FROM_SOURCE, Direction.INCOMING)) {
+                    intermediate.add(h);
+                }
+            }
+
+            // get intersection
+            if (hypernodes == null) {
+                hypernodes = intermediate;
+            } else {
+                hypernodes.retainAll(intermediate);
+            }
+        }
+
+        // convert node to hyperedges
+        Set<Hyperedge> result = new HashSet<>();
+
+        for (Node h : hypernodes) {
+            Hyperedge e = new Hyperedge();
+            e.source = source;
+            e.target = new HashSet<>();
+            e.hypernode = h;
+
+            // make target set
+            Iterable<Relationship> rels = h.getRelationships(Direction.OUTGOING, Const.REL_TO_TARGET);
+            for (Relationship rel : rels) {
+                e.target.add(rel.getEndNode());
+            }
+        }
+
+        return result;
     }
 }

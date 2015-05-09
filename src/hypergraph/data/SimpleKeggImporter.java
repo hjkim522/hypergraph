@@ -139,7 +139,7 @@ public class SimpleKeggImporter {
 
         Hyperedge hyperedge = new Hyperedge();
         hyperedge.addSource(node1);
-        hyperedge.setTarget(node2);
+        hyperedge.addTarget(node2);
         hyperedge.save(graphDb);
         countRelations++;
     }
