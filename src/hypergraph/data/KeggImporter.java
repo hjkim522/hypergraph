@@ -267,8 +267,8 @@ public class KeggImporter {
             while (iter.hasNext()) {
                 Node n = iter.next();
 
-                if (Math.random() > 0.1)
-                    continue;
+//                if (Math.random() > 0.1)
+//                    continue;
 
                 if (n.getProperty("type").equals("compound")) {
                     n.addLabel(Const.LABEL_STARTABLE);
