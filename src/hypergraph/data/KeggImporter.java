@@ -230,10 +230,10 @@ public class KeggImporter {
             }
 
             // parse relation
-//            for (int i = 0; i < relations.getLength(); i++) {
-//                KeggRelation relation = new KeggRelation((Element) relations.item(i), entryMap);
-//                relation.save(graphDb);
-//            }
+            for (int i = 0; i < relations.getLength(); i++) {
+                KeggRelation relation = new KeggRelation((Element) relations.item(i), entryMap);
+                relation.save(graphDb);
+            }
 
             // parse reactions
             for (int i = 0; i < reactions.getLength(); i++) {

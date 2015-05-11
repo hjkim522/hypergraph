@@ -33,7 +33,10 @@ public class Application {
 
     public static void main(String[] args) {
 
-        keggImport();
+//        keggImport();
+
+        keggQuery();
+
 
 //        MinimalSourceSetBuilder builder = new MinimalSourceSetBuilder(100000);
 //        builder.run();
@@ -77,7 +80,7 @@ public class Application {
             KeggImporter importer = new KeggImporter();
             importer.run();
 
-            MinimalSourceSetBuilder builder = new MinimalSourceSetBuilder(1500);
+            MinimalSourceSetBuilder builder = new MinimalSourceSetBuilder(512);
             builder.run();
         };
 
@@ -105,7 +108,7 @@ public class Application {
             measure.printStatistic();
         };
 
-        execute("kegg-query.txt", "db/kegg", false, runnable);
+        executeTx("kegg-query.txt", "db/kegg", false, runnable);
     }
 
     // Deprecated below
