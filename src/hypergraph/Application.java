@@ -97,13 +97,14 @@ public class Application {
                 Node node = nodes.next();
 
                 // query 1%
-                if (Math.random() < 0.99)
-                    continue;
+//                if (Math.random() < 0.01)
+//                    continue;
 
                 measure.start();
                 MinimalSourceSetFinder finder = new MinimalSourceSetFinder();
                 MinimalSourceSet mss = finder.find(node);
                 measure.end();
+                break;
             }
             measure.printStatistic();
         };

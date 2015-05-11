@@ -19,9 +19,11 @@ import java.util.Set;
  */
 public class MinimalSourceSetFinder {
     private static GraphDatabaseService graphDb;
+    private Set<Long> reconstructed;
 
     public MinimalSourceSetFinder() {
         graphDb = HypergraphDatabase.getGraphDatabase();
+        reconstructed = new HashSet<>();
     }
 
     public MinimalSourceSet find2(Node target) {
@@ -51,6 +53,13 @@ public class MinimalSourceSetFinder {
     }
 
     private MinimalSourceSet reconstruct(MinimalSourceSet mss, long decomposedId) {
+        // check already reconstructed
+        if (reconstructed.contains(decomposedId)) {
+            mss.removeContains(decomposedId);
+            return mss;
+        }
+        reconstructed.add(decomposedId);
+
         MinimalSourceSet mss1 = new MinimalSourceSet();
         MinimalSourceSet mss2 = new MinimalSourceSet();
 
@@ -92,9 +101,9 @@ public class MinimalSourceSetFinder {
                         return recon;
                     }
 
-                    else {
-                        return reconstruct(mss, v.getId());
-                    }
+//                    else {
+//                        return reconstruct(mss, v.getId());
+//                    }
                 }
             }
         }
