@@ -92,7 +92,7 @@ public class MinimalSourceSetFinder {
                         recon.removeContains(nodeId);
                         return recon;
                     }
-                    
+
                     reconstructed.add(nodeId);
 
                     if (s.size() == 1) {

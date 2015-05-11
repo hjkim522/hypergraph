@@ -77,10 +77,10 @@ public class Application {
 
     private static void keggImport() {
         Runnable runnable = () -> {
-            KeggImporter importer = new KeggImporter();
+            KeggImporter importer = new KeggImporter(false);
             importer.run();
 
-            MinimalSourceSetBuilder builder = new MinimalSourceSetBuilder(512);
+            MinimalSourceSetBuilder builder = new MinimalSourceSetBuilder(1024);
             builder.run();
         };
 
@@ -97,19 +97,20 @@ public class Application {
                 Node node = nodes.next();
 
                 // query 1%
-//                if (Math.random() < 0.01)
-//                    continue;
+                if (Math.random() < 0.01)
+                    continue;
 
                 measure.start();
                 MinimalSourceSetFinder finder = new MinimalSourceSetFinder();
                 MinimalSourceSet mss = finder.find(node);
                 measure.end();
-                break;
+
+                measure.printStatistic();
             }
             measure.printStatistic();
         };
 
-        executeTx("kegg-query.txt", "db/kegg", false, runnable);
+        executeTx("kegg-query", "db/kegg", false, runnable);
     }
 
     // Deprecated below

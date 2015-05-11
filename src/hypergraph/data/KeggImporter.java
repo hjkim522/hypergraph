@@ -173,6 +173,7 @@ public class KeggImporter {
     private int countEntry;
     private int countRelations;
     private int countReactions;
+    private boolean importRelations;
 
     public KeggImporter() {
         graphDb = HypergraphDatabase.getGraphDatabase();
@@ -180,6 +181,12 @@ public class KeggImporter {
         countEntry = 0;
         countRelations = 0;
         countReactions = 0;
+        importRelations = true;
+    }
+
+    public KeggImporter(boolean importRelations) {
+        this();
+        this.importRelations = importRelations;
     }
 
     public void run() {
@@ -230,9 +237,11 @@ public class KeggImporter {
             }
 
             // parse relation
-            for (int i = 0; i < relations.getLength(); i++) {
-                KeggRelation relation = new KeggRelation((Element) relations.item(i), entryMap);
-                relation.save(graphDb);
+            if (importRelations) {
+                for (int i = 0; i < relations.getLength(); i++) {
+                    KeggRelation relation = new KeggRelation((Element) relations.item(i), entryMap);
+                    relation.save(graphDb);
+                }
             }
 
             // parse reactions
