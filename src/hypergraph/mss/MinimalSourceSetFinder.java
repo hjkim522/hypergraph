@@ -53,13 +53,6 @@ public class MinimalSourceSetFinder {
     }
 
     private MinimalSourceSet reconstruct(MinimalSourceSet mss, long decomposedId) {
-        // check already reconstructed
-        if (reconstructed.contains(decomposedId)) {
-            mss.removeContains(decomposedId);
-            return mss;
-        }
-        reconstructed.add(decomposedId);
-
         MinimalSourceSet mss1 = new MinimalSourceSet();
         MinimalSourceSet mss2 = new MinimalSourceSet();
 
@@ -94,6 +87,14 @@ public class MinimalSourceSetFinder {
                 // if decomposed
                 if (v.hasLabel(Const.LABEL_HYPERNODE)) {
 
+                    // check already reconstructed
+                    if (reconstructed.contains(nodeId)) {
+                        recon.removeContains(nodeId);
+                        return recon;
+                    }
+                    
+                    reconstructed.add(nodeId);
+
                     if (s.size() == 1) {
                         MinimalSourceSet mssV = computeMinimalSourceSet(v);
                         recon.addAll(mssV);
@@ -101,9 +102,9 @@ public class MinimalSourceSetFinder {
                         return recon;
                     }
 
-//                    else {
-//                        return reconstruct(mss, v.getId());
-//                    }
+                    else {
+                        return reconstruct(mss, v.getId());
+                    }
                 }
             }
         }
