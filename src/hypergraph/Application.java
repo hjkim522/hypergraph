@@ -4,10 +4,7 @@ import hypergraph.common.Const;
 import hypergraph.common.HypergraphDatabase;
 import hypergraph.data.Importer;
 import hypergraph.data.KeggImporter;
-import hypergraph.mss.MinimalSourceSet;
-import hypergraph.mss.MinimalSourceSetBuilder;
-import hypergraph.mss.NaiveBuilder;
-import hypergraph.mss.NaiveFinder;
+import hypergraph.mss.*;
 import hypergraph.util.Log;
 import hypergraph.util.Measure;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -56,7 +53,7 @@ public class Application {
                     continue;
 
                 measure.start();
-                NaiveFinder finder = new NaiveFinder();
+                MinimalSourceSetFinder finder = new NaiveFinder();
                 MinimalSourceSet mss = finder.find(node);
                 measure.end();
 
