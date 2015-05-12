@@ -56,8 +56,6 @@ public class Application {
                 MinimalSourceSetFinder finder = new NaiveFinder();
                 MinimalSourceSet mss = finder.find(node);
                 measure.end();
-
-                measure.printStatistic();
             }
             measure.printStatistic();
         };
