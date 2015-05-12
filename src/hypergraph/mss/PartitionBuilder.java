@@ -20,13 +20,7 @@ public class PartitionBuilder implements MinimalSourceSetBuilder {
     private Set<Long> visited;
     private Set<Long> computed;
 
-    // decomposition parameter
-    private int maxMSS;
-
-    // statistic - XXX: separate as a module
-    private int statDecomposed;
-    private int totalComputation;
-    private int queueLen;
+    private int countDecomposed;
 
     // for partition
     private int currentMSSSize;
@@ -34,11 +28,6 @@ public class PartitionBuilder implements MinimalSourceSetBuilder {
     private Map<Long, Integer> partition;
 
     public PartitionBuilder() {
-        this(512);
-    }
-
-    public PartitionBuilder(int maxMSS) {
-        this.maxMSS = maxMSS;
         graphDb = HypergraphDatabase.getGraphDatabase();
         mssMap = new HashMap<>();
         visited = new HashSet<>();
@@ -49,13 +38,11 @@ public class PartitionBuilder implements MinimalSourceSetBuilder {
     public void run() {
         // measure building time
         long t = System.currentTimeMillis();
-        statDecomposed = 0;
-        totalComputation = 0;
-        queueLen = 0;
+        countDecomposed = 0;
         currentMSSSize = 0;
         currentPartition = 1;
 
-        Log.info("MSS builder maxMSS = " + maxMSS);
+        Log.info("MSS builder with partition");
 
         try (Transaction tx = graphDb.beginTx()) {
             // find all startable nodes
@@ -70,14 +57,12 @@ public class PartitionBuilder implements MinimalSourceSetBuilder {
             compute(start);
 
             // write computed mms into database
-            save();
+//            save();
             tx.success();
         }
 
         Log.info("Build MSSIndex complete (" + (System.currentTimeMillis() - t) + " ms)");
-        Log.info("Decomposed MSS " + statDecomposed);
-        Log.info("totalComputation " + totalComputation);
-        Log.info("queueLen " + queueLen);
+        Log.info("Decomposed MSS " + countDecomposed);
     }
 
     private void save() {
@@ -118,14 +103,12 @@ public class PartitionBuilder implements MinimalSourceSetBuilder {
             setVisited(s);
             queue.add(s);
             MinimalSourceSet mss = getMinimalSourceSet(s);
-            mss.addSourceSetOfSingleNode(s.getId());
         }
 
         while (!queue.isEmpty()) {
             // dequeue a normal node (one of source nodes)
             Node s = queue.poll();
             Log.debug("node " + s.getId());
-            queueLen++;
 
             // get forward star
             Iterable<Relationship> fromSources = s.getRelationships(Direction.OUTGOING, Const.REL_FROM_SOURCE);
@@ -133,53 +116,70 @@ public class PartitionBuilder implements MinimalSourceSetBuilder {
                 // get pseudo hypernode and check enabled
                 Node h = fromSource.getEndNode();
 
-                // skip if already computed and not modified
-                if (isComputed(h))
+                if (isComputed(h)) // skip if already computed and not modified
+                    continue;
+                if (!isEnabled(h)) // check enabled (all source visited)
                     continue;
 
-                // check enabled (all source visited)
-                if (!isEnabled(h))
-                    continue;
-
-                // mark given hyperedge as computed
-                setComputed(h);
-
-                // calculate mss of hyperedge
-                MinimalSourceSet mssHyperedge = computeMinimalSourceSet(h);
-
-                // get target node
-                // Node t = h.getSingleRelationship(Const.REL_TO_TARGET, Direction.OUTGOING).getEndNode();
-                // modified to support multiple target nodes
+                // get target nodes
                 Iterable<Relationship> toTargets = h.getRelationships(Direction.OUTGOING, Const.REL_TO_TARGET);
                 for (Relationship toTarget : toTargets) {
                     Node t = toTarget.getEndNode();
 
-                    if (!isVisited(t)) {
-                        currentMSSSize++;
-                    }
-                    partition.put(t.getId(), currentPartition);
+                    // 1. target is visited and same partition
+                    // 2. target is visited and different partition
+                    // 3. target is not visited
+                    if (isVisited(t)) {
+                        if (partition.getOrDefault(t.getId(), 0) == currentPartition) {
+                            MinimalSourceSet mssTarget = getMinimalSourceSet(t);
+                            MinimalSourceSet mssHyperedge = computeMinimalSourceSet(h);
+                            setComputed(h);
 
-                    setVisited(t);
-
-                    // calculate and update mss
-                    MinimalSourceSet mssTarget = getMinimalSourceSet(t);
-                    totalComputation++;
-
-                    boolean modified = mssTarget.addAll(mssHyperedge);
-                    if (modified) {
-                        if (queue.contains(t)) {
-                            queue.remove(t);
+                            boolean modified = mssTarget.addAll(mssHyperedge);
+                            if (modified) {
+                                if (queue.contains(t)) {
+                                    queue.remove(t);
+                                }
+                                queue.add(t);
+                                unsetComputed(t);
+                            }
                         }
+                        else {
+                            t.setProperty("decomposed", true);
+                            countDecomposed++;
+                        }
+                    }
+                    else {
+                        setVisited(t);
+                        MinimalSourceSet mssHyperedge = computeMinimalSourceSet(h);
+                        setComputed(h);
+                        setMinimalSourceSet(t, mssHyperedge);
                         queue.add(t);
-                        unsetComputed(t);
+
+                        // set partition to t
+                        currentMSSSize++;
+                        partition.put(t.getId(), currentPartition);
                     }
                 }
             }
 
             // partition
-            if (currentMSSSize == 1024) {
+            if (currentMSSSize > 1024) {
                 currentMSSSize = 0;
                 currentPartition++;
+
+                Log.debug("currentPartition " + currentPartition);
+
+                // flush mss
+                for (Map.Entry<Long, MinimalSourceSet> entry : mssMap.entrySet()) {
+                    Long id = entry.getKey();
+                    MinimalSourceSet mss = entry.getValue();
+                    Node node = graphDb.getNodeById(id);
+                    node.setProperty(Const.PROP_MSS, mss.toString());
+                    Log.debug("MSS(" + id + ") = " + mss.toString());
+                }
+
+                mssMap = new HashMap<>();
             }
         }
     }
@@ -189,16 +189,16 @@ public class PartitionBuilder implements MinimalSourceSetBuilder {
         if (mss != null)
             return mss;
         mss = new MinimalSourceSet();
+        mss.addSourceSetOfSingleNode(node.getId());
         mssMap.put(node.getId(), mss);
         return mss;
     }
 
-    private MinimalSourceSet computeMinimalSourceSet(Node hypernode) {
-        // check already decomposed
-        if (hypernode.hasProperty("decomposed")) {
-            return new MinimalSourceSet(hypernode.getId());
-        }
+    private void setMinimalSourceSet(Node node, MinimalSourceSet mss) {
+        mssMap.put(node.getId(), mss);
+    }
 
+    private MinimalSourceSet computeMinimalSourceSet(Node hypernode) {
         MinimalSourceSet mss = null;
         Iterable<Relationship> rels = hypernode.getRelationships(Direction.INCOMING, Const.REL_FROM_SOURCE);
         for (Relationship rel : rels) {
@@ -207,13 +207,6 @@ public class PartitionBuilder implements MinimalSourceSetBuilder {
                 mss = getMinimalSourceSet(s);
             } else {
                 mss = mss.cartesian(getMinimalSourceSet(s));
-            }
-
-            // decomposition
-            if (mss.cardinality() > maxMSS) {
-                hypernode.setProperty("decomposed", true);
-                statDecomposed++;
-                return new MinimalSourceSet(hypernode.getId());
             }
         }
         return mss;
@@ -237,7 +230,6 @@ public class PartitionBuilder implements MinimalSourceSetBuilder {
         return true;
     }
 
-    //TODO: how to handle changes
     private int getComputationRate(Node node) {
         int countComputed = 0;
         int countTotal = 0;

@@ -33,7 +33,7 @@ public class Application {
 //            Importer importer = new KeggImporter();//false, true, 20);
 //            importer.run();
 
-            MinimalSourceSetBuilder builder = new PartitionBuilder(1024);
+            MinimalSourceSetBuilder builder = new PartitionBuilder();
             builder.run();
         };
 
