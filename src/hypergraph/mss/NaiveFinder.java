@@ -25,11 +25,7 @@ public class NaiveFinder implements MinimalSourceSetFinder {
         reconstructed = new HashSet<>();
     }
 
-    public MinimalSourceSet find2(Node target) {
-        MinimalSourceSet mss = getMinimalSourceSet(target);
-        return null;
-    }
-
+    @Override
     public MinimalSourceSet find(Node target) {
         MinimalSourceSet mss = getMinimalSourceSet(target);
 

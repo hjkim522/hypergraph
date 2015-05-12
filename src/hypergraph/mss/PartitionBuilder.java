@@ -165,7 +165,7 @@ public class PartitionBuilder implements MinimalSourceSetBuilder {
             }
 
             // partition
-            if (currentMSSSize > 1024) {
+            if (currentMSSSize > 512) {
                 currentMSSSize = 0;
                 currentPartition++;
 

@@ -26,15 +26,14 @@ public class Application {
 
     public static void main(String[] args) {
 //        keggImport();
-//        keggQuery();
+        keggQuery();
 
-        execute("kegg-import", "db/hypergraph.txt", true, () -> {
-            Importer importer = new SimpleImporter("input/hypergraph.txt");
-            importer.run();
-
-            MinimalSourceSetBuilder builder = new PartitionBuilder();
-            builder.run();
-        });
+//        execute("kegg-import", "db/hypergraph.txt", true, () -> {
+//            Importer importer = new SimpleImporter("input/hypergraph.txt");
+//            importer.run();
+//            MinimalSourceSetBuilder builder = new PartitionBuilder();
+//            builder.run();
+//        });
     }
 
     private static void keggImport() {
@@ -60,7 +59,7 @@ public class Application {
                     continue;
 
                 measure.start();
-                MinimalSourceSetFinder finder = new NaiveFinder();
+                MinimalSourceSetFinder finder = new PartitionFinder();
                 MinimalSourceSet mss = finder.find(node);
                 measure.end();
             }
