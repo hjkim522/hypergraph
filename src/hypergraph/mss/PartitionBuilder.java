@@ -14,7 +14,7 @@ import java.util.*;
  *
  * Created by Hyunjun on 2015-04-17.
  */
-public class PartitionBuilder {
+public class PartitionBuilder implements MinimalSourceSetBuilder {
     private static GraphDatabaseService graphDb;
     private Map<Long, MinimalSourceSet> mssMap;
     private Set<Long> visited;
@@ -29,7 +29,9 @@ public class PartitionBuilder {
     private int queueLen;
 
     // for partition
-    private int currMSSSize;
+    private int currentMSSSize;
+    private int currentPartition;
+    private Map<Long, Integer> partition;
 
     public PartitionBuilder() {
         this(512);
@@ -41,6 +43,7 @@ public class PartitionBuilder {
         mssMap = new HashMap<>();
         visited = new HashSet<>();
         computed = new HashSet<>();
+        partition = new HashMap<>();
     }
 
     public void run() {
@@ -49,7 +52,8 @@ public class PartitionBuilder {
         statDecomposed = 0;
         totalComputation = 0;
         queueLen = 0;
-        currMSSSize = 0;
+        currentMSSSize = 0;
+        currentPartition = 1;
 
         Log.info("MSS builder maxMSS = " + maxMSS);
 
@@ -119,14 +123,9 @@ public class PartitionBuilder {
 
         while (!queue.isEmpty()) {
             // dequeue a normal node (one of source nodes)
-            printQueue(queue);
             Node s = queue.poll();
             Log.debug("node " + s.getId());
             queueLen++;
-
-            if (getComputationRate(s) != 0) {
-                Log.warn("nonzero rate " + getComputationRate(s));
-            }
 
             // get forward star
             Iterable<Relationship> fromSources = s.getRelationships(Direction.OUTGOING, Const.REL_FROM_SOURCE);
@@ -155,8 +154,12 @@ public class PartitionBuilder {
                 for (Relationship toTarget : toTargets) {
                     Node t = toTarget.getEndNode();
 
+                    if (!isVisited(t)) {
+                        currentMSSSize++;
+                    }
+                    partition.put(t.getId(), currentPartition);
+
                     setVisited(t);
-                    Log.debug("add target " + t.getId());
 
                     // calculate and update mss
                     MinimalSourceSet mssTarget = getMinimalSourceSet(t);
@@ -166,12 +169,17 @@ public class PartitionBuilder {
                     if (modified) {
                         if (queue.contains(t)) {
                             queue.remove(t);
-                            Log.debug("already contains node " + t.getId());
                         }
                         queue.add(t);
                         unsetComputed(t);
                     }
                 }
+            }
+
+            // partition
+            if (currentMSSSize == 1024) {
+                currentMSSSize = 0;
+                currentPartition++;
             }
         }
     }

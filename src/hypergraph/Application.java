@@ -24,20 +24,21 @@ public class Application {
     private static GraphDatabaseService graphDb;
 
     public static void main(String[] args) {
-//        keggImport();
-        keggQuery();
+        keggImport();
+//        keggQuery();
     }
 
     private static void keggImport() {
         Runnable runnable = () -> {
-            Importer importer = new KeggImporter(false, true, 20);
-            importer.run();
+//            Importer importer = new KeggImporter();//false, true, 20);
+//            importer.run();
 
-            MinimalSourceSetBuilder builder = new NaiveBuilder(128);
+            MinimalSourceSetBuilder builder = new PartitionBuilder(1024);
             builder.run();
         };
 
-        execute("kegg-import", "db/kegg", true, runnable);
+//        execute("kegg-import", "db/kegg", true, runnable);
+        execute("kegg-import", "db/kegg", false, runnable);
     }
 
     private static void keggQuery() {
@@ -67,9 +68,9 @@ public class Application {
         // Initialize log
         Log.init(log);
 
-        // Init and open hypergraph database
-        if (init) HypergraphDatabase.init(db);
-        graphDb = HypergraphDatabase.open(db);
+        // Init or open hypergraph database
+        if (init) graphDb = HypergraphDatabase.init(db);
+        else graphDb = HypergraphDatabase.open(db);
 
         runnable.run();
 
