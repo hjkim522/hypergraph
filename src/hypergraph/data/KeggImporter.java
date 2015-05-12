@@ -173,7 +173,11 @@ public class KeggImporter implements Importer {
     private int countEntry;
     private int countRelations;
     private int countReactions;
+
+    // for test
     private boolean importRelations;
+    private boolean importFileLimit;
+    private int limit;
 
     public KeggImporter() {
         graphDb = HypergraphDatabase.getGraphDatabase();
@@ -182,9 +186,11 @@ public class KeggImporter implements Importer {
         countRelations = 0;
         countReactions = 0;
         importRelations = true;
+        importFileLimit = false;
+        limit = 0;
     }
 
-    public KeggImporter(boolean importRelations) {
+    public KeggImporter(boolean importRelations, boolean importFileLimit, int limit) {
         this();
         this.importRelations = importRelations;
     }
@@ -197,7 +203,9 @@ public class KeggImporter implements Importer {
                 handleFile(file);
                 countFile++;
             }
-            if (countFile == 50) break;
+            if (importFileLimit && countFile == limit) {
+                break;
+            }
         }
 
         markStartables();
@@ -291,7 +299,7 @@ public class KeggImporter implements Importer {
         }
     }
 
-    //TODO:  add as a target in previsoue hyperedge
+    //TODO: add as a target in previsoue hyperedge
     private boolean isDuplicated(Hyperedge hyperedge) {
         Set<Hyperedge> hyperedges = Hyperedge.getHyperedgesFrom(hyperedge.getSource());
         for (Hyperedge e : hyperedges) {

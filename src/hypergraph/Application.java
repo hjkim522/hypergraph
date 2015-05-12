@@ -25,52 +25,13 @@ public class Application {
     private static GraphDatabaseService graphDb;
 
     public static void main(String[] args) {
-
-//        keggImport();
-
-        keggQuery();
-
-
-//        MinimalSourceSetBuilder builder = new MinimalSourceSetBuilder(100000);
-//        builder.run();
-//    });execute("kegg-test", "db/kegg", false, () -> {
-
-
-//        executeTx("kegg", "db/kegg", false, () -> {
-//            Node node = graphDb.findNode(Const.LABEL_NODE, Const.PROP_UNIQUE, "cpd:C00011");
-//            Log.debug("node id " + node.getId());
-//            NaiveFinder finder = new NaiveFinder();
-//            MinimalSourceSet mss = finder.find(node);
-//        });
-
-    }
-
-    private static void execute(String log, String db, boolean init, Runnable runnable) {
-        // Initialize log
-        Log.init(log);
-
-        // Init and open hypergraph database
-        if (init) HypergraphDatabase.init(db);
-        graphDb = HypergraphDatabase.open(db);
-
-        runnable.run();
-
-        // close
-        HypergraphDatabase.close();
-        Log.close();
-    }
-
-    private static void executeTx(String log, String db, boolean init, Runnable runnable) {
-        execute(log, db, init, ()->{
-            try (Transaction tx = graphDb.beginTx()) {
-                runnable.run();
-            }
-        });
+        keggImport();
+//        keggQuery();
     }
 
     private static void keggImport() {
         Runnable runnable = () -> {
-            KeggImporter importer = new KeggImporter(false);
+            KeggImporter importer = new KeggImporter(false, true, 50);
             importer.run();
 
             NaiveBuilder builder = new NaiveBuilder(1024);
@@ -79,7 +40,6 @@ public class Application {
 
         execute("kegg-import", "db/kegg", true, runnable);
     }
-
 
     private static void keggQuery() {
         Runnable runnable = () -> {
@@ -106,78 +66,26 @@ public class Application {
         executeTx("kegg-query", "db/kegg", false, runnable);
     }
 
-    // Deprecated below
-//    private static void experiment(String dataSet) {
-//        if (!dataSet.isEmpty()) {
-//            dataSet = "-" + dataSet;
-//        }
-//
-//        Log.init("log" + dataSet + ".txt");
-//        HypergraphDatabase.init("db/hypergraph" + dataSet);
-//
-//        SimpleImporter importer = new SimpleImporter("input/hypergraph" + dataSet + ".txt");
-//        importer.run();
-//
-//        MinimalSourceSetBuilder builder = new MinimalSourceSetBuilder();
-//        builder.run();
-//
-//        HypergraphDatabase.close();
-//        Log.close();
-//    }
-//
-//    private static void query() {
-//        GraphDatabaseService graphDb = HypergraphDatabase.getGraphDatabase();
-//        Random random = new Random(0);
-//        Set<Long> targets = new HashSet<>();
-//        Measure measure = new Measure("Query MSS");
-//
-//        try (Transaction tx = graphDb.beginTx()) {
-//            // get number of nodes from meta node
-//            Node meta = graphDb.findNodes(Const.LABEL_META).next();
-//            int numNodes = (int) meta.getProperty(Const.PROP_COUNT);
-//            int numQuery = (int) (numNodes * 0.05);
-//
-//            // select random target nodes
-//            while (targets.size() < numQuery) {
-//                targets.add((long) random.nextInt(numNodes));
-//            }
-//
-//            targets.add((long) numNodes - 1); // test last node
-//
-//            Log.info("Querying " + targets.size() + " nodes");
-//
-//            for (Long nodeId : targets) {
-//                Node target = graphDb.findNode(Const.LABEL_NODE, Const.PROP_UNIQUE, nodeId);
-//
-//                measure.start();
-//                NaiveFinder finder = new NaiveFinder();
-//                MinimalSourceSet mss = finder.find(target);
-//                measure.end();
-//            }
-//        }
-//
-//        measure.printStatistic();
-//    }
-//
-//    private static void backwardDiscovery() {
-//        GraphDatabaseService graphDb = HypergraphDatabase.getGraphDatabase();
-//        try (Transaction tx = graphDb.beginTx()) {
-//            // get number of nodes from meta node
-//            Node meta = graphDb.findNodes(Const.LABEL_META).next();
-//            int numNodes = (int) meta.getProperty(Const.PROP_COUNT);
-//
-//            Node t = graphDb.findNode(Const.LABEL_NODE, Const.PROP_UNIQUE, numNodes - 2);
-//            NaiveBackwardDiscovery naiveBackwardDiscovery = new NaiveBackwardDiscovery();
-//            IndexedBackwardDiscovery indexedBackwardDiscovery = new IndexedBackwardDiscovery();
-//
-//            Set<Long> r1 = naiveBackwardDiscovery.find(t);
-//            Set<Long> r2 = indexedBackwardDiscovery.find(t);
-//
-//            // compare result
-//            Log.info("backward discovery results");
-//            Log.info("naive: " + r1.toString());
-//            Log.info("index: " + r2.toString());
-//        }
-//    }
+    private static void execute(String log, String db, boolean init, Runnable runnable) {
+        // Initialize log
+        Log.init(log);
 
+        // Init and open hypergraph database
+        if (init) HypergraphDatabase.init(db);
+        graphDb = HypergraphDatabase.open(db);
+
+        runnable.run();
+
+        // close
+        HypergraphDatabase.close();
+        Log.close();
+    }
+
+    private static void executeTx(String log, String db, boolean init, Runnable runnable) {
+        execute(log, db, init, () -> {
+            try (Transaction tx = graphDb.beginTx()) {
+                runnable.run();
+            }
+        });
+    }
 }
