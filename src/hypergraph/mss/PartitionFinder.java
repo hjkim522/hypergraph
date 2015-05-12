@@ -84,7 +84,8 @@ public class PartitionFinder implements MinimalSourceSetFinder {
 
                     // check already reconstructed
                     if (reconstructed.contains(nodeId)) {
-                        recon.removeContains(nodeId);
+                        if (!v.hasLabel(Const.LABEL_STARTABLE))
+                            recon.removeContains(nodeId);
                         return recon;
                     }
 
@@ -93,7 +94,8 @@ public class PartitionFinder implements MinimalSourceSetFinder {
                     if (s.size() == 1) {
                         MinimalSourceSet mssV = getMinimalSourceSet(v);
                         recon.addAll(mssV);
-                        recon.removeContains(v.getId());
+                        if (!v.hasLabel(Const.LABEL_STARTABLE))
+                            recon.removeContains(v.getId());
                         return recon;
                     }
 
