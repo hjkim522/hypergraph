@@ -2,8 +2,10 @@ package hypergraph;
 
 import hypergraph.common.Const;
 import hypergraph.common.HypergraphDatabase;
+import hypergraph.data.Importer;
 import hypergraph.data.KeggImporter;
 import hypergraph.mss.MinimalSourceSet;
+import hypergraph.mss.MinimalSourceSetBuilder;
 import hypergraph.mss.NaiveBuilder;
 import hypergraph.mss.NaiveFinder;
 import hypergraph.util.Log;
@@ -26,15 +28,15 @@ public class Application {
 
     public static void main(String[] args) {
         keggImport();
-//        keggQuery();
+        keggQuery();
     }
 
     private static void keggImport() {
         Runnable runnable = () -> {
-            KeggImporter importer = new KeggImporter(false, true, 50);
+            Importer importer = new KeggImporter(false, true, 20);
             importer.run();
 
-            NaiveBuilder builder = new NaiveBuilder(1024);
+            MinimalSourceSetBuilder builder = new NaiveBuilder(128);
             builder.run();
         };
 

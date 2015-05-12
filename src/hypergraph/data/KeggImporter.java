@@ -193,6 +193,8 @@ public class KeggImporter implements Importer {
     public KeggImporter(boolean importRelations, boolean importFileLimit, int limit) {
         this();
         this.importRelations = importRelations;
+        this.importFileLimit = importFileLimit;
+        this.limit = limit;
     }
 
     @Override
