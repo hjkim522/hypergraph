@@ -33,6 +33,11 @@ public class IntegrationTest {
         HypergraphDatabase.close();
     }
 
+    @Test
+    public void testKegg() throws Exception {
+
+    }
+
 
 
 //    private void testFind(GraphDatabaseService graphDb, MinimalSourceSetFinder finder) throws Exception {
