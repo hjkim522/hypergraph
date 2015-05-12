@@ -21,10 +21,11 @@ public class HypergraphDatabase {
         return graphDb;
     }
 
-    public static void init(String path) {
+    public static GraphDatabaseService init(String path) {
         delete(path);
-        open(path);
+        graphDb = open(path);
         createIndex();
+        return graphDb;
     }
 
     public static GraphDatabaseService open(String path) {
