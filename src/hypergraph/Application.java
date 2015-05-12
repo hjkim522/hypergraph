@@ -38,20 +38,17 @@ public class Application {
     }
 
     private static void keggImport() {
-        Runnable runnable = () -> {
-//            Importer importer = new KeggImporter();//false, true, 20);
-//            importer.run();
+        execute("kegg-import", "db/kegg", true, () -> {
+            Importer importer = new KeggImporter();//false, true, 20);
+            importer.run();
 
             MinimalSourceSetBuilder builder = new PartitionBuilder();
             builder.run();
-        };
-
-//        execute("kegg-import", "db/kegg", true, runnable);
-        execute("kegg-import", "db/kegg", false, runnable);
+        });
     }
 
     private static void keggQuery() {
-        Runnable runnable = () -> {
+        executeTx("kegg-query", "db/kegg", false, () -> {
             Measure measure = new Measure("Query MSS");
             ResourceIterator<Node> nodes = graphDb.findNodes(Const.LABEL_NODE);
 
@@ -68,9 +65,7 @@ public class Application {
                 measure.end();
             }
             measure.printStatistic();
-        };
-
-        executeTx("kegg-query", "db/kegg", false, runnable);
+        });
     }
 
     private static void execute(String log, String db, boolean init, Runnable runnable) {

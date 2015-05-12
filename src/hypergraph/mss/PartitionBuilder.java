@@ -4,6 +4,7 @@ import hypergraph.common.Const;
 import hypergraph.common.HypergraphDatabase;
 import hypergraph.util.Log;
 import hypergraph.util.Measure;
+import org.neo4j.cypher.internal.compiler.v1_9.commands.expressions.Min;
 import org.neo4j.graphdb.*;
 
 import java.util.*;
@@ -102,7 +103,8 @@ public class PartitionBuilder implements MinimalSourceSetBuilder {
         for (Node s : start) {
             setVisited(s);
             queue.add(s);
-            MinimalSourceSet mss = getMinimalSourceSet(s);
+            MinimalSourceSet mss = new MinimalSourceSet(s.getId());
+            setMinimalSourceSet(s, mss);
         }
 
         while (!queue.isEmpty()) {
@@ -145,8 +147,7 @@ public class PartitionBuilder implements MinimalSourceSetBuilder {
                             }
                         }
                         else {
-                            t.setProperty("decomposed", true);
-                            countDecomposed++;
+                            setDecomposed(t);
                         }
                     }
                     else {
@@ -184,6 +185,7 @@ public class PartitionBuilder implements MinimalSourceSetBuilder {
         }
     }
 
+    //XXX: separate with decomposition
     private MinimalSourceSet getMinimalSourceSet(Node node) {
         MinimalSourceSet mss = mssMap.get(node.getId());
         if (mss != null)
@@ -191,6 +193,7 @@ public class PartitionBuilder implements MinimalSourceSetBuilder {
         mss = new MinimalSourceSet();
         mss.addSourceSetOfSingleNode(node.getId());
         mssMap.put(node.getId(), mss);
+        setDecomposed(node);
         return mss;
     }
 
@@ -259,6 +262,13 @@ public class PartitionBuilder implements MinimalSourceSetBuilder {
         for (Relationship rel : rels) {
             Node h = rel.getEndNode();
             computed.remove(h.getId());
+        }
+    }
+
+    private void setDecomposed(Node node) {
+        if (!node.hasProperty("decomposed")) {
+            node.setProperty("decomposed", true);
+            countDecomposed++;
         }
     }
 }
