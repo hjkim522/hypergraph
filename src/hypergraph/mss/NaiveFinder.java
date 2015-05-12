@@ -55,13 +55,13 @@ public class NaiveFinder implements MinimalSourceSetFinder {
         MinimalSourceSet mss1 = new MinimalSourceSet();
         MinimalSourceSet mss2 = new MinimalSourceSet();
 
-        for (Set<Long> s : mss.getMSS()) {
+        for (Set<Long> s : mss.getSourceSets()) {
             if (s.contains(decomposedId)) {
                 Set<Long> t = new HashSet<>(s);
                 t.remove(decomposedId);
-                mss1.getMSS().add(t);
+                mss1.getSourceSets().add(t);
             } else {
-                mss2.getMSS().add(s);
+                mss2.getSourceSets().add(s);
             }
         }
 
@@ -79,7 +79,7 @@ public class NaiveFinder implements MinimalSourceSetFinder {
     private MinimalSourceSet reconstruct(MinimalSourceSet mss) {
         MinimalSourceSet recon = new MinimalSourceSet(mss);
 
-        for (Set<Long> s : mss.getMSS()) {
+        for (Set<Long> s : mss.getSourceSets()) {
             for (Long nodeId : s) {
                 Node v = graphDb.getNodeById(nodeId);
 
@@ -115,7 +115,7 @@ public class NaiveFinder implements MinimalSourceSetFinder {
         Log.debug("call needReconstruction of mss(" + mss.cardinality() + "):");
         Log.debug(mss.toString());
 
-        for (Set<Long> s : mss.getMSS()) {
+        for (Set<Long> s : mss.getSourceSets()) {
             for (Long nodeId : s) {
                 Node v = graphDb.getNodeById(nodeId);
                 if (v.hasLabel(Const.LABEL_HYPERNODE)) {

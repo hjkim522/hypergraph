@@ -1,14 +1,13 @@
 import hypergraph.common.HypergraphDatabase;
 import hypergraph.data.Importer;
 import hypergraph.data.SimpleImporter;
-import hypergraph.mss.MinimalSourceSetBuilder;
-import hypergraph.mss.MinimalSourceSetFinder;
-import hypergraph.mss.NaiveBuilder;
-import hypergraph.mss.NaiveFinder;
+import hypergraph.mss.*;
 import org.junit.Test;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
+
+import static org.junit.Assert.*;
 
 /**
  * Created by Hyunjun on 2015-05-12.
@@ -24,15 +23,23 @@ public class IntegrationTest {
 
         importer.run();
         builder.run();
-        testFind(graphDb, finder);
+
+        try (Transaction tx = graphDb.beginTx()) {
+            Node t = graphDb.findNode(hypergraph.common.Const.LABEL_NODE, hypergraph.common.Const.PROP_UNIQUE, 5);
+            MinimalSourceSet mss = finder.find(t);
+            assertTrue(mss.equals(new MinimalSourceSet(0, 1, 6)));
+        }
 
         HypergraphDatabase.close();
     }
 
-    private void testFind(GraphDatabaseService graphDb, MinimalSourceSetFinder finder) throws Exception {
-        try (Transaction tx = graphDb.beginTx()) {
-            Node t = graphDb.findNode(hypergraph.common.Const.LABEL_NODE, hypergraph.common.Const.PROP_UNIQUE, 0);
 
-        }
-    }
+
+//    private void testFind(GraphDatabaseService graphDb, MinimalSourceSetFinder finder) throws Exception {
+//        try (Transaction tx = graphDb.beginTx()) {
+//            Node t = graphDb.findNode(hypergraph.common.Const.LABEL_NODE, hypergraph.common.Const.PROP_UNIQUE, 5);
+//            MinimalSourceSet mss = finder.find(t);
+//            assertTrue(mss.equals(new MinimalSourceSet(0, 1, 6)));
+//        }
+//    }
 }

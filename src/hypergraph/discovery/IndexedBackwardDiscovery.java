@@ -27,7 +27,7 @@ public class IndexedBackwardDiscovery implements BackwardDiscovery {
         Set<Long> minimum = null;
         int minimumCardinality = 0;
 
-        for (Set<Long> s : mss.getMSS()) {
+        for (Set<Long> s : mss.getSourceSets()) {
             if (minimum == null || minimumCardinality > s.size()) {
                 minimum = s;
                 minimumCardinality = s.size();

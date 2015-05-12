@@ -4,6 +4,7 @@ import hypergraph.util.Log;
 
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -36,7 +37,17 @@ public class MinimalSourceSet {
         addSourceSetOfSingleNode(nodeId);
     }
 
-    public Set<Set<Long>> getMSS() {
+    // testing purpose
+    public MinimalSourceSet(Number... nodeIds) {
+        this();
+        Set<Long> sourceSet = new HashSet<>();
+        for (Number id : nodeIds) {
+            sourceSet.add(id.longValue());
+        }
+        mss.add(sourceSet);
+    }
+
+    public Set<Set<Long>> getSourceSets() {
         return mss;
     }
 
@@ -153,7 +164,21 @@ public class MinimalSourceSet {
         return mss;
     }
 
-    // for testing purpose
+    @Override
+    public boolean equals(Object other) {
+        MinimalSourceSet otherMss = (MinimalSourceSet) other;
+        if (this.cardinality() != otherMss.cardinality())
+            return false;
+
+        for (Set<Long> s : mss) {
+            if (!otherMss.contains(s)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     public boolean contains(Set<Long> sourceSet) {
         for (Set<Long> s : mss) {
             if (s.containsAll(sourceSet) && sourceSet.containsAll(s)) {
@@ -163,5 +188,12 @@ public class MinimalSourceSet {
         return false;
     }
 
-
+    // for testing purpose
+    public static Set<Long> createSourceSet(Number... ids) {
+        Set<Long> sourceSet = new HashSet<>();
+        for (Number id : ids) {
+            sourceSet.add(id.longValue());
+        }
+        return sourceSet;
+    }
 }
