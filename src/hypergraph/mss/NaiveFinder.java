@@ -30,7 +30,6 @@ public class NaiveFinder implements MinimalSourceSetFinder {
         return null;
     }
 
-    //XXX: bad impl
     public MinimalSourceSet find(Node target) {
         MinimalSourceSet mss = getMinimalSourceSet(target);
 
@@ -38,7 +37,6 @@ public class NaiveFinder implements MinimalSourceSetFinder {
         long decomposedId = needReconstruction(mss);
         while (decomposedId > 0) {
             mss = reconstruct(mss);
-//            mss = reconstruct(mss, decomposedId);
             decomposedId = needReconstruction(mss);
         }
 
@@ -52,8 +50,13 @@ public class NaiveFinder implements MinimalSourceSetFinder {
     }
 
     private MinimalSourceSet reconstruct(MinimalSourceSet mss, long decomposedId) {
-        MinimalSourceSet mss1 = new MinimalSourceSet();
-        MinimalSourceSet mss2 = new MinimalSourceSet();
+        /*
+        A = {a, gf, h}
+        mss = {Abc, Abe, ADe}
+        mss = A cartesian {bc, be, De}
+         */
+        MinimalSourceSet mss1 = new MinimalSourceSet(); // mss containing decomposedId
+        MinimalSourceSet mss2 = new MinimalSourceSet(); // others (does not need to be join with A)
 
         for (Set<Long> s : mss.getSourceSets()) {
             if (s.contains(decomposedId)) {
@@ -66,11 +69,10 @@ public class NaiveFinder implements MinimalSourceSetFinder {
         }
 
         if (mss1.cardinality() != 0) {
-            //TODO:
-//            Node d = graphDb.getNodeById(decomposedId);
-//            MinimalSourceSet mss3 = computeMinimalSourceSet(d);
-//            mss3.removeContains(decomposedId);
-//            mss2.addAll(mss3.cartesian(mss1));
+            Node d = graphDb.getNodeById(decomposedId);
+            MinimalSourceSet mss3 = computeMinimalSourceSet(d); // A in example
+            mss3.removeContains(decomposedId);
+            mss2.addAll(mss3.cartesian(mss1));
         }
 
         return mss2;

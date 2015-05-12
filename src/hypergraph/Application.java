@@ -24,7 +24,7 @@ public class Application {
     private static GraphDatabaseService graphDb;
 
     public static void main(String[] args) {
-        keggImport();
+//        keggImport();
         keggQuery();
     }
 
