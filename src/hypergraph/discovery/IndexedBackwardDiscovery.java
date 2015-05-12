@@ -1,9 +1,8 @@
 package hypergraph.discovery;
 
-import hypergraph.Application;
 import hypergraph.common.HypergraphDatabase;
 import hypergraph.mss.MinimalSourceSet;
-import hypergraph.mss.MinimalSourceSetFinder;
+import hypergraph.mss.NaiveFinder;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 
@@ -22,7 +21,7 @@ public class IndexedBackwardDiscovery implements BackwardDiscovery {
 
     @Override
     public Set<Long> find(Node t) {
-        MinimalSourceSetFinder finder = new MinimalSourceSetFinder();
+        NaiveFinder finder = new NaiveFinder();
         MinimalSourceSet mss = finder.find(t);
 
         Set<Long> minimum = null;

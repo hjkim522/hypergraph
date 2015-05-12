@@ -3,22 +3,15 @@ package hypergraph;
 import hypergraph.common.Const;
 import hypergraph.common.HypergraphDatabase;
 import hypergraph.data.KeggImporter;
-import hypergraph.discovery.IndexedBackwardDiscovery;
-import hypergraph.discovery.NaiveBackwardDiscovery;
 import hypergraph.mss.MinimalSourceSet;
-import hypergraph.mss.MinimalSourceSetBuilder;
-import hypergraph.mss.MinimalSourceSetFinder;
+import hypergraph.mss.NaiveBuilder;
+import hypergraph.mss.NaiveFinder;
 import hypergraph.util.Log;
 import hypergraph.util.Measure;
-import hypergraph.data.SimpleImporter;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.ResourceIterator;
 import org.neo4j.graphdb.Transaction;
-
-import java.util.HashSet;
-import java.util.Random;
-import java.util.Set;
 
 /**
  * Main hypergraph.Application
@@ -46,7 +39,7 @@ public class Application {
 //        executeTx("kegg", "db/kegg", false, () -> {
 //            Node node = graphDb.findNode(Const.LABEL_NODE, Const.PROP_UNIQUE, "cpd:C00011");
 //            Log.debug("node id " + node.getId());
-//            MinimalSourceSetFinder finder = new MinimalSourceSetFinder();
+//            NaiveFinder finder = new NaiveFinder();
 //            MinimalSourceSet mss = finder.find(node);
 //        });
 
@@ -80,7 +73,7 @@ public class Application {
             KeggImporter importer = new KeggImporter(false);
             importer.run();
 
-            MinimalSourceSetBuilder builder = new MinimalSourceSetBuilder(1024);
+            NaiveBuilder builder = new NaiveBuilder(1024);
             builder.run();
         };
 
@@ -101,7 +94,7 @@ public class Application {
                     continue;
 
                 measure.start();
-                MinimalSourceSetFinder finder = new MinimalSourceSetFinder();
+                NaiveFinder finder = new NaiveFinder();
                 MinimalSourceSet mss = finder.find(node);
                 measure.end();
 
@@ -157,7 +150,7 @@ public class Application {
 //                Node target = graphDb.findNode(Const.LABEL_NODE, Const.PROP_UNIQUE, nodeId);
 //
 //                measure.start();
-//                MinimalSourceSetFinder finder = new MinimalSourceSetFinder();
+//                NaiveFinder finder = new NaiveFinder();
 //                MinimalSourceSet mss = finder.find(target);
 //                measure.end();
 //            }

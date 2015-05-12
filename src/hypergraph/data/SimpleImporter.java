@@ -31,7 +31,7 @@ import java.io.FileReader;
  *
  * Created by Hyunjun on 2015-04-15.
  */
-public class SimpleImporter {
+public class SimpleImporter implements Importer {
     private String filename;
     private GraphDatabaseService graphDb;
 
@@ -44,6 +44,7 @@ public class SimpleImporter {
         this.graphDb = HypergraphDatabase.getGraphDatabase();
     }
 
+    @Override
     public void run() {
         Log.debug("hypergraph.data.SimpleImporter START " + filename);
 

@@ -22,7 +22,7 @@ import java.util.*;
  * Examples are from hsa00010.xml
  * Created by hyunjun on 2015. 5. 7..
  */
-public class KeggImporter {
+public class KeggImporter implements Importer {
     /*
      * Example of kegg entry
      * <entry id="44" name="ko:K13970 ko:K13971 ko:K13972" type="ortholog"
@@ -189,6 +189,7 @@ public class KeggImporter {
         this.importRelations = importRelations;
     }
 
+    @Override
     public void run() {
         File[] files = new File("input/kegg").listFiles();
         for (File file : files) {
