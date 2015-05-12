@@ -4,6 +4,7 @@ import hypergraph.common.Const;
 import hypergraph.common.HypergraphDatabase;
 import hypergraph.data.Importer;
 import hypergraph.data.KeggImporter;
+import hypergraph.data.SimpleImporter;
 import hypergraph.mss.*;
 import hypergraph.util.Log;
 import hypergraph.util.Measure;
@@ -24,8 +25,16 @@ public class Application {
     private static GraphDatabaseService graphDb;
 
     public static void main(String[] args) {
-        keggImport();
+//        keggImport();
 //        keggQuery();
+
+        execute("kegg-import", "db/hypergraph.txt", true, () -> {
+            Importer importer = new SimpleImporter("input/hypergraph.txt");
+            importer.run();
+
+            MinimalSourceSetBuilder builder = new PartitionBuilder();
+            builder.run();
+        });
     }
 
     private static void keggImport() {

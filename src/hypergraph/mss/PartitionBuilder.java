@@ -57,7 +57,7 @@ public class PartitionBuilder implements MinimalSourceSetBuilder {
             compute(start);
 
             // write computed mms into database
-//            save();
+            save();
             tx.success();
         }
 
