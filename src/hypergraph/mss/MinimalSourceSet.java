@@ -113,6 +113,10 @@ public class MinimalSourceSet {
 
     public MinimalSourceSet cartesian(MinimalSourceSet other) {
         MinimalSourceSet result = new MinimalSourceSet();
+
+        if (this.cardinality() == 0 || other.cardinality() == 0)
+            return result;
+
         for (Set<Long> s1 : mss) {
             for (Set<Long> s2 : other.mss) {
                 Set<Long> s = new HashSet<>();

@@ -73,6 +73,10 @@ public class PartitionBuilder implements MinimalSourceSetBuilder {
             Long id = entry.getKey();
             MinimalSourceSet mss = entry.getValue();
             Node node = graphDb.getNodeById(id);
+
+            if (node.hasProperty(Const.PROP_MSS))
+                continue;
+
             node.setProperty(Const.PROP_MSS, mss.toString());
 
             Log.debug("MSS(" + id + ") = " + mss.toString());
@@ -176,6 +180,8 @@ public class PartitionBuilder implements MinimalSourceSetBuilder {
                     Long id = entry.getKey();
                     MinimalSourceSet mss = entry.getValue();
                     Node node = graphDb.getNodeById(id);
+                    if (node.hasProperty(Const.PROP_MSS))
+                        continue;
                     node.setProperty(Const.PROP_MSS, mss.toString());
                     Log.debug("MSS(" + id + ") = " + mss.toString());
                 }

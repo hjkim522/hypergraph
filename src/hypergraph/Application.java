@@ -25,7 +25,7 @@ public class Application {
     private static GraphDatabaseService graphDb;
 
     public static void main(String[] args) {
-//        keggImport();
+        keggImport();
         keggQuery();
 
 //        execute("kegg-import", "db/hypergraph.txt", true, () -> {
@@ -57,6 +57,8 @@ public class Application {
                 // query 1%
                 if (Math.random() < 0.01)
                     continue;
+
+                Log.debug("query for node " + node.getId());
 
                 measure.start();
                 MinimalSourceSetFinder finder = new PartitionFinder();

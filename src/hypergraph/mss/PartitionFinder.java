@@ -64,8 +64,9 @@ public class PartitionFinder implements MinimalSourceSetFinder {
 
         if (mss1.cardinality() != 0) {
             Node d = graphDb.getNodeById(decomposedId);
-            MinimalSourceSet mss3 = computeMinimalSourceSet(d); // A in example
-            mss3.removeContains(decomposedId);
+            MinimalSourceSet mss3 = getMinimalSourceSet(d); // A in example
+            if (!d.hasLabel(Const.LABEL_STARTABLE))
+                mss3.removeContains(decomposedId);
             mss2.addAll(mss3.cartesian(mss1));
         }
 
@@ -127,24 +128,24 @@ public class PartitionFinder implements MinimalSourceSetFinder {
         return -1;
     }
 
-    private MinimalSourceSet computeMinimalSourceSet(Node hypernode) {
-        MinimalSourceSet mss = null;
-        Iterable<Relationship> rels = hypernode.getRelationships(Direction.INCOMING, Const.REL_FROM_SOURCE);
-        for (Relationship rel : rels) {
-            Node s = rel.getStartNode();
-            if (mss == null) {
-                mss = getMinimalSourceSet(s);
-            } else {
-                mss = mss.cartesian(getMinimalSourceSet(s));
-            }
-        }
-        Log.debug("computeMinimalSourceSet");
-        Log.debug("hypernode mss len = " + mss.cardinality());
-        Log.debug(mss.toString());
-
-        return mss;
-
-        // Get from saved result
-//        return getMinimalSourceSet(hypernode);
-    }
+//    private MinimalSourceSet computeMinimalSourceSet(Node hypernode) {
+//        MinimalSourceSet mss = null;
+//        Iterable<Relationship> rels = hypernode.getRelationships(Direction.INCOMING, Const.REL_FROM_SOURCE);
+//        for (Relationship rel : rels) {
+//            Node s = rel.getStartNode();
+//            if (mss == null) {
+//                mss = getMinimalSourceSet(s);
+//            } else {
+//                mss = mss.cartesian(getMinimalSourceSet(s));
+//            }
+//        }
+//        Log.debug("computeMinimalSourceSet");
+//        Log.debug("hypernode mss len = " + mss.cardinality());
+//        Log.debug(mss.toString());
+//
+//        return mss;
+//
+//        // Get from saved result
+////        return getMinimalSourceSet(hypernode);
+//    }
 }

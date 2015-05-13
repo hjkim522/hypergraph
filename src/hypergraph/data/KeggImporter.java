@@ -168,6 +168,16 @@ public class KeggImporter implements Importer {
         }
     }
 
+    /**
+     * Kegg importer configuration
+     */
+    public class KeggImporterConf {
+        public boolean importRelations;
+        public boolean importFileLimit;
+        public int fileLimit;
+        public double startableRatio;
+    }
+
     private GraphDatabaseService graphDb;
     private int countFile;
     private int countEntry;
