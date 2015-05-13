@@ -28,7 +28,7 @@ public class Application {
 //        keggImport();
 //        keggQuery();
 
-        execute("hypergraph-import", "db/hypergraph.txt", true, () -> {
+        execute("hypergraph-import", "db/hypergraph", true, () -> {
             Importer importer = new SimpleImporter("input/hypergraph.txt");
             importer.run();
             MinimalSourceSetBuilder builder = new PartitionBuilder();
