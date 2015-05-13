@@ -25,15 +25,17 @@ public class Application {
     private static GraphDatabaseService graphDb;
 
     public static void main(String[] args) {
-        keggImport();
-        keggQuery();
+//        keggImport();
+//        keggQuery();
 
-//        execute("kegg-import", "db/hypergraph.txt", true, () -> {
-//            Importer importer = new SimpleImporter("input/hypergraph.txt");
-//            importer.run();
-//            MinimalSourceSetBuilder builder = new PartitionBuilder();
-//            builder.run();
-//        });
+        execute("hypergraph-import", "db/hypergraph.txt", true, () -> {
+            Importer importer = new SimpleImporter("input/hypergraph.txt");
+            importer.run();
+            MinimalSourceSetBuilder builder = new PartitionBuilder();
+            builder.run();
+        });
+
+        query("hypergraph-query", "db/hypergraph");
     }
 
     private static void keggImport() {
@@ -47,7 +49,11 @@ public class Application {
     }
 
     private static void keggQuery() {
-        executeTx("kegg-query", "db/kegg", false, () -> {
+        query("kegg-query", "db/kegg");
+    }
+
+    private static void query(String log, String db) {
+        executeTx(log, db, false, () -> {
             Measure measure = new Measure("Query MSS");
             ResourceIterator<Node> nodes = graphDb.findNodes(Const.LABEL_NODE);
 
