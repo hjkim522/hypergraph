@@ -30,7 +30,7 @@ public class PartitionFinder implements MinimalSourceSetFinder {
         // Naive implementation
         long decomposedId = needReconstruction(mss);
         while (decomposedId > 0) {
-            mss = reconstruct(mss);
+            mss = reconstruct(mss, decomposedId);
             decomposedId = needReconstruction(mss);
         }
 
@@ -47,13 +47,18 @@ public class PartitionFinder implements MinimalSourceSetFinder {
         /*
         A = {a, gf, h}
         mss = {Abc, Abe, ADe}
-        mss = A cartesian {bc, be, De}
+        mss = A cartesian {bc, be, De} = A * B
          */
-        MinimalSourceSet mss1 = new MinimalSourceSet(); // mss containing decomposedId
+        MinimalSourceSet mss1 = new MinimalSourceSet(); // B = mss containing decomposedId
         MinimalSourceSet mss2 = new MinimalSourceSet(); // others (does not need to be join with A)
 
         for (Set<Long> s : mss.getSourceSets()) {
-            if (s.contains(decomposedId)) {
+            if (s.contains(decomposedId) && s.size() == 1) {
+                mss2 = mss;
+                mss2.removeContains(decomposedId);
+                break;
+            }
+            else if (s.contains(decomposedId)) {
                 Set<Long> t = new HashSet<>(s);
                 t.remove(decomposedId);
                 mss1.getSourceSets().add(t);
@@ -62,52 +67,19 @@ public class PartitionFinder implements MinimalSourceSetFinder {
             }
         }
 
+        Node d = graphDb.getNodeById(decomposedId);
+        MinimalSourceSet mss3 = getMinimalSourceSet(d); // A in example
+
         if (mss1.cardinality() != 0) {
-            Node d = graphDb.getNodeById(decomposedId);
-            MinimalSourceSet mss3 = getMinimalSourceSet(d); // A in example
-            if (!d.hasLabel(Const.LABEL_STARTABLE))
-                mss3.removeContains(decomposedId);
             mss2.addAll(mss3.cartesian(mss1));
         }
-
-        return mss2;
-    }
-
-    private MinimalSourceSet reconstruct(MinimalSourceSet mss) {
-        MinimalSourceSet recon = new MinimalSourceSet(mss);
-
-        for (Set<Long> s : mss.getSourceSets()) {
-            for (Long nodeId : s) {
-                Node v = graphDb.getNodeById(nodeId);
-
-                // if decomposed
-                if (v.hasProperty("decomposed")) {
-
-                    // check already reconstructed
-                    if (reconstructed.contains(nodeId)) {
-                        if (!v.hasLabel(Const.LABEL_STARTABLE))
-                            recon.removeContains(nodeId);
-                        return recon;
-                    }
-
-                    reconstructed.add(nodeId);
-
-                    if (s.size() == 1) {
-                        MinimalSourceSet mssV = getMinimalSourceSet(v);
-                        recon.addAll(mssV);
-                        if (!v.hasLabel(Const.LABEL_STARTABLE))
-                            recon.removeContains(v.getId());
-                        return recon;
-                    }
-
-                    else {
-                        return reconstruct(mss, v.getId());
-                    }
-                }
-            }
+        else {
+            mss2.addAll(mss3);
         }
 
-        return recon;
+        reconstructed.add(decomposedId);
+
+        return mss2;
     }
 
     private long needReconstruction(MinimalSourceSet mss) {
@@ -117,7 +89,7 @@ public class PartitionFinder implements MinimalSourceSetFinder {
         for (Set<Long> s : mss.getSourceSets()) {
             for (Long nodeId : s) {
                 Node v = graphDb.getNodeById(nodeId);
-                if (v.hasProperty("decomposed")) {
+                if (v.hasProperty("decomposed") && !reconstructed.contains(nodeId)) {
                     Log.debug("needs recon at " + nodeId);
                     Log.debug("of " + s);
                     return nodeId;
@@ -127,25 +99,4 @@ public class PartitionFinder implements MinimalSourceSetFinder {
         Log.debug("reconstructed!");
         return -1;
     }
-
-//    private MinimalSourceSet computeMinimalSourceSet(Node hypernode) {
-//        MinimalSourceSet mss = null;
-//        Iterable<Relationship> rels = hypernode.getRelationships(Direction.INCOMING, Const.REL_FROM_SOURCE);
-//        for (Relationship rel : rels) {
-//            Node s = rel.getStartNode();
-//            if (mss == null) {
-//                mss = getMinimalSourceSet(s);
-//            } else {
-//                mss = mss.cartesian(getMinimalSourceSet(s));
-//            }
-//        }
-//        Log.debug("computeMinimalSourceSet");
-//        Log.debug("hypernode mss len = " + mss.cardinality());
-//        Log.debug(mss.toString());
-//
-//        return mss;
-//
-//        // Get from saved result
-////        return getMinimalSourceSet(hypernode);
-//    }
 }
