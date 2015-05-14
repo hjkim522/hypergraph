@@ -41,7 +41,7 @@ public class Application {
 
     private static void keggImport() {
         execute("kegg-import", "db/kegg", true, () -> {
-            Importer importer = new KeggImporter(false, false, 0, 1.0);
+            Importer importer = new KeggImporter();
             importer.run();
 
             MinimalSourceSetBuilder builder = new NaiveBuilder();
