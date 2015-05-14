@@ -41,7 +41,8 @@ public class Measure {
         LongSummaryStatistics stat = list.stream().mapToLong((x)->x).summaryStatistics();
         Log.info("hypergraph.util.Measure - " + name);
         Log.info(" average : " + stat.getAverage());
-        Log.info(" sum : " + stat.getSum());
         Log.info(" max : " + stat.getMax());
+        Log.info(" sum : " + stat.getSum());
+        Log.info(" count : " + stat.getCount());
     }
 }

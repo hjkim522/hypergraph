@@ -12,6 +12,7 @@ import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.ResourceIterator;
 import org.neo4j.graphdb.Transaction;
+import scala.collection.immutable.Stream;
 
 /**
  * Main hypergraph.Application
@@ -61,16 +62,17 @@ public class Application {
             while (nodes.hasNext()) {
                 Node node = nodes.next();
 
-                // query 1%
-                if (Math.random() < 0.01)
-                    continue;
+                String name = (String) node.getProperty(Const.PROP_UNIQUE);
+                Log.debug(name);
 
-                Log.debug("query for node " + node.getId());
+                if (name.startsWith("hsa:")) {
+                    Log.debug("query for node " + node.getId() + " " + name);
 
-                measure.start();
-                MinimalSourceSetFinder finder = new NaiveFinder();
-                MinimalSourceSet mss = finder.find(node);
-                measure.end();
+                    measure.start();
+                    MinimalSourceSetFinder finder = new NaiveFinder();
+                    MinimalSourceSet mss = finder.find(node);
+                    measure.end();
+                }
             }
             measure.printStatistic();
         });

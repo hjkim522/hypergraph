@@ -103,8 +103,8 @@ public class KeggImporter implements Importer {
 
         public void save(GraphDatabaseService graphDb) {
             //XXX: skip large relation
-            if (entry1.nameSet.size() > 5 || entry2.nameSet.size() > 5)
-                return;
+//            if (entry1.nameSet.size() > 5 || entry2.nameSet.size() > 5)
+//                return;
 
             Set<Node> sources = namesToNodes(graphDb, entry1.nameSet);
             Set<Node> targets = namesToNodes(graphDb, entry2.nameSet);
@@ -153,8 +153,8 @@ public class KeggImporter implements Importer {
 
         public void save(GraphDatabaseService graphDb) {
             //XXX: skip large relation
-            if (sourceNames.size() > 5 || targetNames.size() > 5)
-                return;
+//            if (sourceNames.size() > 5 || targetNames.size() > 5)
+//                return;
 
             Set<Node> sources = namesToNodes(graphDb, sourceNames);
             Set<Node> targets = namesToNodes(graphDb, targetNames);
@@ -289,10 +289,13 @@ public class KeggImporter implements Importer {
             while (iter.hasNext()) {
                 Node n = iter.next();
 
-                if (Math.random() > conf.startableRatio)
-                    continue;
+//                if (Math.random() > conf.startableRatio)
+//                    continue;
 
-                if (n.getProperty("type").equals("compound")) {
+//                if (n.getProperty("type").equals("compound")) {
+                String name = (String) n.getProperty(Const.PROP_UNIQUE);
+                if (name.startsWith("dr:")) {
+                    Log.debug(name);
                     n.addLabel(Const.LABEL_STARTABLE);
                     numStartable++;
                 }

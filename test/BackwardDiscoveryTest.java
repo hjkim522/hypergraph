@@ -29,7 +29,7 @@ public class BackwardDiscoveryTest {
 
     @Test
     public void testIndexedBackwardDiscovery() throws Exception {
-        
+
     }
 
     @Test
