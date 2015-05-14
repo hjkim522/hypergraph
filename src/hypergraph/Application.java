@@ -14,6 +14,8 @@ import org.neo4j.graphdb.ResourceIterator;
 import org.neo4j.graphdb.Transaction;
 import scala.collection.immutable.Stream;
 
+import java.util.Set;
+
 /**
  * Main hypergraph.Application
  *
@@ -27,7 +29,7 @@ public class Application {
 
     public static void main(String[] args) {
         keggImport();
-        keggQuery();
+//        keggQuery();
 
 //        execute("hypergraph-import", "db/hypergraph", false, () -> {
 
@@ -72,10 +74,23 @@ public class Application {
                     MinimalSourceSetFinder finder = new NaiveFinder();
                     MinimalSourceSet mss = finder.find(node);
                     measure.end();
+                    printNames(mss);
                 }
             }
             measure.printStatistic();
         });
+    }
+
+    private static void printNames(MinimalSourceSet mss) {
+        for (Set<Long> source : mss.getSourceSets()) {
+            System.out.print("{");
+            for (Long sid : source) {
+                Node s = graphDb.getNodeById(sid);
+                String name = (String) s.getProperty(Const.PROP_UNIQUE);
+                System.out.print(name + ", ");
+            }
+            System.out.println("}");
+        }
     }
 
     private static void execute(String log, String db, boolean init, Runnable runnable) {

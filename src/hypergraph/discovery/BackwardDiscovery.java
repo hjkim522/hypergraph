@@ -1,5 +1,6 @@
 package hypergraph.discovery;
 
+import hypergraph.mss.MinimalSourceSet;
 import org.neo4j.graphdb.Node;
 
 import java.util.Set;
