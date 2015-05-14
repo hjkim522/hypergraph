@@ -28,12 +28,12 @@ public class Application {
 //        keggImport();
 //        keggQuery();
 
-        execute("hypergraph-import", "db/hypergraph", true, () -> {
-            Importer importer = new SimpleImporter("input/hypergraph.txt");
-            importer.run();
-            MinimalSourceSetBuilder builder = new PartitionBuilder();
-            builder.run();
-        });
+//        execute("hypergraph-import", "db/hypergraph", true, () -> {
+//            Importer importer = new SimpleImporter("input/hypergraph.txt");
+//            importer.run();
+//            MinimalSourceSetBuilder builder = new PartitionBuilder();
+//            builder.run();
+//        });
 
         query("hypergraph-query", "db/hypergraph");
     }

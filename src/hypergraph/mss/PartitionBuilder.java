@@ -141,6 +141,8 @@ public class PartitionBuilder implements MinimalSourceSetBuilder {
                             MinimalSourceSet mssHyperedge = computeMinimalSourceSet(h);
                             setComputed(h);
 
+                            int prevSize = mssTarget.size();
+
                             boolean modified = mssTarget.addAll(mssHyperedge);
                             if (modified) {
                                 if (queue.contains(t)) {
@@ -148,6 +150,7 @@ public class PartitionBuilder implements MinimalSourceSetBuilder {
                                 }
                                 queue.add(t);
                                 unsetComputed(t);
+                                currentMSSSize = currentMSSSize - prevSize + mssTarget.size();
                             }
                         }
                         else {
@@ -162,14 +165,15 @@ public class PartitionBuilder implements MinimalSourceSetBuilder {
                         queue.add(t);
 
                         // set partition to t
-                        currentMSSSize++;
+                        //currentMSSSize++;
+                        currentMSSSize += mssHyperedge.size();
                         partition.put(t.getId(), currentPartition);
                     }
                 }
             }
 
             // partition
-            if (currentMSSSize > 512) {
+            if (currentMSSSize > 1024) {
                 currentMSSSize = 0;
                 currentPartition++;
 
@@ -208,6 +212,7 @@ public class PartitionBuilder implements MinimalSourceSetBuilder {
     }
 
     private MinimalSourceSet computeMinimalSourceSet(Node hypernode) {
+        Log.debug("computeMinimalSourceSet of hypernode " + hypernode.getId());
         MinimalSourceSet mss = null;
         Iterable<Relationship> rels = hypernode.getRelationships(Direction.INCOMING, Const.REL_FROM_SOURCE);
         for (Relationship rel : rels) {
@@ -217,6 +222,7 @@ public class PartitionBuilder implements MinimalSourceSetBuilder {
             } else {
                 mss = mss.cartesian(getMinimalSourceSet(s));
             }
+            Log.debug(mss.cardinality() + " - " + mss.toString());
         }
         return mss;
     }
