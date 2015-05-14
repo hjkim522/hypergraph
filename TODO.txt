@@ -4,6 +4,10 @@ multiple edges
 
 
 
-1.mark decomposed hypernodes so that avoid duplications
+OK 1.mark decomposed hypernodes so that avoid duplications
 2.latter compute once and set an attr
 
+
+
+early decomposition mss < limit
+for massive node

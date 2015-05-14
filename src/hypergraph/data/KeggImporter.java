@@ -1,6 +1,5 @@
 package hypergraph.data;
 
-import hypergraph.Application;
 import hypergraph.common.Const;
 import hypergraph.common.Hyperedge;
 import hypergraph.common.HypergraphDatabase;
@@ -171,12 +170,12 @@ public class KeggImporter implements Importer {
     /**
      * Kegg importer configuration
      */
-    public class KeggImporterConf {
-        public boolean importRelations;
-        public boolean importFileLimit;
-        public int fileLimit;
-        public double startableRatio;
-    }
+//    public class KeggImporterConf {
+//        public boolean importRelations;
+//        public boolean importFileLimit;
+//        public int fileLimit;
+//        public double startableRatio;
+//    }
 
     private GraphDatabaseService graphDb;
     private int countFile;
@@ -187,7 +186,8 @@ public class KeggImporter implements Importer {
     // for test
     private boolean importRelations;
     private boolean importFileLimit;
-    private int limit;
+    private int fileLimit;
+    public double startableRatio;
 
     public KeggImporter() {
         graphDb = HypergraphDatabase.getGraphDatabase();
@@ -197,14 +197,16 @@ public class KeggImporter implements Importer {
         countReactions = 0;
         importRelations = true;
         importFileLimit = false;
-        limit = 0;
+        fileLimit = 0;
+        startableRatio = 1.0;
     }
 
-    public KeggImporter(boolean importRelations, boolean importFileLimit, int limit) {
+    public KeggImporter(boolean importRelations, boolean importFileLimit, int fileLimit, double startableRatio) {
         this();
         this.importRelations = importRelations;
         this.importFileLimit = importFileLimit;
-        this.limit = limit;
+        this.fileLimit = fileLimit;
+        this.startableRatio = startableRatio;
     }
 
     @Override
@@ -215,7 +217,7 @@ public class KeggImporter implements Importer {
                 handleFile(file);
                 countFile++;
             }
-            if (importFileLimit && countFile == limit) {
+            if (importFileLimit && countFile == fileLimit) {
                 break;
             }
         }
@@ -297,8 +299,8 @@ public class KeggImporter implements Importer {
             while (iter.hasNext()) {
                 Node n = iter.next();
 
-//                if (Math.random() > 0.1)
-//                    continue;
+                if (Math.random() > startableRatio)
+                    continue;
 
                 if (n.getProperty("type").equals("compound")) {
                     n.addLabel(Const.LABEL_STARTABLE);

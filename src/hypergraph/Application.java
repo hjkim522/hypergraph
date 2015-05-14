@@ -25,22 +25,23 @@ public class Application {
     private static GraphDatabaseService graphDb;
 
     public static void main(String[] args) {
-//        keggImport();
-//        keggQuery();
+        keggImport();
+        keggQuery();
 
-//        execute("hypergraph-import", "db/hypergraph", true, () -> {
+//        execute("hypergraph-import", "db/hypergraph", false, () -> {
+
 //            Importer importer = new SimpleImporter("input/hypergraph.txt");
 //            importer.run();
 //            MinimalSourceSetBuilder builder = new PartitionBuilder();
 //            builder.run();
 //        });
-
-        query("hypergraph-query", "db/hypergraph");
+//
+//        query("hypergraph-query", "db/hypergraph");
     }
 
     private static void keggImport() {
         execute("kegg-import", "db/kegg", true, () -> {
-            Importer importer = new KeggImporter();//false, true, 20);
+            Importer importer = new KeggImporter();
             importer.run();
 
             MinimalSourceSetBuilder builder = new PartitionBuilder();

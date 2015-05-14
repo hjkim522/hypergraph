@@ -3,8 +3,10 @@ package hypergraph.mss;
 import hypergraph.common.Const;
 import hypergraph.common.HypergraphDatabase;
 import hypergraph.util.Log;
+import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Relationship;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -66,7 +68,8 @@ public class PartitionFinder implements MinimalSourceSetFinder {
         }
 
         Node d = graphDb.getNodeById(decomposedId);
-        MinimalSourceSet mss3 = getMinimalSourceSet(d); // A in example
+//        MinimalSourceSet mss3 = getMinimalSourceSet(d); // A in example
+        MinimalSourceSet mss3 = computeMinimalSourceSetOfNode(d); // A in example
 
         if (mss1.cardinality() != 0) {
             mss2.addAll(mss3.cartesian(mss1));
@@ -96,5 +99,37 @@ public class PartitionFinder implements MinimalSourceSetFinder {
         }
         Log.debug("reconstructed!");
         return -1;
+    }
+
+    private MinimalSourceSet computeMinimalSourceSetOfNode(Node node) {
+        MinimalSourceSet mss = null;
+        Iterable<Relationship> rels = node.getRelationships(Direction.INCOMING, Const.REL_TO_TARGET);
+        for (Relationship rel : rels) {
+            Node h = rel.getStartNode();
+            if (mss == null) {
+                mss = computeMinimalSourceSetOfHypernode(h);
+            } else {
+                mss.addAll(computeMinimalSourceSetOfHypernode(h));
+            }
+        }
+        return mss;
+    }
+
+    private MinimalSourceSet computeMinimalSourceSetOfHypernode(Node hypernode) {
+        MinimalSourceSet mss = null;
+        Iterable<Relationship> rels = hypernode.getRelationships(Direction.INCOMING, Const.REL_FROM_SOURCE);
+        for (Relationship rel : rels) {
+            Node s = rel.getStartNode();
+            if (mss == null) {
+                mss = getMinimalSourceSet(s);
+            } else {
+                mss = mss.cartesian(getMinimalSourceSet(s));
+            }
+        }
+        Log.debug("computeMinimalSourceSet");
+        Log.debug("hypernode mss len = " + mss.cardinality());
+        Log.debug(mss.toString());
+
+        return mss;
     }
 }

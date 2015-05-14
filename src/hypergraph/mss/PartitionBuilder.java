@@ -136,6 +136,9 @@ public class PartitionBuilder implements MinimalSourceSetBuilder {
                     // 2. target is visited and different partition
                     // 3. target is not visited
                     if (isVisited(t)) {
+                        if (t.hasProperty("decomposed"))
+                            continue;
+
                         if (partition.getOrDefault(t.getId(), 0) == currentPartition) {
                             MinimalSourceSet mssTarget = getMinimalSourceSet(t);
                             MinimalSourceSet mssHyperedge = computeMinimalSourceSet(h);
@@ -151,6 +154,12 @@ public class PartitionBuilder implements MinimalSourceSetBuilder {
                                 queue.add(t);
                                 unsetComputed(t);
                                 currentMSSSize = currentMSSSize - prevSize + mssTarget.size();
+                            }
+
+                            // early decomposition
+                            if (mssTarget.size() > 1024) {
+                                setMinimalSourceSet(t, new MinimalSourceSet(t.getId()));
+                                setDecomposed(t);
                             }
                         }
                         else {
