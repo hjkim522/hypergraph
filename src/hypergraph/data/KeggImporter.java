@@ -170,43 +170,33 @@ public class KeggImporter implements Importer {
     /**
      * Kegg importer configuration
      */
-//    public class KeggImporterConf {
-//        public boolean importRelations;
-//        public boolean importFileLimit;
-//        public int fileLimit;
-//        public double startableRatio;
-//    }
+    public class KeggImporterConf {
+        public boolean importAttributes = false;
+        public boolean importRelations = true;
+        public boolean importFileLimit = false;
+        public int fileLimit = 0;
+        public double startableRatio = 1.0;
+    }
 
     private GraphDatabaseService graphDb;
+    private KeggImporterConf conf;
     private int countFile;
     private int countEntry;
     private int countRelations;
     private int countReactions;
 
-    // for test
-    private boolean importRelations;
-    private boolean importFileLimit;
-    private int fileLimit;
-    public double startableRatio;
-
     public KeggImporter() {
         graphDb = HypergraphDatabase.getGraphDatabase();
+        conf = new KeggImporterConf();
         countFile = 0;
         countEntry = 0;
         countRelations = 0;
         countReactions = 0;
-        importRelations = true;
-        importFileLimit = false;
-        fileLimit = 0;
-        startableRatio = 1.0;
     }
 
-    public KeggImporter(boolean importRelations, boolean importFileLimit, int fileLimit, double startableRatio) {
+    public KeggImporter(KeggImporterConf conf) {
         this();
-        this.importRelations = importRelations;
-        this.importFileLimit = importFileLimit;
-        this.fileLimit = fileLimit;
-        this.startableRatio = startableRatio;
+        this.conf = conf;
     }
 
     @Override
@@ -217,7 +207,7 @@ public class KeggImporter implements Importer {
                 handleFile(file);
                 countFile++;
             }
-            if (importFileLimit && countFile == fileLimit) {
+            if (conf.importFileLimit && countFile == conf.fileLimit) {
                 break;
             }
         }
@@ -260,7 +250,7 @@ public class KeggImporter implements Importer {
             }
 
             // parse relation
-            if (importRelations) {
+            if (conf.importRelations) {
                 for (int i = 0; i < relations.getLength(); i++) {
                     KeggRelation relation = new KeggRelation((Element) relations.item(i), entryMap);
                     relation.save(graphDb);
@@ -299,7 +289,7 @@ public class KeggImporter implements Importer {
             while (iter.hasNext()) {
                 Node n = iter.next();
 
-                if (Math.random() > startableRatio)
+                if (Math.random() > conf.startableRatio)
                     continue;
 
                 if (n.getProperty("type").equals("compound")) {

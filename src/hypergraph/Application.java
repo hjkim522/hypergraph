@@ -41,10 +41,10 @@ public class Application {
 
     private static void keggImport() {
         execute("kegg-import", "db/kegg", true, () -> {
-            Importer importer = new KeggImporter();
+            Importer importer = new KeggImporter(false, false, 0, 1.0);
             importer.run();
 
-            MinimalSourceSetBuilder builder = new PartitionBuilder();
+            MinimalSourceSetBuilder builder = new NaiveBuilder();
             builder.run();
         });
     }
@@ -68,7 +68,7 @@ public class Application {
                 Log.debug("query for node " + node.getId());
 
                 measure.start();
-                MinimalSourceSetFinder finder = new PartitionFinder();
+                MinimalSourceSetFinder finder = new NaiveFinder();
                 MinimalSourceSet mss = finder.find(node);
                 measure.end();
             }
