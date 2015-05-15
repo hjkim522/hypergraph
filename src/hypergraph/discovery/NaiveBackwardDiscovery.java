@@ -36,7 +36,6 @@ public class NaiveBackwardDiscovery implements BackwardDiscovery {
         return result;
     }
 
-    // can find a minimal set
     private Set<Node> findWithTraversal(Set<Node> targets) {
         Queue<Node> queue = new LinkedList<Node>();
         Stack<Node> stack = new Stack<>();
@@ -49,37 +48,79 @@ public class NaiveBackwardDiscovery implements BackwardDiscovery {
 
         while (!queue.isEmpty()) {
             Node v = queue.poll();
+            Node selectedHyperedge = null;
             int inDegree = v.getDegree(Const.REL_TO_TARGET, Direction.INCOMING);
+            int edgeSelect = 1; //XXX: temp
+            int edgeCount = 0;
 
-            if (inDegree == 1) {
-
+            // selected a hyperedge from backward star
+            Iterable<Relationship> toTargets = v.getRelationships(Direction.INCOMING, Const.REL_TO_TARGET);
+            for (Relationship toTarget : toTargets) {
+                edgeCount++;
+                if (edgeCount == edgeSelect) {
+                    selectedHyperedge = toTarget.getStartNode();
+                    break;
+                }
             }
 
+            if (selectedHyperedge == null) // or visited
+                continue;
 
-//            // get backward star
-//            Iterable<Relationship> rels = v.getRelationships(Direction.INCOMING, Const.REL_TO_TARGET);
-//            for (Relationship rel : rels) {
-//                Node h = rel.getStartNode();
-//
-//                // get sources
-//                Iterable<Relationship> sourceRels = h.getRelationships(Direction.INCOMING, Const.REL_FROM_SOURCE);
-//                for (Relationship sourceRel : sourceRels) {
-//                    Node s = sourceRel.getStartNode();
-//                    if (isVisited(s))
-//                        continue;;
-//                    setVisited(s);
-//
-//                    if (s.hasLabel(Const.LABEL_STARTABLE)) {
-//                        result.add(s);
-//                    }
-//                    else {
-//                        queue.add(s);
-//                    }
-//                }
-//
-//                // choose one
-//                break;
-//            }
+            // insert sources into queue
+            Iterable<Relationship> fromSources = selectedHyperedge.getRelationships(Direction.INCOMING, Const.REL_FROM_SOURCE);
+            for (Relationship fromSource : fromSources) {
+                Node s = fromSource.getStartNode();
+                if (!isVisited(s)) {
+                    setVisited(s);
+                    queue.add(s);
+                }
+            }
+        }
+
+        return null;//result;
+    }
+
+    // can find a minimal set
+    // XXX: temporarily save
+    private Set<Node> findAnyTraversal(Set<Node> targets) {
+        Queue<Node> queue = new LinkedList<Node>();
+        Stack<Node> stack = new Stack<>();
+        Map<Long, Integer> choice = new HashMap<>();
+
+        for (Node t : targets) {
+            setVisited(t);
+            queue.add(t);
+        }
+
+        while (!queue.isEmpty()) {
+            Node v = queue.poll();
+            Node selectedHyperedge = null;
+            int inDegree = v.getDegree(Const.REL_TO_TARGET, Direction.INCOMING);
+            int edgeSelect = 1; //XXX: temp
+            int edgeCount = 0;
+
+            // selected a hyperedge from backward star
+            Iterable<Relationship> toTargets = v.getRelationships(Direction.INCOMING, Const.REL_TO_TARGET);
+            for (Relationship toTarget : toTargets) {
+                edgeCount++;
+                if (edgeCount == edgeSelect) {
+                    selectedHyperedge = toTarget.getStartNode();
+                    break;
+                }
+            }
+
+            if (selectedHyperedge == null) // or visited
+                continue;
+
+            // insert sources into queue
+            Iterable<Relationship> fromSources = selectedHyperedge.getRelationships(Direction.INCOMING, Const.REL_FROM_SOURCE);
+            for (Relationship fromSource : fromSources) {
+                Node s = fromSource.getStartNode();
+                if (!isVisited(s)) {
+                    setVisited(s);
+                    queue.add(s);
+                }
+            }
         }
 
         return null;//result;
