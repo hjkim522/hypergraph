@@ -90,19 +90,19 @@ public class BackwardDiscoveryTest {
         }
     }
 
-    @Test
-    public void testNaiveWithBackawrdTraversal() throws Exception {
-        try (Transaction tx = graphDb.beginTx()) {
-            Node t = graphDb.findNode(Const.LABEL_NODE, Const.PROP_UNIQUE, targetName);
-            BackwardTraversal bt = new BackwardTraversal(node -> {
-                if (node.hasLabel(Const.LABEL_STARTABLE)) {
-                    String name = (String) node.getProperty(Const.PROP_UNIQUE);
-                    Log.debug(name);
-                }
-            });
-            Set<Node> target = new HashSet<>();
-            target.add(t);
-            bt.traverse(target);
-        }
-    }
+//    @Test
+//    public void testNaiveWithBackawrdTraversal() throws Exception {
+//        try (Transaction tx = graphDb.beginTx()) {
+//            Node t = graphDb.findNode(Const.LABEL_NODE, Const.PROP_UNIQUE, targetName);
+//            BackwardTraversal bt = new BackwardTraversal(node -> {
+//                if (node.hasLabel(Const.LABEL_STARTABLE)) {
+//                    String name = (String) node.getProperty(Const.PROP_UNIQUE);
+//                    Log.debug(name);
+//                }
+//            });
+//            Set<Node> target = new HashSet<>();
+//            target.add(t);
+//            bt.traverse(target);
+//        }
+//    }
 }
