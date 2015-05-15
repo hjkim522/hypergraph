@@ -1,6 +1,5 @@
 package hypergraph.traversal;
 
-import hypergraph.Application;
 import hypergraph.common.Const;
 import hypergraph.common.HypergraphDatabase;
 import org.neo4j.graphdb.Direction;
@@ -14,56 +13,51 @@ import java.util.Queue;
 import java.util.Set;
 
 /**
- * Created by Hyunjun on 2015-04-17.
+ * Created by Hyunjun on 2015-05-15.
  */
-public class HypergraphTraversal {
+public class BackwardTraversal {
     private Set<Long> visited; // visited nodes, in-memory
     private HypergraphTraversalCallback callback;
 
-    public HypergraphTraversal() {
+    public BackwardTraversal() {
         this(node -> {});
     }
 
-    public HypergraphTraversal(HypergraphTraversalCallback callback) {
+    public BackwardTraversal(HypergraphTraversalCallback callback) {
         this.visited = new HashSet<Long>();
         this.callback = callback;
     }
 
-    public void traverse(Set<Node> start) {
+    public void traverse(Set<Node> target) {
         Queue<Node> queue = new LinkedList<Node>();
 
-        for (Node s : start) {
-            setVisited(s);
-            queue.add(s);
-            callback.onVisit(s);
+        for (Node t : target) {
+            setVisited(t);
+            queue.add(t);
+            callback.onVisit(t);
         }
 
         while (!queue.isEmpty()) {
             // dequeue a normal node (one of source nodes)
             Node v = queue.poll();
 
-            // get connected hyperedges
-            Iterable<Relationship> fromSources = v.getRelationships(Direction.OUTGOING, Const.REL_FROM_SOURCE);
-            for (Relationship fromSource : fromSources) {
+            // get connected hyperedges, backward star
+            Iterable<Relationship> toTargets = v.getRelationships(Direction.INCOMING, Const.REL_TO_TARGET);
+            for (Relationship toTarget : toTargets) {
                 // get pseudo hypernode
-                Node h = fromSource.getEndNode();
+                Node h = toTarget.getStartNode();
                 if (isVisited(h))
                     continue;
-                else if (!isEnabled(h))
-                    continue;
-                else
-                    setVisited(h);
+                setVisited(h);
 
-                // get single target node
-                // Node t = h.getSingleRelationship(Const.REL_TO_TARGET, Direction.OUTGOING).getEndNode();
-                // modified to support multiple target nodes
-                Iterable<Relationship> toTargets = h.getRelationships(Direction.OUTGOING, Const.REL_TO_TARGET);
-                for (Relationship toTarget : toTargets) {
-                    Node t = toTarget.getEndNode();
-                    if (!isVisited(t)) {
-                        setVisited(t);
-                        queue.add(t);
-                        callback.onVisit(t);
+                // get all source nodes
+                Iterable<Relationship> fromSources = h.getRelationships(Direction.INCOMING, Const.REL_FROM_SOURCE);
+                for (Relationship fromSource : fromSources) {
+                    Node s = fromSource.getStartNode();
+                    if (!isVisited(s)) {
+                        setVisited(s);
+                        queue.add(s);
+                        callback.onVisit(s);
                     }
                 }
             }
