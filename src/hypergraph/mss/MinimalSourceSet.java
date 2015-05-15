@@ -97,9 +97,7 @@ public class MinimalSourceSet {
         while (iter.hasNext()) {
             Set<Long> s = iter.next();
             if (s.contains(nodeId)) {
-                //if (s.size() != 1) Log.error("not 1");
                 iter.remove();
-                //break;
             }
         }
     }

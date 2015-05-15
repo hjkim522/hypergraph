@@ -176,7 +176,12 @@ public class NaiveBuilder implements MinimalSourceSetBuilder {
         MinimalSourceSet mss = mssMap.get(node.getId());
         if (mss != null)
             return mss;
+
+        // allocate new mss
         mss = new MinimalSourceSet();
+//        if (node.hasLabel(Const.LABEL_STARTABLE))
+//            mss.addSourceSetOfSingleNode(node.getId());
+
         mssMap.put(node.getId(), mss);
         return mss;
     }

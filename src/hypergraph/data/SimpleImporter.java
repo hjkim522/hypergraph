@@ -73,7 +73,7 @@ public class SimpleImporter implements Importer {
         try (Transaction tx = graphDb.beginTx()) {
             for (int i = 0; i < n; i++) {
                 Node node = graphDb.createNode(Const.LABEL_NODE);
-                node.setProperty(Const.PROP_UNIQUE, i);
+                node.setProperty(Const.PROP_UNIQUE, String.valueOf(i));
                 nodes[i] = node;
             }
             tx.success();

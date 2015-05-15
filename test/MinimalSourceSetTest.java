@@ -1,4 +1,5 @@
 import hypergraph.mss.MinimalSourceSet;
+import hypergraph.util.Log;
 import org.junit.Test;
 
 import java.util.HashSet;
@@ -37,12 +38,23 @@ public class MinimalSourceSetTest {
         MinimalSourceSet mss1 = new MinimalSourceSet();
         mss1.addSourceSet(constructSourceSet(0, 1, 2));
         mss1.addSourceSet(constructSourceSet(3, 4));
+        Log.debug(mss1.toString());
 
         MinimalSourceSet mss2 = new MinimalSourceSet();
         mss2.addSourceSet(constructSourceSet(3, 4, 5));
+        Log.debug(mss2.toString());
 
         MinimalSourceSet cartesian = mss1.cartesian(mss2);
+        Log.debug(cartesian.toString());
         assertTrue(cartesian.contains(constructSourceSet(3, 4, 5)));
+        assertFalse(cartesian.contains(constructSourceSet(0, 1, 2, 3, 4, 5)));
+
+        mss1 = new MinimalSourceSet();
+        mss1.addSourceSet(constructSourceSet(0, 1, 2));
+        mss2 = new MinimalSourceSet();
+        mss2.addSourceSet(constructSourceSet(3, 4, 5));
+        cartesian = mss1.cartesian(mss2);
+        assertTrue(cartesian.contains(constructSourceSet(0, 1, 2, 3, 4, 5)));
     }
 
     private Set<Long> constructSourceSet(Number... ids) {

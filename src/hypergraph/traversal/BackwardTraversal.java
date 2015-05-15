@@ -34,12 +34,13 @@ public class BackwardTraversal {
         for (Node t : target) {
             setVisited(t);
             queue.add(t);
-            callback.onVisit(t);
+            //callback.onVisit(t);
         }
 
         while (!queue.isEmpty()) {
             // dequeue a normal node (one of source nodes)
             Node v = queue.poll();
+            callback.onVisit(v);
 
             // get connected hyperedges, backward star
             Iterable<Relationship> toTargets = v.getRelationships(Direction.INCOMING, Const.REL_TO_TARGET);
@@ -57,7 +58,7 @@ public class BackwardTraversal {
                     if (!isVisited(s)) {
                         setVisited(s);
                         queue.add(s);
-                        callback.onVisit(s);
+//                        callback.onVisit(s);
                     }
                 }
             }

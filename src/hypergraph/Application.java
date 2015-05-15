@@ -29,6 +29,25 @@ public class Application {
 
     public static void main(String[] args) {
         keggImport();
+
+        executeTx("kegg-query", "db/kegg", false, () -> {
+            Node t = graphDb.findNode(Const.LABEL_NODE, Const.PROP_UNIQUE, "hsa:5161");
+
+            NaiveFinder finder = new NaiveFinder();
+            MinimalSourceSet mss = finder.find(t);
+
+            // MSS to node set
+            for (Set<Long> source : mss.getSourceSets()) {
+                System.out.print("{");
+                for (Long sid : source) {
+                    Node s = graphDb.getNodeById(sid);
+                    String name = (String) s.getProperty(Const.PROP_UNIQUE);
+                    System.out.print(name + ", ");
+                }
+                System.out.println("}");
+            }
+        });
+
 //        keggQuery();
 
 //        execute("hypergraph-import", "db/hypergraph", false, () -> {

@@ -3,6 +3,7 @@ package hypergraph.discovery;
 import hypergraph.Application;
 import hypergraph.common.Const;
 import hypergraph.common.HypergraphDatabase;
+import hypergraph.mss.MinimalSourceSet;
 import hypergraph.util.Log;
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -49,12 +50,25 @@ public class NaiveBackwardDiscovery implements BackwardDiscovery {
         return result;
     }
 
-    public Set<Long> findOpt(Set<Node> targets) {
+    public MinimalSourceSet findOpt(Set<Node> targets) {
+        MinimalSourceSet mss = new MinimalSourceSet();
 
         do {
             visited = new HashSet<>();
             Set<Node> sources = findWithTraversal(targets);
-            printNodes(sources);
+//            printNodes(sources);
+
+            if (!sources.isEmpty()) { // empty == unreachable
+                Set<Long> result = new HashSet<Long>();
+                for (Node s : sources) {
+                    result.add(s.getId());
+                }
+
+                ForwardDiscovery discovery = new ForwardDiscovery();
+                if (discovery.isReachable(sources, targets)) {
+                    mss.addSourceSet(result);
+                }
+            }
 
             // manage branch
             while (!branchingNode.empty()) {
@@ -62,8 +76,8 @@ public class NaiveBackwardDiscovery implements BackwardDiscovery {
                 int inDegree = b.getDegree(Const.REL_TO_TARGET, Direction.INCOMING);
                 int edgeIndex = nextEdge.getOrDefault(b.getId(), 0);
 
-                int name = (int) b.getProperty(Const.PROP_UNIQUE);
-                Log.debug("branching node " + name);
+//                int name = (int) b.getProperty(Const.PROP_UNIQUE);
+//                Log.debug("branching node " + name);
 
                 if (!b.hasLabel(Const.LABEL_STARTABLE) && edgeIndex == 0)
                     edgeIndex = 1;
@@ -77,13 +91,13 @@ public class NaiveBackwardDiscovery implements BackwardDiscovery {
             }
         } while (!branchingNode.empty());
 
-        return null;
+        return mss;
     }
 
     private void printNodes(Set<Node> nodes) {
         System.out.print("{");
         for (Node v : nodes) {
-            int name = (int) v.getProperty(Const.PROP_UNIQUE);
+            String name = (String) v.getProperty(Const.PROP_UNIQUE);
             System.out.print(name + ", ");
         }
         System.out.println("}");
@@ -96,8 +110,6 @@ public class NaiveBackwardDiscovery implements BackwardDiscovery {
         for (Node t : targets) {
             setVisited(t);
             queue.add(t);
-            if (t.hasLabel(Const.LABEL_STARTABLE))
-                result.add(t);
         }
 
         while (!queue.isEmpty()) {
@@ -105,19 +117,19 @@ public class NaiveBackwardDiscovery implements BackwardDiscovery {
             Node selectedHyperedge = null;
 
             int inDegree = v.getDegree(Const.REL_TO_TARGET, Direction.INCOMING);
-            if (inDegree == 0)
-                continue;
-
             int edgeIndex = nextEdge.getOrDefault(v.getId(), 0);
 
             // if startable, then can choose stop traversing!
             if (v.hasLabel(Const.LABEL_STARTABLE) && edgeIndex == 0) {
+                result.add(v);
                 if (inDegree > 0 && !branchingNode.contains(v)) {
                     branchingNode.push(v);
                 }
                 continue;
             }
 
+            if (inDegree == 0)
+                continue;
             if (!v.hasLabel(Const.LABEL_STARTABLE) && edgeIndex == 0)
                 edgeIndex = 1;
 
@@ -139,8 +151,6 @@ public class NaiveBackwardDiscovery implements BackwardDiscovery {
                 if (!isVisited(s)) {
                     setVisited(s);
                     queue.add(s);
-                    if (s.hasLabel(Const.LABEL_STARTABLE))
-                        result.add(s);
                 }
             }
 
