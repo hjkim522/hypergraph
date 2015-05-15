@@ -5,6 +5,7 @@ import hypergraph.common.Const;
 import hypergraph.common.HypergraphDatabase;
 import hypergraph.mss.MinimalSourceSet;
 import hypergraph.util.Log;
+import org.neo4j.cypher.internal.compiler.v1_9.parser.ParserPattern;
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
@@ -63,11 +64,7 @@ public class NaiveBackwardDiscovery implements BackwardDiscovery {
                 for (Node s : sources) {
                     result.add(s.getId());
                 }
-
-                ForwardDiscovery discovery = new ForwardDiscovery();
-                if (discovery.isReachable(sources, targets)) {
-                    mss.addSourceSet(result);
-                }
+                mss.addSourceSet(result);
             }
 
             // manage branch
@@ -91,7 +88,25 @@ public class NaiveBackwardDiscovery implements BackwardDiscovery {
             }
         } while (!branchingNode.empty());
 
-        return mss;
+        MinimalSourceSet result = new MinimalSourceSet();
+        for (Set<Long> sourceSet : mss.getSourceSets()) {
+            Set<Node> sources = toNodeSet(sourceSet);
+            ForwardDiscovery discovery = new ForwardDiscovery();
+            if (discovery.isReachable(sources, targets)) {
+                result.getSourceSets().add(sourceSet);
+            }
+        }
+
+        return result;
+    }
+
+    private Set<Node> toNodeSet(Set<Long> sourceSet) {
+        Set<Node> nodeSet = new HashSet<>();
+        for (Long s : sourceSet) {
+            Node v = graphDb.getNodeById(s);
+            nodeSet.add(v);
+        }
+        return nodeSet;
     }
 
     private void printNodes(Set<Node> nodes) {
