@@ -71,14 +71,4 @@ public class BackwardTraversal {
     private boolean isVisited(Node node) {
         return visited.contains(node.getId());
     }
-
-    private boolean isEnabled(Node hypernode) {
-        Iterable<Relationship> rels = hypernode.getRelationships(Direction.INCOMING, Const.REL_FROM_SOURCE);
-        for (Relationship rel : rels) {
-            if (!isVisited(rel.getStartNode())) {
-                return false;
-            }
-        }
-        return true;
-    }
 }
