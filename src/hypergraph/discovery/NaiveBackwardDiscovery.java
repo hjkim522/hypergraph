@@ -44,9 +44,10 @@ public class NaiveBackwardDiscovery implements BackwardDiscovery {
             printNodes(sources);
 
             if (!sources.isEmpty()) { // empty == unreachable
-                ForwardDiscovery discovery = new ForwardDiscovery();
-                if (discovery.isReachable(sources, target)) {
-                    Log.debug("reachable");
+//                ForwardDiscovery discovery = new ForwardDiscovery();
+//                if (discovery.isReachable(sources, target)) {
+                if (true) {
+//                    Log.debug("reachable");
                     Set<Long> result = new HashSet<Long>();
                     for (Node s : sources) {
                         result.add(s.getId());
