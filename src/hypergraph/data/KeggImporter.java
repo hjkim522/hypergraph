@@ -292,9 +292,9 @@ public class KeggImporter implements Importer {
 //                if (Math.random() > conf.startableRatio)
 //                    continue;
 
-//                if (n.getProperty("type").equals("compound")) {
                 String name = (String) n.getProperty(Const.PROP_UNIQUE);
-                if (name.startsWith("dr:")) {
+                if (n.getProperty("type").equals("compound")) {
+//                if (name.startsWith("dr:")) {
                     Log.debug(name);
                     n.addLabel(Const.LABEL_STARTABLE);
                     numStartable++;

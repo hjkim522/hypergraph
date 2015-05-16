@@ -24,17 +24,17 @@ import static org.junit.Assert.*;
  */
 public class BackwardDiscoveryTest {
     static GraphDatabaseService graphDb;
-    static String targetName = "hsa:5161";
+    static String targetName = "88";//"hsa:5161";
 
     @BeforeClass
     public static void openDatabase() {
-        graphDb = HypergraphDatabase.open("db/kegg");
+//        graphDb = HypergraphDatabase.open("db/kegg");
 
-//        graphDb = HypergraphDatabase.init("db/test");
-//        SimpleImporter importer = new SimpleImporter("input/test.txt");
-//        importer.run();
-//        NaiveBuilder builder = new NaiveBuilder();
-//        builder.run();
+        graphDb = HypergraphDatabase.init("db/test");
+        SimpleImporter importer = new SimpleImporter("input/hypergraph.txt");
+        importer.run();
+        NaiveBuilder builder = new NaiveBuilder();
+        builder.run();
     }
 
     @AfterClass
