@@ -5,6 +5,7 @@ import hypergraph.common.Const;
 import hypergraph.common.HypergraphDatabase;
 import hypergraph.mss.MinimalSourceSet;
 import hypergraph.util.Log;
+import javafx.collections.transformation.SortedList;
 import org.neo4j.cypher.internal.compiler.v1_9.parser.ParserPattern;
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -129,14 +130,28 @@ public class NaiveBackwardDiscovery implements BackwardDiscovery {
             if (!v.hasLabel(Const.LABEL_STARTABLE) && edgeIndex == 0)
                 edgeIndex = 1;
 
-            // selected a hyperedge from backward star
-            int edgeCount = 0;
-            Iterable<Relationship> toTargets = v.getRelationships(Direction.INCOMING, Const.REL_TO_TARGET);
-            for (Relationship toTarget : toTargets) {
-                edgeCount++;
-                if (edgeCount == edgeIndex) {
-                    selectedHyperedge = toTarget.getStartNode();
-                    break;
+            boolean sortEdge = true;
+            if (!sortEdge) {
+                List<Node> hyperedges = new LinkedList<>();
+                Iterable<Relationship> toTargets = v.getRelationships(Direction.INCOMING, Const.REL_TO_TARGET);
+                for (Relationship toTarget : toTargets) {
+                    hyperedges.add(toTarget.getStartNode());
+                }
+                hyperedges.sort((Node a, Node b) -> {
+                    return (int) (a.getId() - b.getId());
+                });
+                selectedHyperedge = hyperedges.get(edgeIndex + 1);
+            }
+            else {
+                // selected a hyperedge from backward star
+                int edgeCount = 0;
+                Iterable<Relationship> toTargets = v.getRelationships(Direction.INCOMING, Const.REL_TO_TARGET);
+                for (Relationship toTarget : toTargets) {
+                    edgeCount++;
+                    if (edgeCount == edgeIndex) {
+                        selectedHyperedge = toTarget.getStartNode();
+                        break;
+                    }
                 }
             }
 
@@ -151,7 +166,6 @@ public class NaiveBackwardDiscovery implements BackwardDiscovery {
             }
 
             // edge remains
-//            if (edgeCount < inDegree && !branchingNode.contains(v)) {
             if (inDegree > 1 && !branchingNode.contains(v)) {
                 branchingNode.push(v);
             }

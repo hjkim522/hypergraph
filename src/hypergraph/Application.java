@@ -90,7 +90,7 @@ public class Application {
             Measure measureNaive = new Measure("Naive Query MSS");
             ResourceIterator<Node> nodes = graphDb.findNodes(Const.LABEL_NODE);
             int count = 0;
-            int max = 20;
+            int max = 200;
             int countErr = 0;
 
             while (nodes.hasNext()) {
