@@ -38,23 +38,17 @@ public class NaiveBackwardDiscovery implements BackwardDiscovery {
         MinimalSourceSet mss = new MinimalSourceSet();
 
         do {
-            Log.debug("\n\niter");
             visited = new HashSet<>();
             Set<Node> sources = findWithTraversal(target);
             printNodes(sources);
 
             if (!sources.isEmpty()) { // empty == unreachable
-//                ForwardDiscovery discovery = new ForwardDiscovery();
-//                if (discovery.isReachable(sources, target)) {
-                if (true) {
-//                    Log.debug("reachable");
-                    Set<Long> result = new HashSet<Long>();
-                    for (Node s : sources) {
-                        result.add(s.getId());
-                    }
-                    mss.addSourceSet(result);
-                    Log.debug(mss.toString());
+                Set<Long> result = new HashSet<Long>();
+                for (Node s : sources) {
+                    result.add(s.getId());
                 }
+                mss.addSourceSet(result);
+                Log.debug(mss.toString());
             }
 
             // manage branch
