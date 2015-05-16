@@ -37,6 +37,18 @@ public class Application {
 
         syntheticImport();
         syntheticQuery();
+
+//        executeTx("test", "db/syn", false, () -> {
+//            Set<Node> source = new HashSet<Node>();
+//            Set<Node> target = new HashSet<Node>();
+//            source.add(graphDb.getNodeById(17));
+//            source.add(graphDb.getNodeById(1));
+//            source.add(graphDb.getNodeById(5));
+//            source.add(graphDb.getNodeById(23));
+//            target.add(graphDb.getNodeById(14));
+//            ForwardDiscovery discovery = new ForwardDiscovery();
+//            Log.debug("rechable: " + discovery.isReachable(source, target));
+//        });
     }
 
     private static void keggImport() {
@@ -97,7 +109,8 @@ public class Application {
                 Node node = nodes.next();
                 String name = (String) node.getProperty(Const.PROP_UNIQUE);
 
-                if (Math.random() < 0.5) {//1) {
+                if (true) { //Math.random() < 0.5) {//1) {
+//                if (name.equals("14")) {
                     Log.debug("Indexed query for node " + node.getId() + " " + name);
                     measureIndexed.start();
                     MinimalSourceSetFinder finder = new NaiveFinder();
@@ -117,7 +130,7 @@ public class Application {
                     if (!mssIndexed.equals(mssNaive)) {
                         Log.error("ERROR: MSS diff at " + node.getId() + " " + name);
                         Log.error(mssIndexed.toString());
-                        Log.error("\nnaive");
+                        Log.error("naive");
                         Log.error(mssNaive.toString());
                         countErr++;
                     }

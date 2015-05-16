@@ -4,6 +4,7 @@ import hypergraph.Application;
 import hypergraph.common.Const;
 import hypergraph.common.HypergraphDatabase;
 import hypergraph.mss.MinimalSourceSet;
+import hypergraph.traversal.HypergraphTraversal;
 import hypergraph.util.Log;
 import javafx.collections.transformation.SortedList;
 import org.neo4j.cypher.internal.compiler.v1_9.parser.ParserPattern;
@@ -37,16 +38,22 @@ public class NaiveBackwardDiscovery implements BackwardDiscovery {
         MinimalSourceSet mss = new MinimalSourceSet();
 
         do {
+            Log.debug("\n\niter");
             visited = new HashSet<>();
             Set<Node> sources = findWithTraversal(target);
-//            printNodes(sources);
+            printNodes(sources);
 
             if (!sources.isEmpty()) { // empty == unreachable
-                Set<Long> result = new HashSet<Long>();
-                for (Node s : sources) {
-                    result.add(s.getId());
+                ForwardDiscovery discovery = new ForwardDiscovery();
+                if (discovery.isReachable(sources, target)) {
+                    Log.debug("reachable");
+                    Set<Long> result = new HashSet<Long>();
+                    for (Node s : sources) {
+                        result.add(s.getId());
+                    }
+                    mss.addSourceSet(result);
+                    Log.debug(mss.toString());
                 }
-                mss.addSourceSet(result);
             }
 
             // manage branch
@@ -62,16 +69,24 @@ public class NaiveBackwardDiscovery implements BackwardDiscovery {
                     edgeIndex = 1;
 
                 if (inDegree == edgeIndex) {
+                    nextEdge.put(b.getId(), 0); //XXX:??
                     branchingNode.pop();
                 } else if (inDegree > edgeIndex) {
                     nextEdge.put(b.getId(), edgeIndex + 1);
                     break;
                 }
             }
+
+            // print stack
+            Log.debug("branchingNode");
+            for (Node b : branchingNode) {
+                Log.debug(b.getId() + "");
+            }
         } while (!branchingNode.empty());
 
         MinimalSourceSet result = new MinimalSourceSet();
         for (Set<Long> sourceSet : mss.getSourceSets()) {
+            Log.debug("check " + sourceSet.toString());
             Set<Node> sources = toNodeSet(sourceSet);
             ForwardDiscovery discovery = new ForwardDiscovery();
             if (discovery.isReachable(sources, target)) {
@@ -112,6 +127,7 @@ public class NaiveBackwardDiscovery implements BackwardDiscovery {
         while (!queue.isEmpty()) {
             Node v = queue.poll();
             Node selectedHyperedge = null;
+            Log.debug("visit " + v.getId());
 
             int inDegree = v.getDegree(Const.REL_TO_TARGET, Direction.INCOMING);
             int edgeIndex = nextEdge.getOrDefault(v.getId(), 0);
@@ -131,7 +147,7 @@ public class NaiveBackwardDiscovery implements BackwardDiscovery {
                 edgeIndex = 1;
 
             boolean sortEdge = true;
-            if (!sortEdge) {
+            if (sortEdge) {
                 List<Node> hyperedges = new LinkedList<>();
                 Iterable<Relationship> toTargets = v.getRelationships(Direction.INCOMING, Const.REL_TO_TARGET);
                 for (Relationship toTarget : toTargets) {
@@ -140,7 +156,7 @@ public class NaiveBackwardDiscovery implements BackwardDiscovery {
                 hyperedges.sort((Node a, Node b) -> {
                     return (int) (a.getId() - b.getId());
                 });
-                selectedHyperedge = hyperedges.get(edgeIndex + 1);
+                selectedHyperedge = hyperedges.get(edgeIndex - 1);
             }
             else {
                 // selected a hyperedge from backward star
@@ -154,6 +170,7 @@ public class NaiveBackwardDiscovery implements BackwardDiscovery {
                     }
                 }
             }
+            Log.debug("selectedHyperedge " + selectedHyperedge.getId());
 
             // insert sources into queue
             Iterable<Relationship> fromSources = selectedHyperedge.getRelationships(Direction.INCOMING, Const.REL_FROM_SOURCE);

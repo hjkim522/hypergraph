@@ -55,6 +55,11 @@ public class MinimalSourceSetTest {
         mss2.addSourceSet(constructSourceSet(3, 4, 5));
         cartesian = mss1.cartesian(mss2);
         assertTrue(cartesian.contains(constructSourceSet(0, 1, 2, 3, 4, 5)));
+
+        // test empty case
+        mss1 = new MinimalSourceSet();
+        cartesian = mss2.cartesian(mss1);
+        assertTrue(cartesian.cardinality() == 0);
     }
 
     private Set<Long> constructSourceSet(Number... ids) {

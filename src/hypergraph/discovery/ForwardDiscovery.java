@@ -14,7 +14,7 @@ public class ForwardDiscovery {
         return null;
     }
 
-    boolean isReachable(Set<Node> source, Set<Node> target) {
+    public boolean isReachable(Set<Node> source, Set<Node> target) {
         Set<Long> check = new HashSet<>();
         for (Node t : target)
             check.add(t.getId());

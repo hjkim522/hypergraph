@@ -64,6 +64,19 @@ public class Hyperedge {
             return;
         }
 
+        // temporarily skip self edge
+        Iterator<Node> iter = target.iterator();
+        while (iter.hasNext()) {
+            Node t = iter.next();
+            if (source.contains(t)) {
+                Log.info("self edge");
+                iter.remove();
+            }
+        }
+        if (target.isEmpty()) {
+            return;
+        }
+
         // create a pseudo hypernode
         hypernode = graphDb.createNode(Const.LABEL_HYPERNODE);
 
