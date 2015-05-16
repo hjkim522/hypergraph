@@ -5,8 +5,10 @@ import hypergraph.common.HypergraphDatabase;
 import hypergraph.data.Importer;
 import hypergraph.data.KeggImporter;
 import hypergraph.data.SimpleImporter;
+import hypergraph.discovery.ForwardDiscovery;
 import hypergraph.discovery.NaiveBackwardDiscovery;
 import hypergraph.mss.*;
+import hypergraph.traversal.HypergraphTraversal;
 import hypergraph.util.Log;
 import hypergraph.util.Measure;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -128,6 +130,22 @@ public class Application {
             measureNaive.printStatistic();
             Log.info("error " + countErr);
         });
+    }
+
+    private static void checkMss(MinimalSourceSet mss, Node t) {
+        Set<Node> target = new HashSet<>();
+        target.add(t);
+
+        for (Set<Long> source : mss.getSourceSets()) {
+            Set<Node> sourceSet = new HashSet<>();
+            for (Long s : source) {
+                Node v = graphDb.getNodeById(s);
+                sourceSet.add(v);
+            }
+
+            ForwardDiscovery discovery = new ForwardDiscovery();
+            //discovery.isReachable(sourceSet, target);
+        }
     }
 
     private static void printNames(MinimalSourceSet mss) {

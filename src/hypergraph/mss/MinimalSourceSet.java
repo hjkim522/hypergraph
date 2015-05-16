@@ -1,6 +1,7 @@
 package hypergraph.mss;
 
 import hypergraph.util.Log;
+import org.neo4j.graphdb.Node;
 
 import java.util.HashSet;
 import java.util.Iterator;
@@ -198,4 +199,5 @@ public class MinimalSourceSet {
         }
         return sourceSet;
     }
+
 }
