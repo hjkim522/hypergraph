@@ -25,7 +25,14 @@ public class BruteForceBackwardDiscovery implements BackwardDiscovery {
         traversal.traverse(target);
 
         // Test all possible cases
-        
+        // 1 to 2^k - 1, k = |sources|
+        int k = sources.size();
+        if (k > 64) return null; //XXX: naive impl
+
+        long n = (1 << k) - 1;
+        for (long i = 1; i <= n; i++) {
+            //TODO:
+        }
 
         return null;
     }
