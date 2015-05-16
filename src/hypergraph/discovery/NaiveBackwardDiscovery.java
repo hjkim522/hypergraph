@@ -107,12 +107,12 @@ public class NaiveBackwardDiscovery implements BackwardDiscovery {
     }
 
     private void printNodes(Set<Node> nodes) {
-        System.out.print("{");
-        for (Node v : nodes) {
-            String name = (String) v.getProperty(Const.PROP_UNIQUE);
-            System.out.print(name + ", ");
-        }
-        System.out.println("}");
+//        System.out.print("{");
+//        for (Node v : nodes) {
+//            String name = (String) v.getProperty(Const.PROP_UNIQUE);
+//            System.out.print(name + ", ");
+//        }
+//        System.out.println("}");
     }
 
     private Set<Node> findWithTraversal(Set<Node> targets) {

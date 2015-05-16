@@ -17,7 +17,7 @@ public class Log {
     public static final int DEBUG = 0x8;
     public static final int ALL = ERROR | WARN | INFO | DEBUG;
 
-    private static int consoleLevel = ALL; // ERROR | INFO;
+    private static int consoleLevel = ERROR | INFO;
     private static int fileLevel = ERROR | INFO;
 
     // log file writers

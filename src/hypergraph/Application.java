@@ -102,15 +102,16 @@ public class Application {
             Measure measureNaive = new Measure("Naive Query MSS");
             ResourceIterator<Node> nodes = graphDb.findNodes(Const.LABEL_NODE);
             int count = 0;
-            int max = 200;
+            int max = 100;
             int countErr = 0;
 
             while (nodes.hasNext()) {
                 Node node = nodes.next();
                 String name = (String) node.getProperty(Const.PROP_UNIQUE);
 
-                if (true) { //Math.random() < 0.5) {//1) {
+                if (Math.random() < 0.2) {//1) {
 //                if (name.equals("14")) {
+                    Log.info("Query for node " + node.getId() + " " + name);
                     Log.debug("Indexed query for node " + node.getId() + " " + name);
                     measureIndexed.start();
                     MinimalSourceSetFinder finder = new NaiveFinder();
@@ -162,15 +163,15 @@ public class Application {
     }
 
     private static void printNames(MinimalSourceSet mss) {
-        for (Set<Long> source : mss.getSourceSets()) {
-            System.out.print("{");
-            for (Long sid : source) {
-                Node s = graphDb.getNodeById(sid);
-                String name = (String) s.getProperty(Const.PROP_UNIQUE);
-                System.out.print(name + ", ");
-            }
-            System.out.println("}");
-        }
+//        for (Set<Long> source : mss.getSourceSets()) {
+//            System.out.print("{");
+//            for (Long sid : source) {
+//                Node s = graphDb.getNodeById(sid);
+//                String name = (String) s.getProperty(Const.PROP_UNIQUE);
+//                System.out.print(name + ", ");
+//            }
+//            System.out.println("}");
+//        }
     }
 
     private static void execute(String log, String db, boolean init, Runnable runnable) {
