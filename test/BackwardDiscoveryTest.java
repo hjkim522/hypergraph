@@ -69,11 +69,7 @@ public class BackwardDiscoveryTest {
             Node t = graphDb.findNode(Const.LABEL_NODE, Const.PROP_UNIQUE, targetName);
 
             NaiveBackwardDiscovery discovery = new NaiveBackwardDiscovery();
-            //Set<Long> source = discovery.find(t);
-
-            Set<Node> targets = new HashSet<>();
-            targets.add(t);
-            MinimalSourceSet mss = discovery.findOpt(targets);
+            MinimalSourceSet mss = discovery.findMinimal(t);
 
             // MSS to node set
             for (Set<Long> source : mss.getSourceSets()) {

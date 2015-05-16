@@ -2,6 +2,7 @@ package hypergraph.discovery;
 
 import hypergraph.common.HypergraphDatabase;
 import hypergraph.mss.MinimalSourceSet;
+import hypergraph.mss.MinimalSourceSetFinder;
 import hypergraph.mss.NaiveFinder;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
@@ -13,30 +14,18 @@ import java.util.Set;
  * Created by Hyunjun on 2015-05-06.
  */
 public class IndexedBackwardDiscovery implements BackwardDiscovery {
-    private GraphDatabaseService graphDb;
-
-    public IndexedBackwardDiscovery() {
-        graphDb = HypergraphDatabase.getGraphDatabase();
-    }
-
+    
     @Override
-    public Set<Long> find(Node t) {
-        NaiveFinder finder = new NaiveFinder();
-        MinimalSourceSet mss = finder.find(t);
+    public MinimalSourceSet findMinimal(Set<Node> target) {
+        MinimalSourceSet result = null;
 
-        Set<Long> minimum = null;
-        int minimumCardinality = 0;
-
-        for (Set<Long> s : mss.getSourceSets()) {
-            if (minimum == null || minimumCardinality > s.size()) {
-                minimum = s;
-                minimumCardinality = s.size();
-            }
+        for (Node t : target) {
+            MinimalSourceSetFinder finder = new NaiveFinder();
+            MinimalSourceSet mss = finder.find(t);
+            if (result == null) result = mss;
+            else result = result.cartesian(mss);
         }
 
-        if (minimum == null)
-            return new HashSet<>();
-
-        return minimum;
+        return result;
     }
 }

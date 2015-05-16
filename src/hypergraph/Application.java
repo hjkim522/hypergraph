@@ -110,7 +110,7 @@ public class Application {
                     NaiveBackwardDiscovery discovery = new NaiveBackwardDiscovery();
                     Set<Node> targets = new HashSet<>();
                     targets.add(node);
-                    MinimalSourceSet mssNaive = discovery.findOpt(targets);
+                    MinimalSourceSet mssNaive = discovery.findMinimal(targets);
                     measureNaive.end();
                     printNames(mssNaive);
 

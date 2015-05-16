@@ -32,31 +32,12 @@ public class NaiveBackwardDiscovery implements BackwardDiscovery {
     }
 
     @Override
-    public Set<Long> find(Node t) {
-        Set<Node> targets = new HashSet<>();
-        targets.add(t);
-
-        findOpt(targets);
-
-//        Set<Node> sourceSet = findWithTraversal(targets);
-//        printNodes(sourceSet);
-//
-//        printNodes(findWithTraversal(targets));
-//
-        Set<Long> result = new HashSet<Long>();
-//        for (Node s : sourceSet) {
-//            result.add(s.getId());
-//        }
-
-        return result;
-    }
-
-    public MinimalSourceSet findOpt(Set<Node> targets) {
+    public MinimalSourceSet findMinimal(Set<Node> target) {
         MinimalSourceSet mss = new MinimalSourceSet();
 
         do {
             visited = new HashSet<>();
-            Set<Node> sources = findWithTraversal(targets);
+            Set<Node> sources = findWithTraversal(target);
 //            printNodes(sources);
 
             if (!sources.isEmpty()) { // empty == unreachable
@@ -92,7 +73,7 @@ public class NaiveBackwardDiscovery implements BackwardDiscovery {
         for (Set<Long> sourceSet : mss.getSourceSets()) {
             Set<Node> sources = toNodeSet(sourceSet);
             ForwardDiscovery discovery = new ForwardDiscovery();
-            if (discovery.isReachable(sources, targets)) {
+            if (discovery.isReachable(sources, target)) {
                 result.getSourceSets().add(sourceSet);
             }
         }
@@ -180,6 +161,7 @@ public class NaiveBackwardDiscovery implements BackwardDiscovery {
     }
 
     // can find any minimal set
+    @Deprecated
     private Set<Node> findAny(Set<Node> targets) {
         Queue<Node> queue = new LinkedList<Node>();
         Set<Node> result = new HashSet<>();
