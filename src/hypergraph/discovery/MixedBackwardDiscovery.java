@@ -27,6 +27,7 @@ public class MixedBackwardDiscovery extends NaiveBuilder implements BackwardDisc
                 start.add(node);
             }
         });
+        bt.traverse(target);
 
         // Build temporal mss from start
         compute(start);
