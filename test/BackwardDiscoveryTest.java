@@ -48,19 +48,9 @@ public class BackwardDiscoveryTest {
         try (Transaction tx = graphDb.beginTx()) {
             Node t = graphDb.findNode(Const.LABEL_NODE, Const.PROP_UNIQUE, targetName);
 
-            NaiveFinder finder = new NaiveFinder();
-            MinimalSourceSet mss = finder.find(t);
-
-            // MSS to node set
-            for (Set<Long> source : mss.getSourceSets()) {
-                System.out.print("{");
-                for (Long sid : source) {
-                    Node s = graphDb.getNodeById(sid);
-                    String name = (String) s.getProperty(Const.PROP_UNIQUE);
-                    System.out.print(name + ", ");
-                }
-                System.out.println("}");
-            }
+            BackwardDiscovery discovery = new IndexedBackwardDiscovery();
+            MinimalSourceSet mss = discovery.findMinimal(t);
+            printNodes(mss);
         }
     }
 
@@ -69,19 +59,9 @@ public class BackwardDiscoveryTest {
         try (Transaction tx = graphDb.beginTx()) {
             Node t = graphDb.findNode(Const.LABEL_NODE, Const.PROP_UNIQUE, targetName);
 
-            NaiveBackwardDiscovery discovery = new NaiveBackwardDiscovery();
+            BackwardDiscovery discovery = new NaiveBackwardDiscovery();
             MinimalSourceSet mss = discovery.findMinimal(t);
-
-            // MSS to node set
-            for (Set<Long> source : mss.getSourceSets()) {
-                System.out.print("{");
-                for (Long sid : source) {
-                    Node s = graphDb.getNodeById(sid);
-                    String name = (String) s.getProperty(Const.PROP_UNIQUE);
-                    System.out.print(name + ", ");
-                }
-                System.out.println("}");
-            }
+            printNodes(mss);
         }
     }
 
@@ -92,33 +72,19 @@ public class BackwardDiscoveryTest {
 
             BackwardDiscovery discovery = new MixedBackwardDiscovery();
             MinimalSourceSet mss = discovery.findMinimal(t);
-
-            // MSS to node set
-            for (Set<Long> source : mss.getSourceSets()) {
-                System.out.print("{");
-                for (Long sid : source) {
-                    Node s = graphDb.getNodeById(sid);
-                    String name = (String) s.getProperty(Const.PROP_UNIQUE);
-                    System.out.print(name + ", ");
-                }
-                System.out.println("}");
-            }
+            printNodes(mss);
         }
     }
 
-//    @Test
-//    public void testNaiveWithBackawrdTraversal() throws Exception {
-//        try (Transaction tx = graphDb.beginTx()) {
-//            Node t = graphDb.findNode(Const.LABEL_NODE, Const.PROP_UNIQUE, targetName);
-//            BackwardTraversal bt = new BackwardTraversal(node -> {
-//                if (node.hasLabel(Const.LABEL_STARTABLE)) {
-//                    String name = (String) node.getProperty(Const.PROP_UNIQUE);
-//                    Log.debug(name);
-//                }
-//            });
-//            Set<Node> target = new HashSet<>();
-//            target.add(t);
-//            bt.traverse(target);
-//        }
-//    }
+    private void printNodes(MinimalSourceSet mss) {
+        for (Set<Long> source : mss.getSourceSets()) {
+            System.out.print("{");
+            for (Long sid : source) {
+                Node s = graphDb.getNodeById(sid);
+                String name = (String) s.getProperty(Const.PROP_UNIQUE);
+                System.out.print(name + ", ");
+            }
+            System.out.println("}");
+        }
+    }
 }

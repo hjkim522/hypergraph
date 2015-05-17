@@ -34,13 +34,15 @@ public class MixedBackwardDiscovery extends NaiveBuilder implements BackwardDisc
         MinimalSourceSet result = null;
         for (Node t : target) {
             MinimalSourceSet mss = mssMap.get(t.getId());
-            if (mss == null)
+            if (mss == null) {
                 return new MinimalSourceSet();
+            }
 
-            if (result == null)
+            if (result == null) {
                 result = mss;
-            else
+            } else {
                 result = result.cartesian(mss);
+            }
         }
 
         return result;
