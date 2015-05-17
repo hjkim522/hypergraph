@@ -121,22 +121,22 @@ public class Application {
                     measureIndexed.end();
                     printNames(mssIndexed);
 
-                    Log.debug("Naive query for node " + node.getId() + " " + name);
-                    measureNaive.start();
-                    BackwardDiscovery discovery = new MixedBackwardDiscovery();
-                    Set<Node> targets = new HashSet<>();
-                    targets.add(node);
-                    MinimalSourceSet mssNaive = discovery.findMinimal(targets);
-                    measureNaive.end();
-                    printNames(mssNaive);
-
-                    if (!mssIndexed.equals(mssNaive)) {
-                        Log.error("ERROR: MSS diff at " + node.getId() + " " + name);
-                        Log.error(mssIndexed.toString());
-                        Log.error("naive");
-                        Log.error(mssNaive.toString());
-                        countErr++;
-                    }
+//                    Log.debug("Naive query for node " + node.getId() + " " + name);
+//                    measureNaive.start();
+//                    BackwardDiscovery discovery = new MixedBackwardDiscovery();
+//                    Set<Node> targets = new HashSet<>();
+//                    targets.add(node);
+//                    MinimalSourceSet mssNaive = discovery.findMinimal(targets);
+//                    measureNaive.end();
+//                    printNames(mssNaive);
+//
+//                    if (!mssIndexed.equals(mssNaive)) {
+//                        Log.error("ERROR: MSS diff at " + node.getId() + " " + name);
+//                        Log.error(mssIndexed.toString());
+//                        Log.error("naive");
+//                        Log.error(mssNaive.toString());
+//                        countErr++;
+//                    }
                     count++;
                     if (count > max)
                         break;

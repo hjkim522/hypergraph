@@ -203,6 +203,8 @@ public class NaiveBuilder implements MinimalSourceSetBuilder {
                 mss = mss.cartesian(getMinimalSourceSet(s));
             }
 
+            Log.debug("mss grow " + mss.cardinality());
+
             // decomposition
             if (mss.cardinality() > maxMSS) {
                 hypernode.setProperty("decomposed", true);
