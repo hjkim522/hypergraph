@@ -9,24 +9,32 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Created by Hyunun on 2015-05-14.
+ * Created by Hyunjun on 2015-05-14.
  */
 public class ForwardDiscovery {
 
-    public Set<Node> find(Node s) {
-        Set<Node> source = new HashSet<>();
-        source.add(s);
-        return find(source);
+    public Set<Node> find(Set<Node> source, Node t) {
+        Set<Node> target = new HashSet<>();
+        target.add(t);
+        return find(source, target);
     }
 
-    public Set<Node> find(Set<Node> source) {
+    /**
+     * Find reachable nodes among target
+     * Following hypergraph traversal rule
+     *
+     * @param source source set
+     * @param target target set
+     * @return reachable nodes
+     */
+    public Set<Node> find(Set<Node> source, Set<Node> target) {
         Set<Node> result = new HashSet<>();
-//        HypergraphTraversal traversal = new HypergraphTraversal(node -> {
-//            if (node.hasLabel(Const.LABEL_STARTABLE)) {
-//                result.add(node);
-//            }
-//        });
-//        traversal.traverse(source);
+        HypergraphTraversal traversal = new HypergraphTraversal(node -> {
+            if (target.contains(node)) {
+                result.add(node);
+            }
+        });
+        traversal.traverse(source);
         return result;
     }
 
