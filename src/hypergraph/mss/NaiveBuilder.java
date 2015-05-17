@@ -16,7 +16,7 @@ import java.util.*;
  */
 public class NaiveBuilder implements MinimalSourceSetBuilder {
     private static GraphDatabaseService graphDb;
-    private Map<Long, MinimalSourceSet> mssMap;
+    protected Map<Long, MinimalSourceSet> mssMap;
     private Set<Long> visited;
     private Set<Long> computed;
 
@@ -97,7 +97,7 @@ public class NaiveBuilder implements MinimalSourceSetBuilder {
         Log.debug(str);
     }
 
-    private void compute(Set<Node> start) {
+    protected void compute(Set<Node> start) {
         PriorityQueue<Node> queue = new PriorityQueue<Node>(new Comparator<Node>() {
             @Override
             public int compare(Node n1, Node n2) {

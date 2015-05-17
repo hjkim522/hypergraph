@@ -5,7 +5,9 @@ import hypergraph.common.HypergraphDatabase;
 import hypergraph.data.Importer;
 import hypergraph.data.KeggImporter;
 import hypergraph.data.SimpleImporter;
+import hypergraph.discovery.BackwardDiscovery;
 import hypergraph.discovery.ForwardDiscovery;
+import hypergraph.discovery.MixedBackwardDiscovery;
 import hypergraph.discovery.NaiveBackwardDiscovery;
 import hypergraph.mss.*;
 import hypergraph.traversal.HypergraphTraversal;
@@ -121,7 +123,7 @@ public class Application {
 
                     Log.debug("Naive query for node " + node.getId() + " " + name);
                     measureNaive.start();
-                    NaiveBackwardDiscovery discovery = new NaiveBackwardDiscovery();
+                    BackwardDiscovery discovery = new MixedBackwardDiscovery();
                     Set<Node> targets = new HashSet<>();
                     targets.add(node);
                     MinimalSourceSet mssNaive = discovery.findMinimal(targets);

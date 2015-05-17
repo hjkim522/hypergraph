@@ -5,6 +5,7 @@ import hypergraph.data.KeggImporter;
 import hypergraph.data.SimpleImporter;
 import hypergraph.discovery.BackwardDiscovery;
 import hypergraph.discovery.IndexedBackwardDiscovery;
+import hypergraph.discovery.MixedBackwardDiscovery;
 import hypergraph.discovery.NaiveBackwardDiscovery;
 import hypergraph.mss.*;
 import hypergraph.traversal.BackwardTraversal;
@@ -69,6 +70,27 @@ public class BackwardDiscoveryTest {
             Node t = graphDb.findNode(Const.LABEL_NODE, Const.PROP_UNIQUE, targetName);
 
             NaiveBackwardDiscovery discovery = new NaiveBackwardDiscovery();
+            MinimalSourceSet mss = discovery.findMinimal(t);
+
+            // MSS to node set
+            for (Set<Long> source : mss.getSourceSets()) {
+                System.out.print("{");
+                for (Long sid : source) {
+                    Node s = graphDb.getNodeById(sid);
+                    String name = (String) s.getProperty(Const.PROP_UNIQUE);
+                    System.out.print(name + ", ");
+                }
+                System.out.println("}");
+            }
+        }
+    }
+
+    @Test
+    public void testMixedBackwardDiscovery() throws Exception {
+        try (Transaction tx = graphDb.beginTx()) {
+            Node t = graphDb.findNode(Const.LABEL_NODE, Const.PROP_UNIQUE, targetName);
+
+            BackwardDiscovery discovery = new MixedBackwardDiscovery();
             MinimalSourceSet mss = discovery.findMinimal(t);
 
             // MSS to node set
