@@ -143,7 +143,7 @@ public class Application {
                 }
             }
             measureIndexed.printStatistic();
-            measureNaive.printStatistic();
+//            measureNaive.printStatistic();
             Log.info("error " + countErr);
         });
     }
