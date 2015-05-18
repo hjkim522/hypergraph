@@ -2,6 +2,7 @@ package hypergraph;
 
 import hypergraph.common.Const;
 import hypergraph.common.HypergraphDatabase;
+import hypergraph.data.CodaImporter;
 import hypergraph.data.Importer;
 import hypergraph.data.KeggImporter;
 import hypergraph.data.SimpleImporter;
@@ -34,11 +35,14 @@ public class Application {
     private static GraphDatabaseService graphDb;
 
     public static void main(String[] args) {
+        codaImport();
+        codaQuery();
+
 //        keggImport();
 //        keggQuery();
 
-        syntheticImport();
-        syntheticQuery();
+//        syntheticImport();
+//        syntheticQuery();
 
 //        executeTx("test", "db/syn", false, () -> {
 //            Set<Node> source = new HashSet<Node>();
@@ -51,6 +55,20 @@ public class Application {
 //            ForwardDiscovery discovery = new ForwardDiscovery();
 //            Log.debug("rechable: " + discovery.isReachable(source, target));
 //        });
+    }
+
+    private static void codaImport() {
+        execute("coda-import", "db/coda", true, () -> {
+            Importer importer = new CodaImporter();
+            importer.run();
+
+//            MinimalSourceSetBuilder builder = new NaiveBuilder();
+//            builder.run();
+        });
+    }
+
+    private static void codaQuery() {
+
     }
 
     private static void keggImport() {
