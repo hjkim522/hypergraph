@@ -35,14 +35,14 @@ public class Application {
     private static GraphDatabaseService graphDb;
 
     public static void main(String[] args) {
-        codaImport();
-        codaQuery();
+//        codaImport();
+//        codaQuery();
 
 //        keggImport();
 //        keggQuery();
 
-//        syntheticImport();
-//        syntheticQuery();
+        syntheticImport();
+        syntheticQuery();
 
 //        executeTx("test", "db/syn", false, () -> {
 //            Set<Node> source = new HashSet<Node>();
