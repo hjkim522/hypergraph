@@ -10,7 +10,7 @@ outputFile = "input/hypergraph.txt"
 numNodes = 100
 numHyperedges = 100
 numStartable = 20
-sourceSetSizeMin = 2
+sourceSetSizeMin = 1
 sourceSetSizeMax = 3
 avgPathLen = 5
 
@@ -97,9 +97,9 @@ def generate():
 
     #pick startables
     startables = set()
-    for i in range(numNodes):
-        if indegree[i] == 0:
-            startables.add(i)
+    #for i in range(numNodes):
+    #    if indegree[i] == 0:
+    #        startables.add(i)
     while len(startables) < numStartable:
         startables.add(random.randint(0, numNodes-1))
 
