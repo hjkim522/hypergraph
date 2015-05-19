@@ -8,6 +8,7 @@ import org.neo4j.graphdb.schema.Schema;
 import org.neo4j.io.fs.FileUtils;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -42,10 +43,18 @@ public class HypergraphDatabase {
         graphDb = null;
     }
 
-    private static void delete(String path) {
+    public static void copy(String from, String to) {
+        try {
+            FileUtils.copyRecursively(new File(from), new File(to));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void delete(String path) {
         try {
             FileUtils.deleteRecursively(new File(path));
-        } catch (Exception e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
