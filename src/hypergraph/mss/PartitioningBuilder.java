@@ -15,7 +15,7 @@ import java.util.*;
  *
  * Created by Hyunjun on 2015-04-17.
  */
-public class PartitionBuilder implements MinimalSourceSetBuilder {
+public class PartitioningBuilder implements MinimalSourceSetBuilder {
     private static final int threshold = 1024;
 
     private static GraphDatabaseService graphDb;
@@ -33,7 +33,7 @@ public class PartitionBuilder implements MinimalSourceSetBuilder {
     private int currentPartition;
     private Map<Long, Integer> partition;
 
-    public PartitionBuilder() {
+    public PartitioningBuilder() {
         graphDb = HypergraphDatabase.getGraphDatabase();
         mssMap = new HashMap<>();
         visited = new HashSet<>();

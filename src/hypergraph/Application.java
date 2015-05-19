@@ -1,25 +1,19 @@
 package hypergraph;
 
-import com.oracle.webservices.internal.api.databinding.Databinding;
 import hypergraph.common.Const;
 import hypergraph.common.HypergraphDatabase;
 import hypergraph.data.CodaImporter;
 import hypergraph.data.Importer;
 import hypergraph.data.KeggImporter;
 import hypergraph.data.SimpleImporter;
-import hypergraph.discovery.BackwardDiscovery;
 import hypergraph.discovery.ForwardDiscovery;
-import hypergraph.discovery.MixedBackwardDiscovery;
-import hypergraph.discovery.NaiveBackwardDiscovery;
 import hypergraph.mss.*;
-import hypergraph.traversal.HypergraphTraversal;
 import hypergraph.util.Log;
 import hypergraph.util.Measure;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.ResourceIterator;
 import org.neo4j.graphdb.Transaction;
-import scala.collection.immutable.Stream;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -36,29 +30,36 @@ public class Application {
     private static GraphDatabaseService graphDb;
 
     public static void main(String[] args) {
-
         HypergraphDatabase.delete("db/kegg");
         HypergraphDatabase.copy("db/kegg-marked", "db/kegg");
 
         execute("kegg-build", "db/kegg", false, () -> {
-            MinimalSourceSetBuilder builder = new PartitionBuilder();
+            MinimalSourceSetBuilder builder = new PartitioningBuilder();
             builder.run();
         });
 
-//        execute("syn-import", "db/syn", true, () -> {
-//            Importer importer = new SimpleImporter("input/hypergraph.txt");
-//            importer.run();
-//        });
+        executeTx("kegg-query", "db/kegg", false, () -> {
+            Measure measure = new Measure("Query MSS");
+            ResourceIterator<Node> nodes = graphDb.findNodes(Const.LABEL_NODE);
 
-//        HypergraphDatabase.delete("db/syn");
-//        HypergraphDatabase.copy("db/syn-imported", "db/syn");
-//
-//        execute("syn-build", "db/syn", false, () -> {
-//            MinimalSourceSetBuilder builder = new PartitionBuilder();
-//            builder.run();
-//        });
+            while (nodes.hasNext()) {
+                Node node = nodes.next();
 
-//        syntheticQuery();
+                String name = (String) node.getProperty(Const.PROP_UNIQUE);
+                Log.debug(name);
+
+                if (name.startsWith("hsa:")) {
+                    Log.debug("query for node " + node.getId() + " " + name);
+
+                    measure.start();
+                    MinimalSourceSetFinder finder = new NaiveFinder();
+                    MinimalSourceSet mss = finder.find(node);
+                    measure.end();
+                    printNames(mss);
+                }
+            }
+            measure.printStatistic();
+        });
     }
 
     private static void codaImport() {

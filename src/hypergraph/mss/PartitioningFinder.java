@@ -14,11 +14,11 @@ import java.util.Set;
 /**
  * Created by Hyunjun on 2015-05-12.
  */
-public class PartitionFinder implements MinimalSourceSetFinder {
+public class PartitioningFinder implements MinimalSourceSetFinder {
     private static GraphDatabaseService graphDb;
     private Set<Long> reconstructed;
 
-    public PartitionFinder() {
+    public PartitioningFinder() {
         graphDb = HypergraphDatabase.getGraphDatabase();
         reconstructed = new HashSet<>();
     }
