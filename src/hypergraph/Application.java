@@ -1,5 +1,6 @@
 package hypergraph;
 
+import com.oracle.webservices.internal.api.databinding.Databinding;
 import hypergraph.common.Const;
 import hypergraph.common.HypergraphDatabase;
 import hypergraph.data.CodaImporter;
@@ -35,26 +36,20 @@ public class Application {
     private static GraphDatabaseService graphDb;
 
     public static void main(String[] args) {
-//        codaImport();
-//        codaQuery();
-
-//        keggImport();
-//        keggQuery();
-
-        syntheticImport();
-//        syntheticQuery();
-
-//        executeTx("test", "db/syn", false, () -> {
-//            Set<Node> source = new HashSet<Node>();
-//            Set<Node> target = new HashSet<Node>();
-//            source.add(graphDb.getNodeById(17));
-//            source.add(graphDb.getNodeById(1));
-//            source.add(graphDb.getNodeById(5));
-//            source.add(graphDb.getNodeById(23));
-//            target.add(graphDb.getNodeById(14));
-//            ForwardDiscovery discovery = new ForwardDiscovery();
-//            Log.debug("rechable: " + discovery.isReachable(source, target));
+//        execute("syn-import", "db/syn", true, () -> {
+//            Importer importer = new SimpleImporter("input/hypergraph.txt");
+//            importer.run();
 //        });
+
+        HypergraphDatabase.delete("db/syn");
+        HypergraphDatabase.copy("db/syn-imported", "db/syn");
+
+        execute("syn-build", "db/syn", false, () -> {
+            MinimalSourceSetBuilder builder = new PartitionBuilder();
+            builder.run();
+        });
+
+//        syntheticQuery();
     }
 
     private static void codaImport() {
