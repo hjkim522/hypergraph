@@ -12,6 +12,7 @@ import java.util.*;
  * Simple in-memory builder
  * No optimization applied
  * No decomposition
+ * (without decomposition, only can handle small dataset around 1000)
  *
  * Created by Hyunjun on 2015-04-17.
  */
