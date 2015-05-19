@@ -1,13 +1,9 @@
 package hypergraph.discovery;
 
-import hypergraph.Application;
 import hypergraph.common.Const;
 import hypergraph.common.HypergraphDatabase;
 import hypergraph.mss.MinimalSourceSet;
-import hypergraph.traversal.HypergraphTraversal;
 import hypergraph.util.Log;
-import javafx.collections.transformation.SortedList;
-import org.neo4j.cypher.internal.compiler.v1_9.parser.ParserPattern;
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
@@ -46,7 +42,7 @@ public class NaiveBackwardDiscovery implements BackwardDiscovery {
                 for (Node s : sources) {
                     result.add(s.getId());
                 }
-                mss.addSourceSet(result);
+                mss.add(result);
                 Log.debug(mss.toString());
             }
 

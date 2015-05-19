@@ -4,7 +4,6 @@ import hypergraph.common.Const;
 import hypergraph.common.HypergraphDatabase;
 import hypergraph.util.Log;
 import hypergraph.util.Measure;
-import org.neo4j.cypher.internal.compiler.v1_9.commands.expressions.Min;
 import org.neo4j.graphdb.*;
 
 import java.util.*;
@@ -230,7 +229,7 @@ public class PartitioningBuilder implements MinimalSourceSetBuilder {
         if (mss != null)
             return mss;
         mss = new MinimalSourceSet();
-        mss.addSourceSetOfSingleNode(node.getId());
+        mss.add(node.getId());
         mssMap.put(node.getId(), mss);
         setDecomposed(node);
         return mss;

@@ -30,39 +30,41 @@ public class Application {
     private static GraphDatabaseService graphDb;
 
     public static void main(String[] args) {
-//        keggImport();
-        HypergraphDatabase.delete("db/kegg");
-        HypergraphDatabase.copy("db/kegg-marked", "db/kegg");
+        syntheticImport();
+//        syntheticQuery();
 
-        execute("kegg-build", "db/kegg", false, () -> {
-            MinimalSourceSetBuilder builder = new PartitioningBuilder();
-            builder.run();
-        });
-
-        executeTx("kegg-query", "db/kegg", false, () -> {
-            Measure measure = new Measure("Query MSS");
-            ResourceIterator<Node> nodes = graphDb.findNodes(Const.LABEL_NODE);
-
-            while (nodes.hasNext()) {
-                Node node = nodes.next();
-
-                String name = (String) node.getProperty(Const.PROP_UNIQUE);
-                Log.debug(name);
-
-                if (name.startsWith("hsa:")) {
-                    Log.debug("query for node " + node.getId() + " " + name);
-
-                    measure.start();
-                    MinimalSourceSetFinder finder = new PartitioningFinder();
-                    MinimalSourceSet mss = finder.find(node);
-                    measure.end();
-                    printNames(mss);
-                    Log.debug(name);
-                    break;
-                }
-            }
-            measure.printStatistic();
-        });
+//        HypergraphDatabase.delete("db/kegg");
+//        HypergraphDatabase.copy("db/kegg-marked", "db/kegg");
+//
+//        execute("kegg-build", "db/kegg", false, () -> {
+//            MinimalSourceSetBuilder builder = new PartitioningBuilder();
+//            builder.run();
+//        });
+//
+//        executeTx("kegg-query", "db/kegg", false, () -> {
+//            Measure measure = new Measure("Query MSS");
+//            ResourceIterator<Node> nodes = graphDb.findNodes(Const.LABEL_NODE);
+//
+//            while (nodes.hasNext()) {
+//                Node node = nodes.next();
+//
+//                String name = (String) node.getProperty(Const.PROP_UNIQUE);
+//                Log.debug(name);
+//
+//                if (name.startsWith("hsa:")) {
+//                    Log.debug("query for node " + node.getId() + " " + name);
+//
+//                    measure.start();
+//                    MinimalSourceSetFinder finder = new PartitioningFinder();
+//                    MinimalSourceSet mss = finder.find(node);
+//                    measure.end();
+//                    printNames(mss);
+//                    Log.debug(name);
+//                    break;
+//                }
+//            }
+//            measure.printStatistic();
+//        });
     }
 
     private static void codaImport() {
