@@ -143,11 +143,8 @@ public class NaiveBuilder implements MinimalSourceSetBuilder {
 
                 // calculate mss of hyperedge
                 MinimalSourceSet mssHyperedge = computeMinimalSourceSet(h);
-//                mssMap.put(h.getId(), mssHyperedge); //XXX: for test
 
                 // get target node
-                // Node t = h.getSingleRelationship(Const.REL_TO_TARGET, Direction.OUTGOING).getEndNode();
-                // modified to support multiple target nodes
                 Iterable<Relationship> toTargets = h.getRelationships(Direction.OUTGOING, Const.REL_TO_TARGET);
                 for (Relationship toTarget : toTargets) {
                     Node t = toTarget.getEndNode();

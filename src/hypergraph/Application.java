@@ -30,6 +30,7 @@ public class Application {
     private static GraphDatabaseService graphDb;
 
     public static void main(String[] args) {
+//        keggImport();
         HypergraphDatabase.delete("db/kegg");
         HypergraphDatabase.copy("db/kegg-marked", "db/kegg");
 
@@ -52,10 +53,12 @@ public class Application {
                     Log.debug("query for node " + node.getId() + " " + name);
 
                     measure.start();
-                    MinimalSourceSetFinder finder = new NaiveFinder();
+                    MinimalSourceSetFinder finder = new PartitioningFinder();
                     MinimalSourceSet mss = finder.find(node);
                     measure.end();
                     printNames(mss);
+                    Log.debug(name);
+                    break;
                 }
             }
             measure.printStatistic();
@@ -188,15 +191,18 @@ public class Application {
     }
 
     private static void printNames(MinimalSourceSet mss) {
-//        for (Set<Long> source : mss.getSourceSets()) {
-//            System.out.print("{");
-//            for (Long sid : source) {
-//                Node s = graphDb.getNodeById(sid);
-//                String name = (String) s.getProperty(Const.PROP_UNIQUE);
-//                System.out.print(name + ", ");
-//            }
-//            System.out.println("}");
-//        }
+        for (Set<Long> source : mss.getSourceSets()) {
+            System.out.print("{");
+            for (Long sid : source) {
+                Node s = graphDb.getNodeById(sid);
+                String name = (String) s.getProperty(Const.PROP_UNIQUE);
+                System.out.print(name + ", ");
+                if (!s.hasLabel(Const.LABEL_STARTABLE)) {
+                    Log.error("ERROR: NOT A STARTABLE!!");
+                }
+            }
+            System.out.println("}");
+        }
     }
 
     private static void execute(String log, String db, boolean init, Runnable runnable) {

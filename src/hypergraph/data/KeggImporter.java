@@ -76,6 +76,7 @@ public class KeggImporter implements Importer {
                     node.setProperty(Const.PROP_UNIQUE, name);
                     node.setProperty("type", type);
                     countEntry++;
+                    Log.debug(name);
                 }
             }
         }

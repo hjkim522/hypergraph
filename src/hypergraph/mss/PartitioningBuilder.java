@@ -219,6 +219,7 @@ public class PartitioningBuilder implements MinimalSourceSetBuilder {
                 }
 
                 mssMap = new HashMap<>();
+//                return; //XXX: temp compute 1 partition only
             }
         }
     }
@@ -314,6 +315,24 @@ public class PartitioningBuilder implements MinimalSourceSetBuilder {
     }
 
     private void computeDecomposed() {
+        for (Long d : decomposed) {
+            Node node = graphDb.getNodeById(d);
+            MinimalSourceSet mss = computeMinimalSourceSetOfNode(node);
+            node.setProperty(Const.PROP_MSS, mss.toString());
+        }
+    }
 
+    private MinimalSourceSet computeMinimalSourceSetOfNode(Node node) {
+        MinimalSourceSet mss = null;
+        Iterable<Relationship> rels = node.getRelationships(Direction.INCOMING, Const.REL_TO_TARGET);
+        for (Relationship rel : rels) {
+            Node h = rel.getStartNode();
+            if (mss == null) {
+                mss = computeMinimalSourceSet(h);
+            } else {
+                mss.addAll(computeMinimalSourceSet(h));
+            }
+        }
+        return mss;
     }
 }

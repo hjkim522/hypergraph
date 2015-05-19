@@ -33,7 +33,6 @@ public class PartitioningFinder implements MinimalSourceSetFinder {
             mss = reconstruct(mss, decomposedId);
             decomposedId = needReconstruction(mss);
         }
-
         return mss;
     }
 
@@ -68,8 +67,8 @@ public class PartitioningFinder implements MinimalSourceSetFinder {
         }
 
         Node d = graphDb.getNodeById(decomposedId);
-//        MinimalSourceSet mss3 = getMinimalSourceSet(d); // A in example
-        MinimalSourceSet mss3 = computeMinimalSourceSetOfNode(d); // A in example
+        MinimalSourceSet mss3 = getMinimalSourceSet(d); // A in example
+//        MinimalSourceSet mss3 = computeMinimalSourceSetOfNode(d); // A in example
 
         if (mss1.cardinality() != 0) {
             mss2.addAll(mss3.cartesian(mss1));
@@ -126,7 +125,7 @@ public class PartitioningFinder implements MinimalSourceSetFinder {
                 mss = mss.cartesian(getMinimalSourceSet(s));
             }
         }
-        Log.debug("computeMinimalSourceSet");
+        Log.debug("computeMinimalSourceSetOfHypernode " + hypernode.getId());
         Log.debug("hypernode mss len = " + mss.cardinality());
         Log.debug(mss.toString());
 
