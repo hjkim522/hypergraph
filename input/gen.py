@@ -12,7 +12,7 @@ numHyperedges = 100
 numStartable = 20
 sourceSetSizeMin = 1
 sourceSetSizeMax = 3
-avgPathLen = 5
+avgPathLen = 1
 
 #not used
 avgIndegree = 3
@@ -35,6 +35,7 @@ def parseParam():
     global numNodes
     global numHyperedges
     global numStartable
+    global avgPathLen
 
     #parse command ling args
     if len(sys.argv) > 1:
@@ -47,10 +48,13 @@ def parseParam():
         numStartable = int(sys.argv[3])
     if len(sys.argv) > 4:
         outputFile = sys.argv[4]
+    if len(sys.argv) > 5:
+        avgPathLen = sys.argv[5]
 
     print("numNodes: " + str(numNodes))
     print("numHyperedges: " + str(numHyperedges))
     print("numStartable: " + str(numStartable))
+    print("avgPathLen: " + str(avgPathLen))
     print("output: " + outputFile)
 
 
@@ -61,7 +65,7 @@ def generate():
     global numStartable
     global sourceSetSizeMin
     global sourceSetSizeMax
-    global avgPathLen #XXX: use range
+    global avgPathLen
 
     #degree count
     indegree = [0] * numNodes
@@ -71,7 +75,6 @@ def generate():
     hyperedges = []
 
     #generate path segments
-    avgPathLen = 1
     for i in range(numHyperedges / avgPathLen):
         h = Hyperedge()
         
@@ -97,9 +100,9 @@ def generate():
 
     #pick startables
     startables = set()
-    #for i in range(numNodes):
-    #    if indegree[i] == 0:
-    #        startables.add(i)
+    for i in range(numNodes):
+        if indegree[i] == 0:
+            startables.add(i)
     while len(startables) < numStartable:
         startables.add(random.randint(0, numNodes-1))
 
@@ -131,6 +134,5 @@ def generate():
 def main():
     parseParam()
     generate()
-
   
 main()

@@ -42,7 +42,7 @@ public class Application {
 //        keggQuery();
 
         syntheticImport();
-        syntheticQuery();
+//        syntheticQuery();
 
 //        executeTx("test", "db/syn", false, () -> {
 //            Set<Node> source = new HashSet<Node>();
