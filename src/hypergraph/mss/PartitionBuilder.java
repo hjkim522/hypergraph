@@ -39,6 +39,7 @@ public class PartitionBuilder implements MinimalSourceSetBuilder {
         visited = new HashSet<>();
         computed = new HashSet<>();
         partition = new HashMap<>();
+        decomposed = new HashSet<>();
     }
 
     public void run() {
@@ -76,6 +77,7 @@ public class PartitionBuilder implements MinimalSourceSetBuilder {
         Log.info("Build MSSIndex complete (" + (System.currentTimeMillis() - t) + " ms)");
         Log.info("Decomposed MSS " + countDecomposed);
         Log.info("countDecomposedByBackEdge " + countDecomposedByBackEdge);
+        Log.info("partition " + currentPartition);
     }
 
     private void save() {
@@ -121,6 +123,7 @@ public class PartitionBuilder implements MinimalSourceSetBuilder {
             queue.add(s);
             MinimalSourceSet mss = new MinimalSourceSet(s.getId());
             setMinimalSourceSet(s, mss);
+            partition.put(s.getId(), currentPartition);
         }
 
         while (!queue.isEmpty()) {
@@ -177,6 +180,7 @@ public class PartitionBuilder implements MinimalSourceSetBuilder {
 //                            }
                         }
                         else {
+                            Log.debug("decom " + partition.getOrDefault(t.getId(), 0));
                             setDecomposed(t);
                             countDecomposedByBackEdge++;
                         }
@@ -305,6 +309,7 @@ public class PartitionBuilder implements MinimalSourceSetBuilder {
         if (!node.hasProperty("decomposed")) {
             node.setProperty("decomposed", true);
             countDecomposed++;
+            decomposed.add(node.getId());
         }
     }
 

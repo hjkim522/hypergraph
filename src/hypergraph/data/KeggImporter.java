@@ -237,7 +237,7 @@ public class KeggImporter implements Importer {
             }
         }
 
-        markStartables();
+//        markStartables();
 
         Log.info("countFile : " + countFile);
         Log.info("countEntry : " + countEntry);

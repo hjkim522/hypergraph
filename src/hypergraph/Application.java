@@ -37,7 +37,13 @@ public class Application {
 
     public static void main(String[] args) {
 
-        keggImport();
+        HypergraphDatabase.delete("db/kegg");
+        HypergraphDatabase.copy("db/kegg-marked", "db/kegg");
+
+        execute("kegg-build", "db/kegg", false, () -> {
+            MinimalSourceSetBuilder builder = new PartitionBuilder();
+            builder.run();
+        });
 
 //        execute("syn-import", "db/syn", true, () -> {
 //            Importer importer = new SimpleImporter("input/hypergraph.txt");

@@ -19,7 +19,6 @@ import java.util.*;
  * Created by Hyunjun on 2015-05-06.
  */
 
-//XXX: not implemented yet
 public class NaiveBackwardDiscovery implements BackwardDiscovery {
     private GraphDatabaseService graphDb;
     private Set<Long> visited;
@@ -56,9 +55,6 @@ public class NaiveBackwardDiscovery implements BackwardDiscovery {
                 Node b = branchingNode.peek();
                 int inDegree = b.getDegree(Const.REL_TO_TARGET, Direction.INCOMING);
                 int edgeIndex = nextEdge.getOrDefault(b.getId(), 0);
-
-//                int name = (int) b.getProperty(Const.PROP_UNIQUE);
-//                Log.debug("branching node " + name);
 
                 if (!b.hasLabel(Const.LABEL_STARTABLE) && edgeIndex == 0)
                     edgeIndex = 1;
@@ -180,55 +176,6 @@ public class NaiveBackwardDiscovery implements BackwardDiscovery {
             // edge remains
             if (inDegree > 1 && !branchingNode.contains(v)) {
                 branchingNode.push(v);
-            }
-        }
-
-        return result;
-    }
-
-    // can find any minimal set
-    @Deprecated
-    private Set<Node> findAny(Set<Node> targets) {
-        Queue<Node> queue = new LinkedList<Node>();
-        Set<Node> result = new HashSet<>();
-
-        for (Node t : targets) {
-            setVisited(t);
-            queue.add(t);
-            if (t.hasLabel(Const.LABEL_STARTABLE))
-                result.add(t);
-        }
-
-        while (!queue.isEmpty()) {
-            Node v = queue.poll();
-            Node selectedHyperedge = null;
-            int inDegree = v.getDegree(Const.REL_TO_TARGET, Direction.INCOMING);
-            int edgeSelect = 1; //XXX: temp
-            int edgeCount = 0;
-
-            // selected a hyperedge from backward star
-            Iterable<Relationship> toTargets = v.getRelationships(Direction.INCOMING, Const.REL_TO_TARGET);
-            for (Relationship toTarget : toTargets) {
-                edgeCount++;
-                if (edgeCount == edgeSelect) {
-                    selectedHyperedge = toTarget.getStartNode();
-                    break;
-                }
-            }
-
-            if (selectedHyperedge == null) // or visited
-                continue;
-
-            // insert sources into queue
-            Iterable<Relationship> fromSources = selectedHyperedge.getRelationships(Direction.INCOMING, Const.REL_FROM_SOURCE);
-            for (Relationship fromSource : fromSources) {
-                Node s = fromSource.getStartNode();
-                if (!isVisited(s)) {
-                    setVisited(s);
-                    queue.add(s);
-                    if (s.hasLabel(Const.LABEL_STARTABLE))
-                        result.add(s);
-                }
             }
         }
 
