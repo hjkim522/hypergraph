@@ -16,14 +16,19 @@ import java.util.*;
  * Created by Hyunjun on 2015-04-17.
  */
 public class PartitionBuilder implements MinimalSourceSetBuilder {
+    private static final int threshold = 1024;
+
     private static GraphDatabaseService graphDb;
     private Map<Long, MinimalSourceSet> mssMap;
     private Set<Long> visited;
     private Set<Long> computed;
+    private Set<Long> decomposed;
 
     private int countDecomposed;
+    private int countDecomposedByBackEdge;
 
     // for partition
+    private int maxMSSSize;
     private int currentMSSSize;
     private int currentPartition;
     private Map<Long, Integer> partition;
@@ -40,8 +45,10 @@ public class PartitionBuilder implements MinimalSourceSetBuilder {
         // measure building time
         long t = System.currentTimeMillis();
         countDecomposed = 0;
+        countDecomposedByBackEdge = 0;
         currentMSSSize = 0;
         currentPartition = 1;
+        maxMSSSize = 0;
 
         Log.info("MSS builder with partition");
 
@@ -59,11 +66,16 @@ public class PartitionBuilder implements MinimalSourceSetBuilder {
 
             // write computed mms into database
             save();
+
+            // compute decomposed
+            computeDecomposed();
+
             tx.success();
         }
 
         Log.info("Build MSSIndex complete (" + (System.currentTimeMillis() - t) + " ms)");
         Log.info("Decomposed MSS " + countDecomposed);
+        Log.info("countDecomposedByBackEdge " + countDecomposedByBackEdge);
     }
 
     private void save() {
@@ -154,16 +166,19 @@ public class PartitionBuilder implements MinimalSourceSetBuilder {
                                 queue.add(t);
                                 unsetComputed(t);
                                 currentMSSSize = currentMSSSize - prevSize + mssTarget.size();
+                                if (maxMSSSize < prevSize)
+                                    maxMSSSize = prevSize;
                             }
 
-                            // early decomposition
-                            if (mssTarget.size() > 1024) {
-                                setMinimalSourceSet(t, new MinimalSourceSet(t.getId()));
-                                setDecomposed(t);
-                            }
+//                            // early decomposition
+//                            if (mssTarget.size() > threshold) {
+//                                setMinimalSourceSet(t, new MinimalSourceSet(t.getId()));
+//                                setDecomposed(t);
+//                            }
                         }
                         else {
                             setDecomposed(t);
+                            countDecomposedByBackEdge++;
                         }
                     }
                     else {
@@ -182,8 +197,8 @@ public class PartitionBuilder implements MinimalSourceSetBuilder {
             }
 
             // partition
-            if (currentMSSSize > 1024) {
-                currentMSSSize = 0;
+            if (maxMSSSize > threshold) {
+                maxMSSSize = 0;
                 currentPartition++;
 
                 Log.debug("currentPartition " + currentPartition);
@@ -291,5 +306,9 @@ public class PartitionBuilder implements MinimalSourceSetBuilder {
             node.setProperty("decomposed", true);
             countDecomposed++;
         }
+    }
+
+    private void computeDecomposed() {
+
     }
 }

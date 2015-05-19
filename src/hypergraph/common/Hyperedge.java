@@ -29,12 +29,24 @@ public class Hyperedge {
         hypernode = null;
     }
 
-    @Deprecated
     public Hyperedge(Set<Node> s, Node t) {
         source = s;
         target = new HashSet<Node>();
         target.add(t);
         hypernode = null;
+    }
+
+    public Hyperedge(Node s, Set<Node> t) {
+        source = new HashSet<>();
+        source.add(s);
+        target = t;
+        hypernode = null;
+    }
+
+    public Hyperedge(Node s, Node t) {
+        this();
+        source.add(s);
+        target.add(t);
     }
 
     public void addSource(Node node) {

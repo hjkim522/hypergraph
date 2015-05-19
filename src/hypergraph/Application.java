@@ -36,18 +36,21 @@ public class Application {
     private static GraphDatabaseService graphDb;
 
     public static void main(String[] args) {
+
+        keggImport();
+
 //        execute("syn-import", "db/syn", true, () -> {
 //            Importer importer = new SimpleImporter("input/hypergraph.txt");
 //            importer.run();
 //        });
 
-        HypergraphDatabase.delete("db/syn");
-        HypergraphDatabase.copy("db/syn-imported", "db/syn");
-
-        execute("syn-build", "db/syn", false, () -> {
-            MinimalSourceSetBuilder builder = new PartitionBuilder();
-            builder.run();
-        });
+//        HypergraphDatabase.delete("db/syn");
+//        HypergraphDatabase.copy("db/syn-imported", "db/syn");
+//
+//        execute("syn-build", "db/syn", false, () -> {
+//            MinimalSourceSetBuilder builder = new PartitionBuilder();
+//            builder.run();
+//        });
 
 //        syntheticQuery();
     }
@@ -71,8 +74,8 @@ public class Application {
             Importer importer = new KeggImporter();
             importer.run();
 
-            MinimalSourceSetBuilder builder = new NaiveBuilder();
-            builder.run();
+//            MinimalSourceSetBuilder builder = new NaiveBuilder();
+//            builder.run();
         });
     }
 

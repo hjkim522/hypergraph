@@ -89,27 +89,56 @@ public class KeggImporter implements Importer {
      *   <subtype name="indirect effect" value="..&gt;"/>
      * </relation>
      */
-    //TODO: handle subtypes
     private class KeggRelation {
         KeggEntry entry1;
         KeggEntry entry2;
+        boolean inhibit;
 
         public KeggRelation(Element relation, Map<String, KeggEntry> entryMap) {
             String entryId1 = relation.getAttribute("entry1");
             String entryId2 = relation.getAttribute("entry2");
             entry1 = entryMap.get(entryId1);
             entry2 = entryMap.get(entryId2);
+            inhibit = false;
+
+            NodeList subtypes = relation.getElementsByTagName("subtype");
+            for (int i = 0; i < subtypes.getLength(); i++) {
+                Element subtype = (Element) subtypes.item(i);
+                inhibit = inhibit | subtype.getAttribute("name").equals("inhibition");
+            }
         }
 
         public void save(GraphDatabaseService graphDb) {
-            //XXX: skip large relation
-//            if (entry1.nameSet.size() > 5 || entry2.nameSet.size() > 5)
-//                return;
-
             Set<Node> sources = namesToNodes(graphDb, entry1.nameSet);
             Set<Node> targets = namesToNodes(graphDb, entry2.nameSet);
-            //targets.removeAll(sources); // avoid loop
-            Hyperedge hyperedge = new Hyperedge(sources, targets);
+
+            if (entry1.type.equals("group") && entry2.type.equals("group")) {
+                saveHyperedge(new Hyperedge(sources, targets));
+            }
+
+            // change semantics as simple edges
+            else if (entry1.type.equals("group")) {
+                for (Node t : targets) {
+                    saveHyperedge(new Hyperedge(sources, t));
+                }
+            }
+
+            else if (entry2.type.equals("group")) {
+                for (Node s : sources) {
+                    saveHyperedge(new Hyperedge(s, targets));
+                }
+            }
+
+            else {
+                for (Node s : sources) {
+                    for (Node t : targets) {
+                        saveHyperedge(new Hyperedge(s, t));
+                    }
+                }
+            }
+        }
+
+        private void saveHyperedge(Hyperedge hyperedge) {
             if (!isDuplicated(hyperedge)) {
                 hyperedge.save(graphDb);
                 countRelations++;
@@ -152,13 +181,9 @@ public class KeggImporter implements Importer {
         }
 
         public void save(GraphDatabaseService graphDb) {
-            //XXX: skip large relation
-//            if (sourceNames.size() > 5 || targetNames.size() > 5)
-//                return;
-
             Set<Node> sources = namesToNodes(graphDb, sourceNames);
             Set<Node> targets = namesToNodes(graphDb, targetNames);
-            //targets.removeAll(sources); // avoid loop
+
             Hyperedge hyperedge = new Hyperedge(sources, targets);
             if (!isDuplicated(hyperedge)) {
                 hyperedge.save(graphDb);
@@ -253,7 +278,9 @@ public class KeggImporter implements Importer {
             if (conf.importRelations) {
                 for (int i = 0; i < relations.getLength(); i++) {
                     KeggRelation relation = new KeggRelation((Element) relations.item(i), entryMap);
-                    relation.save(graphDb);
+                    if (!relation.inhibit) { //TODO: handle inhibition
+                        relation.save(graphDb);
+                    }
                 }
             }
 
