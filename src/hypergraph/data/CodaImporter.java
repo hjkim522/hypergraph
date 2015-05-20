@@ -61,9 +61,8 @@ public class CodaImporter implements Importer {
 
     @Override
     public void run() {
-        importRelationshipFile(new File("input/coda/inter_Cell_network.txt"));
-        importRelationshipFile(new File("input/coda/Intra_Cell_Network_Reactions.txt"));
-        importRelationshipFile(new File("input/coda/Intra_Cell_Network_Relations.txt"));
+        importRelationshipFile(new File("input/coda/Backbone_KEGG_Reactions.txt"));
+        importRelationshipFile(new File("input/coda/Backbone_KEGG_Relations.txt"));
 
         Log.info("CodaImporter DONE");
         Log.info("countEntity: " + entities.size());

@@ -1,11 +1,7 @@
 package hypergraph.mss;
 
-import hypergraph.util.Log;
-import org.neo4j.graphdb.Node;
-
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -35,7 +31,7 @@ public class MinimalSourceSet {
 
     public MinimalSourceSet(Long nodeId) {
         this();
-        addSourceSetOfSingleNode(nodeId);
+        add(nodeId);
     }
 
     // testing purpose
@@ -58,7 +54,7 @@ public class MinimalSourceSet {
      * @param sourceSet source set to add
      * @return true if modified
      */
-    public boolean addSourceSet(Set<Long> sourceSet) {
+    public boolean add(Set<Long> sourceSet) {
         // check minimality of sourceSet
         for (Set<Long> s : mss) {
             if (sourceSet.containsAll(s)) {
@@ -79,18 +75,18 @@ public class MinimalSourceSet {
         return true;
     }
 
+    public boolean add(Long nodeId) {
+        Set<Long> sourceSet = new HashSet<>();
+        sourceSet.add(nodeId);
+        return add(sourceSet);
+    }
+
     public boolean addAll(MinimalSourceSet other) {
         boolean modified = false;
         for (Set<Long> s : other.mss) {
-            modified = modified | addSourceSet(s);
+            modified = modified | add(s);
         }
         return modified;
-    }
-
-    public boolean addSourceSetOfSingleNode(Long nodeId) {
-        Set<Long> sourceSet = new HashSet<>();
-        sourceSet.add(nodeId);
-        return addSourceSet(sourceSet);
     }
 
     public void removeContains(Long nodeId) {
@@ -121,7 +117,7 @@ public class MinimalSourceSet {
                 Set<Long> s = new HashSet<>();
                 s.addAll(s1);
                 s.addAll(s2);
-                result.addSourceSet(s);
+                result.add(s);
             }
         }
         return result;

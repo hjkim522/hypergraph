@@ -11,21 +11,29 @@ import java.util.*;
 /**
  * Simple in-memory builder
  * No optimization applied
- * No decomposition
- * (without decomposition, only can handle small dataset around 1000)
  *
  * Created by Hyunjun on 2015-04-17.
  */
-public class NaiveBuilder implements MinimalSourceSetBuilder {
+public class NaiveDecompositionBuilder implements MinimalSourceSetBuilder {
     private static GraphDatabaseService graphDb;
     protected Map<Long, MinimalSourceSet> mssMap;
     private Set<Long> visited;
     private Set<Long> computed;
 
-    // statistic
+    // decomposition parameter
+    private int maxMSS;
+
+    // statistic - XXX: separate as a module
+    private int statDecomposed;
+    private int totalComputation;
     private int queueLen;
 
-    public NaiveBuilder() {
+    public NaiveDecompositionBuilder() {
+        this(512);
+    }
+
+    public NaiveDecompositionBuilder(int maxMSS) {
+        this.maxMSS = maxMSS;
         graphDb = HypergraphDatabase.getGraphDatabase();
         mssMap = new HashMap<>();
         visited = new HashSet<>();
@@ -33,10 +41,13 @@ public class NaiveBuilder implements MinimalSourceSetBuilder {
     }
 
     public void run() {
-        long t = System.currentTimeMillis(); // measure building time
+        // measure building time
+        long t = System.currentTimeMillis();
+        statDecomposed = 0;
+        totalComputation = 0;
         queueLen = 0;
 
-        Log.info("NaiveBuilder run");
+        Log.info("MSS builder maxMSS = " + maxMSS);
 
         try (Transaction tx = graphDb.beginTx()) {
             // find all startable nodes
@@ -56,6 +67,8 @@ public class NaiveBuilder implements MinimalSourceSetBuilder {
         }
 
         Log.info("Build MSSIndex complete (" + (System.currentTimeMillis() - t) + " ms)");
+        Log.info("Decomposed MSS " + statDecomposed);
+        Log.info("totalComputation " + totalComputation);
         Log.info("queueLen " + queueLen);
     }
 
@@ -85,15 +98,18 @@ public class NaiveBuilder implements MinimalSourceSetBuilder {
     }
 
     protected void compute(Set<Node> start) {
-        PriorityQueue<Node> queue = new PriorityQueue<>((Node n1, Node n2) -> {
-            return getComputationRate(n1) - getComputationRate(n2);
+        PriorityQueue<Node> queue = new PriorityQueue<Node>(new Comparator<Node>() {
+            @Override
+            public int compare(Node n1, Node n2) {
+                return getComputationRate(n1) - getComputationRate(n2);
+            }
         });
 
         // enqueue start nodes
         for (Node s : start) {
             setVisited(s);
             queue.add(s);
-            MinimalSourceSet mss = getOrCreateMinimalSourceSet(s);
+            MinimalSourceSet mss = getMinimalSourceSet(s);
             mss.add(s.getId());
         }
 
@@ -103,6 +119,10 @@ public class NaiveBuilder implements MinimalSourceSetBuilder {
             Node s = queue.poll();
             Log.debug("node " + s.getId());
             queueLen++;
+
+            if (getComputationRate(s) != 0) {
+                Log.warn("nonzero rate " + getComputationRate(s));
+            }
 
             // get forward star
             Iterable<Relationship> fromSources = s.getRelationships(Direction.OUTGOING, Const.REL_FROM_SOURCE);
@@ -133,7 +153,8 @@ public class NaiveBuilder implements MinimalSourceSetBuilder {
                     Log.debug("add target " + t.getId());
 
                     // calculate and update mss
-                    MinimalSourceSet mssTarget = getOrCreateMinimalSourceSet(t);
+                    MinimalSourceSet mssTarget = getMinimalSourceSet(t);
+                    totalComputation++;
 
                     boolean modified = mssTarget.addAll(mssHyperedge);
                     if (modified) {
@@ -149,28 +170,44 @@ public class NaiveBuilder implements MinimalSourceSetBuilder {
         }
     }
 
-    private MinimalSourceSet getOrCreateMinimalSourceSet(Node node) {
+    private MinimalSourceSet getMinimalSourceSet(Node node) {
         MinimalSourceSet mss = mssMap.get(node.getId());
         if (mss != null)
             return mss;
 
         // allocate new mss
         mss = new MinimalSourceSet();
+//        if (node.hasLabel(Const.LABEL_STARTABLE))
+//            mss.add(node.getId());
+
         mssMap.put(node.getId(), mss);
         return mss;
     }
 
     private MinimalSourceSet computeMinimalSourceSet(Node hypernode) {
+        // check already decomposed
+        if (hypernode.hasProperty("decomposed")) {
+            return new MinimalSourceSet(hypernode.getId());
+        }
+
         MinimalSourceSet mss = null;
         Iterable<Relationship> rels = hypernode.getRelationships(Direction.INCOMING, Const.REL_FROM_SOURCE);
         for (Relationship rel : rels) {
             Node s = rel.getStartNode();
             if (mss == null) {
-                mss = getOrCreateMinimalSourceSet(s);
+                mss = getMinimalSourceSet(s);
             } else {
-                mss = mss.cartesian(getOrCreateMinimalSourceSet(s));
+                mss = mss.cartesian(getMinimalSourceSet(s));
             }
+
             Log.debug("mss grow " + mss.cardinality());
+
+            // decomposition
+            if (mss.cardinality() > maxMSS) {
+                hypernode.setProperty("decomposed", true);
+                statDecomposed++;
+                return new MinimalSourceSet(hypernode.getId());
+            }
         }
         return mss;
     }

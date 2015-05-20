@@ -14,10 +14,6 @@ import java.util.Set;
  */
 public class MixedBackwardDiscovery extends NaiveBuilder implements BackwardDiscovery {
 
-    public MixedBackwardDiscovery() {
-        super(Integer.MAX_VALUE);
-    }
-
     @Override
     public MinimalSourceSet findMinimal(Set<Node> target) {
         // Find super source set

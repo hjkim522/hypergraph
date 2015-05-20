@@ -4,7 +4,6 @@ import hypergraph.common.Const;
 import hypergraph.common.HypergraphDatabase;
 import hypergraph.util.Log;
 import hypergraph.util.Measure;
-import org.neo4j.cypher.internal.compiler.v1_9.commands.expressions.Min;
 import org.neo4j.graphdb.*;
 
 import java.util.*;
@@ -15,7 +14,7 @@ import java.util.*;
  *
  * Created by Hyunjun on 2015-04-17.
  */
-public class PartitionBuilder implements MinimalSourceSetBuilder {
+public class PartitioningBuilder implements MinimalSourceSetBuilder {
     private static final int threshold = 1024;
 
     private static GraphDatabaseService graphDb;
@@ -33,12 +32,13 @@ public class PartitionBuilder implements MinimalSourceSetBuilder {
     private int currentPartition;
     private Map<Long, Integer> partition;
 
-    public PartitionBuilder() {
+    public PartitioningBuilder() {
         graphDb = HypergraphDatabase.getGraphDatabase();
         mssMap = new HashMap<>();
         visited = new HashSet<>();
         computed = new HashSet<>();
         partition = new HashMap<>();
+        decomposed = new HashSet<>();
     }
 
     public void run() {
@@ -76,6 +76,7 @@ public class PartitionBuilder implements MinimalSourceSetBuilder {
         Log.info("Build MSSIndex complete (" + (System.currentTimeMillis() - t) + " ms)");
         Log.info("Decomposed MSS " + countDecomposed);
         Log.info("countDecomposedByBackEdge " + countDecomposedByBackEdge);
+        Log.info("partition " + currentPartition);
     }
 
     private void save() {
@@ -121,6 +122,7 @@ public class PartitionBuilder implements MinimalSourceSetBuilder {
             queue.add(s);
             MinimalSourceSet mss = new MinimalSourceSet(s.getId());
             setMinimalSourceSet(s, mss);
+            partition.put(s.getId(), currentPartition);
         }
 
         while (!queue.isEmpty()) {
@@ -177,6 +179,7 @@ public class PartitionBuilder implements MinimalSourceSetBuilder {
 //                            }
                         }
                         else {
+                            Log.debug("decom " + partition.getOrDefault(t.getId(), 0));
                             setDecomposed(t);
                             countDecomposedByBackEdge++;
                         }
@@ -215,6 +218,7 @@ public class PartitionBuilder implements MinimalSourceSetBuilder {
                 }
 
                 mssMap = new HashMap<>();
+//                return; //XXX: temp compute 1 partition only
             }
         }
     }
@@ -225,7 +229,7 @@ public class PartitionBuilder implements MinimalSourceSetBuilder {
         if (mss != null)
             return mss;
         mss = new MinimalSourceSet();
-        mss.addSourceSetOfSingleNode(node.getId());
+        mss.add(node.getId());
         mssMap.put(node.getId(), mss);
         setDecomposed(node);
         return mss;
@@ -305,10 +309,29 @@ public class PartitionBuilder implements MinimalSourceSetBuilder {
         if (!node.hasProperty("decomposed")) {
             node.setProperty("decomposed", true);
             countDecomposed++;
+            decomposed.add(node.getId());
         }
     }
 
     private void computeDecomposed() {
+        for (Long d : decomposed) {
+            Node node = graphDb.getNodeById(d);
+            MinimalSourceSet mss = computeMinimalSourceSetOfNode(node);
+            node.setProperty(Const.PROP_MSS, mss.toString());
+        }
+    }
 
+    private MinimalSourceSet computeMinimalSourceSetOfNode(Node node) {
+        MinimalSourceSet mss = null;
+        Iterable<Relationship> rels = node.getRelationships(Direction.INCOMING, Const.REL_TO_TARGET);
+        for (Relationship rel : rels) {
+            Node h = rel.getStartNode();
+            if (mss == null) {
+                mss = computeMinimalSourceSet(h);
+            } else {
+                mss.addAll(computeMinimalSourceSet(h));
+            }
+        }
+        return mss;
     }
 }

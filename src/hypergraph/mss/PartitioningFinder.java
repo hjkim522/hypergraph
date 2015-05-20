@@ -14,11 +14,11 @@ import java.util.Set;
 /**
  * Created by Hyunjun on 2015-05-12.
  */
-public class PartitionFinder implements MinimalSourceSetFinder {
+public class PartitioningFinder implements MinimalSourceSetFinder {
     private static GraphDatabaseService graphDb;
     private Set<Long> reconstructed;
 
-    public PartitionFinder() {
+    public PartitioningFinder() {
         graphDb = HypergraphDatabase.getGraphDatabase();
         reconstructed = new HashSet<>();
     }
@@ -33,7 +33,6 @@ public class PartitionFinder implements MinimalSourceSetFinder {
             mss = reconstruct(mss, decomposedId);
             decomposedId = needReconstruction(mss);
         }
-
         return mss;
     }
 
@@ -68,8 +67,8 @@ public class PartitionFinder implements MinimalSourceSetFinder {
         }
 
         Node d = graphDb.getNodeById(decomposedId);
-//        MinimalSourceSet mss3 = getMinimalSourceSet(d); // A in example
-        MinimalSourceSet mss3 = computeMinimalSourceSetOfNode(d); // A in example
+        MinimalSourceSet mss3 = getMinimalSourceSet(d); // A in example
+//        MinimalSourceSet mss3 = computeMinimalSourceSetOfNode(d); // A in example
 
         if (mss1.cardinality() != 0) {
             mss2.addAll(mss3.cartesian(mss1));
@@ -126,7 +125,7 @@ public class PartitionFinder implements MinimalSourceSetFinder {
                 mss = mss.cartesian(getMinimalSourceSet(s));
             }
         }
-        Log.debug("computeMinimalSourceSet");
+        Log.debug("computeMinimalSourceSetOfHypernode " + hypernode.getId());
         Log.debug("hypernode mss len = " + mss.cardinality());
         Log.debug(mss.toString());
 

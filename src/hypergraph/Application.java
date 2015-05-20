@@ -1,25 +1,19 @@
 package hypergraph;
 
-import com.oracle.webservices.internal.api.databinding.Databinding;
 import hypergraph.common.Const;
 import hypergraph.common.HypergraphDatabase;
 import hypergraph.data.CodaImporter;
 import hypergraph.data.Importer;
 import hypergraph.data.KeggImporter;
 import hypergraph.data.SimpleImporter;
-import hypergraph.discovery.BackwardDiscovery;
 import hypergraph.discovery.ForwardDiscovery;
-import hypergraph.discovery.MixedBackwardDiscovery;
-import hypergraph.discovery.NaiveBackwardDiscovery;
 import hypergraph.mss.*;
-import hypergraph.traversal.HypergraphTraversal;
 import hypergraph.util.Log;
 import hypergraph.util.Measure;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.ResourceIterator;
 import org.neo4j.graphdb.Transaction;
-import scala.collection.immutable.Stream;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -36,11 +30,8 @@ public class Application {
     private static GraphDatabaseService graphDb;
 
     public static void main(String[] args) {
-
-        execute("kegg-build", "db/kegg", false, () -> {
-            MinimalSourceSetBuilder builder = new NaiveBuilder();
-            builder.run();
-        });
+        syntheticImport();
+//        syntheticQuery();
 
 //        keggImport();
 
@@ -52,12 +43,35 @@ public class Application {
 //        HypergraphDatabase.delete("db/syn");
 //        HypergraphDatabase.copy("db/syn-imported", "db/syn");
 //
-//        execute("syn-build", "db/syn", false, () -> {
-//            MinimalSourceSetBuilder builder = new PartitionBuilder();
+//        execute("kegg-build", "db/kegg", false, () -> {
+//            MinimalSourceSetBuilder builder = new PartitioningBuilder();
 //            builder.run();
 //        });
-
-//        syntheticQuery();
+//
+//        executeTx("kegg-query", "db/kegg", false, () -> {
+//            Measure measure = new Measure("Query MSS");
+//            ResourceIterator<Node> nodes = graphDb.findNodes(Const.LABEL_NODE);
+//
+//            while (nodes.hasNext()) {
+//                Node node = nodes.next();
+//
+//                String name = (String) node.getProperty(Const.PROP_UNIQUE);
+//                Log.debug(name);
+//
+//                if (name.startsWith("hsa:")) {
+//                    Log.debug("query for node " + node.getId() + " " + name);
+//
+//                    measure.start();
+//                    MinimalSourceSetFinder finder = new PartitioningFinder();
+//                    MinimalSourceSet mss = finder.find(node);
+//                    measure.end();
+//                    printNames(mss);
+//                    Log.debug(name);
+//                    break;
+//                }
+//            }
+//            measure.printStatistic();
+//        });
     }
 
     private static void codaImport() {
@@ -186,15 +200,18 @@ public class Application {
     }
 
     private static void printNames(MinimalSourceSet mss) {
-//        for (Set<Long> source : mss.getSourceSets()) {
-//            System.out.print("{");
-//            for (Long sid : source) {
-//                Node s = graphDb.getNodeById(sid);
-//                String name = (String) s.getProperty(Const.PROP_UNIQUE);
-//                System.out.print(name + ", ");
-//            }
-//            System.out.println("}");
-//        }
+        for (Set<Long> source : mss.getSourceSets()) {
+            System.out.print("{");
+            for (Long sid : source) {
+                Node s = graphDb.getNodeById(sid);
+                String name = (String) s.getProperty(Const.PROP_UNIQUE);
+                System.out.print(name + ", ");
+                if (!s.hasLabel(Const.LABEL_STARTABLE)) {
+                    Log.error("ERROR: NOT A STARTABLE!!");
+                }
+            }
+            System.out.println("}");
+        }
     }
 
     private static void execute(String log, String db, boolean init, Runnable runnable) {
