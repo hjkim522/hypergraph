@@ -314,11 +314,11 @@ public class PartitioningBuilder implements MinimalSourceSetBuilder {
     }
 
     private void computeDecomposed() {
-        for (Long d : decomposed) {
-            Node node = graphDb.getNodeById(d);
-            MinimalSourceSet mss = computeMinimalSourceSetOfNode(node);
-            node.setProperty(Const.PROP_MSS, mss.toString());
-        }
+//        for (Long d : decomposed) {
+//            Node node = graphDb.getNodeById(d);
+//            MinimalSourceSet mss = computeMinimalSourceSetOfNode(node);
+//            node.setProperty(Const.PROP_MSS, mss.toString());
+//        }
     }
 
     private MinimalSourceSet computeMinimalSourceSetOfNode(Node node) {

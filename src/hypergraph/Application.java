@@ -30,7 +30,7 @@ public class Application {
     private static GraphDatabaseService graphDb;
 
     public static void main(String[] args) {
-//        syntheticImport();
+        syntheticImport();
         syntheticQuery();
 
 //        HypergraphDatabase.delete("db/syn");
@@ -121,7 +121,7 @@ public class Application {
             Importer importer = new SimpleImporter("input/hypergraph.txt");
             importer.run();
 
-            MinimalSourceSetBuilder builder = new DecompositionBuilder();
+            MinimalSourceSetBuilder builder = new PartitioningBuilder();
             builder.run();
         });
     }
@@ -132,7 +132,7 @@ public class Application {
             Measure measureNaive = new Measure("Naive Query MSS");
             ResourceIterator<Node> nodes = graphDb.findNodes(Const.LABEL_NODE);
             int count = 0;
-            int max = 1;//10;
+            int max = 10;
             int countErr = 0;
 
             while (nodes.hasNext()) {
