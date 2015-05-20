@@ -1,13 +1,10 @@
 package hypergraph.discovery;
 
-import hypergraph.common.HypergraphDatabase;
 import hypergraph.mss.MinimalSourceSet;
 import hypergraph.mss.MinimalSourceSetFinder;
-import hypergraph.mss.NaiveFinder;
-import org.neo4j.graphdb.GraphDatabaseService;
+import hypergraph.mss.DecompositionFinder;
 import org.neo4j.graphdb.Node;
 
-import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -20,7 +17,7 @@ public class IndexedBackwardDiscovery implements BackwardDiscovery {
         MinimalSourceSet result = null;
 
         for (Node t : target) {
-            MinimalSourceSetFinder finder = new NaiveFinder();
+            MinimalSourceSetFinder finder = new DecompositionFinder();
             MinimalSourceSet mss = finder.find(t);
             if (result == null) result = mss;
             else result = result.cartesian(mss);

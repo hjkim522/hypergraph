@@ -14,7 +14,7 @@ import java.util.*;
  *
  * Created by Hyunjun on 2015-04-17.
  */
-public class NaiveDecompositionBuilder implements MinimalSourceSetBuilder {
+public class DecompositionBuilder implements MinimalSourceSetBuilder {
     private static GraphDatabaseService graphDb;
     protected Map<Long, MinimalSourceSet> mssMap;
     private Set<Long> visited;
@@ -28,11 +28,11 @@ public class NaiveDecompositionBuilder implements MinimalSourceSetBuilder {
     private int totalComputation;
     private int queueLen;
 
-    public NaiveDecompositionBuilder() {
+    public DecompositionBuilder() {
         this(512);
     }
 
-    public NaiveDecompositionBuilder(int maxMSS) {
+    public DecompositionBuilder(int maxMSS) {
         this.maxMSS = maxMSS;
         graphDb = HypergraphDatabase.getGraphDatabase();
         mssMap = new HashMap<>();

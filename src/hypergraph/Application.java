@@ -113,7 +113,7 @@ public class Application {
                     Log.debug("query for node " + node.getId() + " " + name);
 
                     measure.start();
-                    MinimalSourceSetFinder finder = new NaiveFinder();
+                    MinimalSourceSetFinder finder = new DecompositionFinder();
                     MinimalSourceSet mss = finder.find(node);
                     measure.end();
                     printNames(mss);
@@ -151,7 +151,7 @@ public class Application {
                     Log.info("Query for node " + node.getId() + " " + name);
                     Log.debug("Indexed query for node " + node.getId() + " " + name);
                     measureIndexed.start();
-                    MinimalSourceSetFinder finder = new NaiveFinder();
+                    MinimalSourceSetFinder finder = new DecompositionFinder();
                     MinimalSourceSet mssIndexed = finder.find(node);
                     measureIndexed.end();
                     printNames(mssIndexed);

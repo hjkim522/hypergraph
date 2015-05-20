@@ -19,7 +19,7 @@ public class IntegrationTest {
         GraphDatabaseService graphDb = HypergraphDatabase.init("db/test");
         Importer importer = new SimpleImporter("input/example-1.txt");
         MinimalSourceSetBuilder builder = new NaiveBuilder();
-        MinimalSourceSetFinder finder = new NaiveFinder();
+        MinimalSourceSetFinder finder = new DecompositionFinder();
 
         importer.run();
         builder.run();
