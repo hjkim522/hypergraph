@@ -84,7 +84,16 @@ public class NaiveBuilder implements MinimalSourceSetBuilder {
         Log.debug(str);
     }
 
-    protected void compute(Set<Node> start) {
+    // extend for mixed backward discovery
+    public interface VisitHandler {
+        boolean visit(Node node);
+    }
+
+    private void compute(Set<Node> start) {
+        compute(start, (node)->{ return true; });
+    }
+
+    protected void compute(Set<Node> start, VisitHandler visitHandler) {
         PriorityQueue<Node> queue = new PriorityQueue<>((Node n1, Node n2) -> {
             return getComputationRate(n1) - getComputationRate(n2);
         });
@@ -128,6 +137,9 @@ public class NaiveBuilder implements MinimalSourceSetBuilder {
                 Iterable<Relationship> toTargets = h.getRelationships(Direction.OUTGOING, Const.REL_TO_TARGET);
                 for (Relationship toTarget : toTargets) {
                     Node t = toTarget.getEndNode();
+
+                    if (!visitHandler.visit(t))
+                        continue;
 
                     setVisited(t);
                     Log.debug("add target " + t.getId());

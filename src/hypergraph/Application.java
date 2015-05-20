@@ -6,7 +6,7 @@ import hypergraph.data.CodaImporter;
 import hypergraph.data.Importer;
 import hypergraph.data.KeggImporter;
 import hypergraph.data.SimpleImporter;
-import hypergraph.discovery.ForwardDiscovery;
+import hypergraph.discovery.*;
 import hypergraph.mss.*;
 import hypergraph.util.Log;
 import hypergraph.util.Measure;
@@ -30,15 +30,8 @@ public class Application {
     private static GraphDatabaseService graphDb;
 
     public static void main(String[] args) {
-        syntheticImport();
-//        syntheticQuery();
-
-//        keggImport();
-
-//        execute("syn-import", "db/syn", true, () -> {
-//            Importer importer = new SimpleImporter("input/hypergraph.txt");
-//            importer.run();
-//        });
+//        syntheticImport();
+        syntheticQuery();
 
 //        HypergraphDatabase.delete("db/syn");
 //        HypergraphDatabase.copy("db/syn-imported", "db/syn");
@@ -146,25 +139,24 @@ public class Application {
                 Node node = nodes.next();
                 String name = (String) node.getProperty(Const.PROP_UNIQUE);
 
-                if (Math.random() < 0.2) {//1) {
-//                if (name.equals("14")) {
-                    Log.info("Query for node " + node.getId() + " " + name);
-                    Log.debug("Indexed query for node " + node.getId() + " " + name);
-                    measureIndexed.start();
-                    MinimalSourceSetFinder finder = new DecompositionFinder();
-                    MinimalSourceSet mssIndexed = finder.find(node);
-                    measureIndexed.end();
-                    printNames(mssIndexed);
+                if (Math.random() < 0.2) {
+//                    Log.info("Query for node " + node.getId() + " " + name);
+//                    Log.debug("Indexed query for node " + node.getId() + " " + name);
+//                    measureIndexed.start();
+//                    BackwardDiscovery indexedDiscovery = new IndexedBackwardDiscovery();
+//                    MinimalSourceSet mssIndexed = indexedDiscovery.findMinimal(node);
+//                    measureIndexed.end();
+//                    printNames(mssIndexed);
 
-//                    Log.debug("Naive query for node " + node.getId() + " " + name);
-//                    measureNaive.start();
-//                    BackwardDiscovery discovery = new MixedBackwardDiscovery();
-//                    Set<Node> targets = new HashSet<>();
-//                    targets.add(node);
-//                    MinimalSourceSet mssNaive = discovery.findMinimal(targets);
-//                    measureNaive.end();
-//                    printNames(mssNaive);
-//
+                    Log.debug("Naive query for node " + node.getId() + " " + name);
+                    measureNaive.start();
+                    BackwardDiscovery naiveDiscovery = new MixedBackwardDiscovery();
+                    Set<Node> targets = new HashSet<>();
+                    targets.add(node);
+                    MinimalSourceSet mssNaive = naiveDiscovery.findMinimal(targets);
+                    measureNaive.end();
+                    printNames(mssNaive);
+
 //                    if (!mssIndexed.equals(mssNaive)) {
 //                        Log.error("ERROR: MSS diff at " + node.getId() + " " + name);
 //                        Log.error(mssIndexed.toString());
@@ -178,7 +170,7 @@ public class Application {
                 }
             }
             measureIndexed.printStatistic();
-//            measureNaive.printStatistic();
+            measureNaive.printStatistic();
             Log.info("error " + countErr);
         });
     }

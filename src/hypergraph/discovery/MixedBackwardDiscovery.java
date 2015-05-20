@@ -13,6 +13,12 @@ import java.util.Set;
  * Created by Hyunjun on 2015-05-17.
  */
 public class MixedBackwardDiscovery extends NaiveBuilder implements BackwardDiscovery {
+    Set<Long> hit;
+
+    public MixedBackwardDiscovery() {
+        super();
+        hit = new HashSet<>();
+    }
 
     @Override
     public MinimalSourceSet findMinimal(Set<Node> target) {
@@ -26,7 +32,8 @@ public class MixedBackwardDiscovery extends NaiveBuilder implements BackwardDisc
         bt.traverse(target);
 
         // Build temporal mss from start
-        compute(start);
+        // only for on the hitting set
+        compute(start, (node) -> { return hit.contains(node.getId()); });
 
         MinimalSourceSet result = null;
         for (Node t : target) {
