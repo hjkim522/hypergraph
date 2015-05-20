@@ -25,6 +25,28 @@ public class DecompositionFinder implements MinimalSourceSetFinder {
         reconstructed = new HashSet<>();
     }
 
+    public MinimalSourceSet findWithSampling(Node target) {
+        MinimalSourceSet mss = getMinimalSourceSet(target);
+        MinimalSourceSet result = new MinimalSourceSet();
+
+        for (Set<Long> set : mss.getSourceSets()) {
+            boolean decomposed = false;
+            for (Long s : set) {
+                Node v = graphDb.getNodeById(s);
+                if (v.hasProperty(Const.PROP_DECOMPOSED)) {
+                    decomposed = true;
+                    Log.debug("decomposed node!");
+                    break;
+                }
+            }
+            if (!decomposed && set.size() < 10) {
+                result.getSourceSets().add(set);
+            }
+        }
+
+        return result;
+    }
+
     @Override
     public MinimalSourceSet find(Node target) {
         MinimalSourceSet mss = getMinimalSourceSet(target);

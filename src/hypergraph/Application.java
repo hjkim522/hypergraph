@@ -121,7 +121,7 @@ public class Application {
             Importer importer = new SimpleImporter("input/hypergraph.txt");
             importer.run();
 
-            MinimalSourceSetBuilder builder = new NaiveBuilder();
+            MinimalSourceSetBuilder builder = new DecompositionBuilder();
             builder.run();
         });
     }
@@ -132,7 +132,7 @@ public class Application {
             Measure measureNaive = new Measure("Naive Query MSS");
             ResourceIterator<Node> nodes = graphDb.findNodes(Const.LABEL_NODE);
             int count = 0;
-            int max = 10;
+            int max = 1;//10;
             int countErr = 0;
 
             while (nodes.hasNext()) {
@@ -140,22 +140,24 @@ public class Application {
                 String name = (String) node.getProperty(Const.PROP_UNIQUE);
 
                 if (Math.random() < 0.2) {
-//                    Log.info("Query for node " + node.getId() + " " + name);
-//                    Log.debug("Indexed query for node " + node.getId() + " " + name);
-//                    measureIndexed.start();
+                    Log.info("Query for node " + node.getId() + " " + name);
+                    Log.debug("Indexed query for node " + node.getId() + " " + name);
+                    measureIndexed.start();
 //                    BackwardDiscovery indexedDiscovery = new IndexedBackwardDiscovery();
 //                    MinimalSourceSet mssIndexed = indexedDiscovery.findMinimal(node);
-//                    measureIndexed.end();
-//                    printNames(mssIndexed);
+                    DecompositionFinder finder = new DecompositionFinder();
+                    MinimalSourceSet mssIndexed = finder.findWithSampling(node);
+                    measureIndexed.end();
+                    printNames(mssIndexed);
 
-                    Log.debug("Naive query for node " + node.getId() + " " + name);
-                    measureNaive.start();
-                    BackwardDiscovery naiveDiscovery = new MixedBackwardDiscovery();
-                    Set<Node> targets = new HashSet<>();
-                    targets.add(node);
-                    MinimalSourceSet mssNaive = naiveDiscovery.findMinimal(targets);
-                    measureNaive.end();
-                    printNames(mssNaive);
+//                    Log.debug("Naive query for node " + node.getId() + " " + name);
+//                    measureNaive.start();
+//                    BackwardDiscovery naiveDiscovery = new NaiveBackwardDiscovery();
+//                    Set<Node> targets = new HashSet<>();
+//                    targets.add(node);
+//                    MinimalSourceSet mssNaive = naiveDiscovery.findMinimal(targets);
+//                    measureNaive.end();
+//                    printNames(mssNaive);
 
 //                    if (!mssIndexed.equals(mssNaive)) {
 //                        Log.error("ERROR: MSS diff at " + node.getId() + " " + name);

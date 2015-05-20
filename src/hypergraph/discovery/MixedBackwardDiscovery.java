@@ -4,9 +4,11 @@ import hypergraph.common.Const;
 import hypergraph.mss.MinimalSourceSet;
 import hypergraph.mss.NaiveBuilder;
 import hypergraph.traversal.BackwardTraversal;
+import hypergraph.util.Log;
 import org.neo4j.graphdb.Node;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -34,6 +36,13 @@ public class MixedBackwardDiscovery extends NaiveBuilder implements BackwardDisc
         // Build temporal mss from start
         // only for on the hitting set
         compute(start, (node) -> { return hit.contains(node.getId()); });
+
+        // print mss
+        for (Map.Entry<Long, MinimalSourceSet> entry : mssMap.entrySet()) {
+            Long id = entry.getKey();
+            MinimalSourceSet mss = entry.getValue();
+            Log.debug("MSS(" + id + ") = " + mss.toString());
+        }
 
         MinimalSourceSet result = null;
         for (Node t : target) {

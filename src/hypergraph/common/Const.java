@@ -21,4 +21,5 @@ public class Const {
     public static final String PROP_UNIQUE = "name";
     public static final String PROP_MSS = "mss";
     public static final String PROP_COUNT = "count";
+    public static final String PROP_DECOMPOSED = "decomposed";
 }
