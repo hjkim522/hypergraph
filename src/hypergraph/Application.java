@@ -10,10 +10,7 @@ import hypergraph.discovery.*;
 import hypergraph.mss.*;
 import hypergraph.util.Log;
 import hypergraph.util.Measure;
-import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.ResourceIterator;
-import org.neo4j.graphdb.Transaction;
+import org.neo4j.graphdb.*;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -30,13 +27,14 @@ public class Application {
     private static GraphDatabaseService graphDb;
 
     public static void main(String[] args) {
-        HypergraphDatabase.delete("db/coda");
-        HypergraphDatabase.copy("db/coda-entry", "db/coda");
+//        HypergraphDatabase.delete("db/coda");
+//        HypergraphDatabase.copy("db/coda-entry", "db/coda");
         codaImport();
+//        codaQuery();
     }
 
     private static void codaImport() {
-        execute("coda-import", "db/coda", false, () -> {
+        execute("coda-import", "db/coda", true, () -> {
             Importer importer = new CodaImporter();
             importer.run();
 
@@ -46,7 +44,30 @@ public class Application {
     }
 
     private static void codaQuery() {
-        //TODO:
+        executeTx("coda-query", "db/coda", false, () -> {
+            Measure measure = new Measure("Query MSS");
+            ResourceIterator<Node> nodes = graphDb.findNodes(Const.LABEL_NODE);
+
+            while (nodes.hasNext()) {
+                Node node = nodes.next();
+
+                if (node.hasLabel(Const.LABEL_STARTABLE)) {
+                    String name = (String) node.getProperty("name");
+                    Log.debug("query for node " + node.getId() + " " + name);
+
+                    measure.start();
+//                    MinimalSourceSetFinder finder = new DecompositionFinder();
+//                    MinimalSourceSet mss = finder.find(node);
+                    ForwardDiscovery discovery = new ForwardDiscovery();
+                    Set<Node> result = discovery.find(node, (v) -> {
+                        return v.hasLabel(DynamicLabel.label("Disease"));
+                    });
+                    measure.end();
+                    printNames(result);
+                }
+            }
+            measure.printStatistic();
+        });
     }
 
     private static void keggImport() {
@@ -178,7 +199,7 @@ public class Application {
 
     private static void printNames(Set<Node> nodes) {
         for (Node v : nodes) {
-            String name = (String) v.getProperty(Const.PROP_UNIQUE);
+            String name = (String) v.getProperty("name");
             Log.debug(name);
         }
     }
