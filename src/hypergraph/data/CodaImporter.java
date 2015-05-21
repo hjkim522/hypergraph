@@ -1,7 +1,12 @@
 package hypergraph.data;
 
+import hypergraph.common.Const;
 import hypergraph.common.Hyperedge;
+import hypergraph.common.HypergraphDatabase;
 import hypergraph.util.Log;
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Transaction;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -23,15 +28,18 @@ public class CodaImporter implements Importer {
 
     private class CodaEntity {
         String id;
-        String meshId;
+        String originId;
         String name;
         String synonym;
         public CodaEntity(String s) {
             String[] token = s.split("\t");
             id = token[0];
-            meshId = token[1];
+            originId = token[1];
             name = token[2];
             synonym = token[3];
+        }
+        public String toString() {
+            return id + "(" + name + ") " + synonym;
         }
     }
 
@@ -49,11 +57,13 @@ public class CodaImporter implements Importer {
 
     }
 
+    private GraphDatabaseService graphDb;
     private Set<String> entities;
     private int countEntity;
     private int countRelationship;
 
     public CodaImporter() {
+        graphDb = HypergraphDatabase.getGraphDatabase();
         entities = new HashSet<>();
         countEntity = 0;
         countRelationship = 0;
@@ -61,18 +71,25 @@ public class CodaImporter implements Importer {
 
     @Override
     public void run() {
-        importRelationshipFile(new File("input/coda/Backbone_KEGG_Reactions.txt"));
-        importRelationshipFile(new File("input/coda/Backbone_KEGG_Relations.txt"));
+        try (Transaction tx = graphDb.beginTx()) {
+            importEntityFile(new File("input/coda/BISL_Ontology/gene(GE)_HomoSapiens.txt"));
+            tx.success();
+        }
+//        importEntityFile(new File("input/coda/BISL_Ontology/"));
+//        importEntityFile(new File("input/coda/"));
+
+//        importRelationshipFile(new File("input/coda/Backbone_KEGG_Reactions.txt"));
+//        importRelationshipFile(new File("input/coda/Backbone_KEGG_Relations.txt"));
 
         Log.info("CodaImporter DONE");
-        Log.info("countEntity: " + entities.size());
+        Log.info("countEntity: " + countEntity);
         Log.info("countRelationship: " + countRelationship);
     }
 
     private void importEntityFile(File file) {
         try (FileReader fr = new FileReader(file)) {
             BufferedReader br = new BufferedReader(fr);
-            String s;
+            String s = s = br.readLine(); // skip first line
             while ((s = br.readLine()) != null) {
                 importEntity(s);
             }
@@ -83,6 +100,14 @@ public class CodaImporter implements Importer {
 
     private void importEntity(String row) {
         CodaEntity entity = new CodaEntity(row);
+        Log.debug(entity.toString());
+
+        Node node = graphDb.createNode(Const.LABEL_NODE);
+        node.setProperty(Const.PROP_UNIQUE, entity.id);
+        node.setProperty("name", entity.name);
+        node.setProperty("synonym", entity.synonym);
+
+        countEntity++;
     }
 
     private void importRelationshipFile(File file) {

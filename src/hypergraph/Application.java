@@ -30,8 +30,9 @@ public class Application {
     private static GraphDatabaseService graphDb;
 
     public static void main(String[] args) {
-        syntheticImport();
-        syntheticQuery();
+        codaImport();
+//        syntheticImport();
+//        syntheticQuery();
 
 //        HypergraphDatabase.delete("db/syn");
 //        HypergraphDatabase.copy("db/syn-imported", "db/syn");

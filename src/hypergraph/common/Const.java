@@ -18,7 +18,7 @@ public class Const {
     public static final RelationshipType REL_FROM_SOURCE = DynamicRelationshipType.withName("fromSource");
     public static final RelationshipType REL_TO_TARGET = DynamicRelationshipType.withName("toTarget");
 
-    public static final String PROP_UNIQUE = "name";
+    public static final String PROP_UNIQUE = "unique";
     public static final String PROP_MSS = "mss";
     public static final String PROP_COUNT = "count";
     public static final String PROP_DECOMPOSED = "decomposed";
