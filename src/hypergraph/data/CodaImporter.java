@@ -77,8 +77,8 @@ public class CodaImporter implements Importer {
     @Override
     public void run() {
         constructRuleType(new File("input/coda/BISL_Ontology/relation(RE).txt"));
-        importEntityFile(new File("input/coda/BISL_Ontology/gene(GE)_HomoSapiens.txt"), "Gene");
-        importEntityFile(new File("input/coda/BISL_Ontology/disease(DS).txt"), "Disease");
+//        importEntityFile(new File("input/coda/BISL_Ontology/gene(GE)_HomoSapiens.txt"), "Gene");
+//        importEntityFile(new File("input/coda/BISL_Ontology/disease(DS).txt"), "Disease");
         importRuleFile(new File("input/coda/FinalNetwork/CODA2_Gene_Disease_Network.txt"));
         importRuleFile(new File("input/coda/FinalNetwork/CODA2_Inter_Cell_Network.txt"));
 
@@ -93,7 +93,7 @@ public class CodaImporter implements Importer {
             BufferedReader br = new BufferedReader(fr);
             String s = br.readLine(); // skip first line
             while ((s = br.readLine()) != null) {
-                if (s.equals("<DB END>")) break;
+                if (s.startsWith("<DB END>")) break;
                 CodaEntity entity = new CodaEntity(s);
                 ruleTypes.put(entity.id, entity.originId);
             }
@@ -156,8 +156,8 @@ public class CodaImporter implements Importer {
         left = left.substring(5, left.length() - 1);
         right = right.substring(6, right.length() - 1);
 
-        Log.debug(left);
-        Log.debug(right);
+//        Log.debug(left);
+//        Log.debug(right);
 
         Set<CodaSide> source = parseSides(left);
         Set<CodaSide> target = parseSides(right);
@@ -209,6 +209,8 @@ public class CodaImporter implements Importer {
         for (String entry : entries) {
             if (entry.startsWith(" "))
                 entry = entry.substring(1, entry.length());
+            if (entry.startsWith("<"))
+                continue;
             CodaSide codaRelSide = new CodaSide(entry);
             result.add(codaRelSide);
         }

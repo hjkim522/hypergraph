@@ -30,53 +30,13 @@ public class Application {
     private static GraphDatabaseService graphDb;
 
     public static void main(String[] args) {
+        HypergraphDatabase.delete("db/coda");
+        HypergraphDatabase.copy("db/coda-entry", "db/coda");
         codaImport();
-//        syntheticImport();
-//        syntheticQuery();
-
-//        HypergraphDatabase.delete("db/syn");
-//        HypergraphDatabase.copy("db/syn-imported", "db/syn");
-//
-//        execute("kegg-build", "db/kegg", false, () -> {
-//            MinimalSourceSetBuilder builder = new PartitioningBuilder();
-//            builder.run();
-//        });
-//
-//        executeTx("kegg-query", "db/kegg", false, () -> {
-//            Measure measure = new Measure("Query MSS");
-//            ResourceIterator<Node> nodes = graphDb.findNodes(Const.LABEL_NODE);
-//
-//            while (nodes.hasNext()) {
-//                Node node = nodes.next();
-//
-//                String name = (String) node.getProperty(Const.PROP_UNIQUE);
-//                Log.debug(name);
-//
-//                if (name.startsWith("cpd:")) {
-//                    Log.debug("query for node " + node.getId() + " " + name);
-//
-//                    measure.start();
-////                    DecompositionFinder finder = new DecompositionFinder();
-////                    MinimalSourceSet mss = finder.findWithSampling(node);
-//
-//                    ForwardDiscovery discovery = new ForwardDiscovery();
-//                    Set<Node> result = discovery.find(node, (Node v) -> {
-//                        String vName = (String) v.getProperty(Const.PROP_UNIQUE);
-//                        return vName.startsWith("hsa:");
-//                    });
-//
-//                    measure.end();
-////                    printNames(mss);
-////                    Log.debug(name);
-////                    break;
-//                }
-//            }
-//            measure.printStatistic();
-//        });
     }
 
     private static void codaImport() {
-        execute("coda-import", "db/coda", true, () -> {
+        execute("coda-import", "db/coda", false, () -> {
             Importer importer = new CodaImporter();
             importer.run();
 
@@ -86,7 +46,7 @@ public class Application {
     }
 
     private static void codaQuery() {
-
+        //TODO:
     }
 
     private static void keggImport() {
