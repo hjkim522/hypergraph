@@ -51,15 +51,22 @@ public class Application {
                 String name = (String) node.getProperty(Const.PROP_UNIQUE);
                 Log.debug(name);
 
-                if (name.startsWith("hsa:")) {
+                if (name.startsWith("cpd:")) {
                     Log.debug("query for node " + node.getId() + " " + name);
 
                     measure.start();
-                    DecompositionFinder finder = new DecompositionFinder();
-                    MinimalSourceSet mss = finder.findWithSampling(node);
+//                    DecompositionFinder finder = new DecompositionFinder();
+//                    MinimalSourceSet mss = finder.findWithSampling(node);
+
+                    ForwardDiscovery discovery = new ForwardDiscovery();
+                    Set<Node> result = discovery.find(node, (Node v) -> {
+                        String vName = (String) v.getProperty(Const.PROP_UNIQUE);
+                        return vName.startsWith("hsa:");
+                    });
+
                     measure.end();
-                    printNames(mss);
-                    Log.debug(name);
+//                    printNames(mss);
+//                    Log.debug(name);
 //                    break;
                 }
             }
@@ -205,6 +212,13 @@ public class Application {
                 }
             }
             System.out.println("}");
+        }
+    }
+
+    private static void printNames(Set<Node> nodes) {
+        for (Node v : nodes) {
+            String name = (String) v.getProperty(Const.PROP_UNIQUE);
+            Log.debug(name);
         }
     }
 

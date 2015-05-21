@@ -27,10 +27,10 @@ public class ForwardDiscovery {
         return result;
     }
 
-    public Set<Node> find(Set<Node> source, Node t) {
-        Set<Node> target = new HashSet<>();
-        target.add(t);
-        return find(source, target);
+    public Set<Node> find(Node s, Rule rule) {
+        Set<Node> source = new HashSet<>();
+        source.add(s);
+        return find(source, rule);
     }
 
     public Set<Node> find(Set<Node> source, Set<Node> target) {
