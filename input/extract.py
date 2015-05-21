@@ -5,13 +5,13 @@ def extract():
     outputFileName = sys.argv[2]
     originDB = "[KEGG]"
 
-    inputFile = open(inputFile, "r")
-    outputFile = open(outputFile, "w")
+    inputFile = open(inputFileName, "r")
+    outputFile = open(outputFileName, "w")
 
     while True:
-        line = inputFile.readline():
+        line = inputFile.readline()
         if not line: break
-        if not line.contains(originDB): continue
+        if originDB not in line: continue
         outputFile.write(line)
     
     print("DONE")
