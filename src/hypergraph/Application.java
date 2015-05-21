@@ -30,8 +30,8 @@ public class Application {
     private static GraphDatabaseService graphDb;
 
     public static void main(String[] args) {
-//        syntheticImport();
-//        syntheticQuery();
+        syntheticImport();
+        syntheticQuery();
 
 //        HypergraphDatabase.delete("db/syn");
 //        HypergraphDatabase.copy("db/syn-imported", "db/syn");
@@ -41,37 +41,37 @@ public class Application {
 //            builder.run();
 //        });
 //
-        executeTx("kegg-query", "db/kegg", false, () -> {
-            Measure measure = new Measure("Query MSS");
-            ResourceIterator<Node> nodes = graphDb.findNodes(Const.LABEL_NODE);
-
-            while (nodes.hasNext()) {
-                Node node = nodes.next();
-
-                String name = (String) node.getProperty(Const.PROP_UNIQUE);
-                Log.debug(name);
-
-                if (name.startsWith("cpd:")) {
-                    Log.debug("query for node " + node.getId() + " " + name);
-
-                    measure.start();
-//                    DecompositionFinder finder = new DecompositionFinder();
-//                    MinimalSourceSet mss = finder.findWithSampling(node);
-
-                    ForwardDiscovery discovery = new ForwardDiscovery();
-                    Set<Node> result = discovery.find(node, (Node v) -> {
-                        String vName = (String) v.getProperty(Const.PROP_UNIQUE);
-                        return vName.startsWith("hsa:");
-                    });
-
-                    measure.end();
-//                    printNames(mss);
-//                    Log.debug(name);
-//                    break;
-                }
-            }
-            measure.printStatistic();
-        });
+//        executeTx("kegg-query", "db/kegg", false, () -> {
+//            Measure measure = new Measure("Query MSS");
+//            ResourceIterator<Node> nodes = graphDb.findNodes(Const.LABEL_NODE);
+//
+//            while (nodes.hasNext()) {
+//                Node node = nodes.next();
+//
+//                String name = (String) node.getProperty(Const.PROP_UNIQUE);
+//                Log.debug(name);
+//
+//                if (name.startsWith("cpd:")) {
+//                    Log.debug("query for node " + node.getId() + " " + name);
+//
+//                    measure.start();
+////                    DecompositionFinder finder = new DecompositionFinder();
+////                    MinimalSourceSet mss = finder.findWithSampling(node);
+//
+//                    ForwardDiscovery discovery = new ForwardDiscovery();
+//                    Set<Node> result = discovery.find(node, (Node v) -> {
+//                        String vName = (String) v.getProperty(Const.PROP_UNIQUE);
+//                        return vName.startsWith("hsa:");
+//                    });
+//
+//                    measure.end();
+////                    printNames(mss);
+////                    Log.debug(name);
+////                    break;
+//                }
+//            }
+//            measure.printStatistic();
+//        });
     }
 
     private static void codaImport() {
@@ -150,21 +150,21 @@ public class Application {
                     Log.info("Query for node " + node.getId() + " " + name);
                     Log.debug("Indexed query for node " + node.getId() + " " + name);
                     measureIndexed.start();
-//                    BackwardDiscovery indexedDiscovery = new IndexedBackwardDiscovery();
-//                    MinimalSourceSet mssIndexed = indexedDiscovery.findMinimal(node);
-                    DecompositionFinder finder = new DecompositionFinder();
-                    MinimalSourceSet mssIndexed = finder.findWithSampling(node);
+                    BackwardDiscovery indexedDiscovery = new IndexedBackwardDiscovery();
+                    MinimalSourceSet mssIndexed = indexedDiscovery.findMinimal(node);
+//                    DecompositionFinder finder = new DecompositionFinder();
+//                    MinimalSourceSet mssIndexed = finder.findWithSampling(node);
                     measureIndexed.end();
                     printNames(mssIndexed);
 
-//                    Log.debug("Naive query for node " + node.getId() + " " + name);
-//                    measureNaive.start();
-//                    BackwardDiscovery naiveDiscovery = new NaiveBackwardDiscovery();
-//                    Set<Node> targets = new HashSet<>();
-//                    targets.add(node);
-//                    MinimalSourceSet mssNaive = naiveDiscovery.findMinimal(targets);
-//                    measureNaive.end();
-//                    printNames(mssNaive);
+                    Log.debug("Naive query for node " + node.getId() + " " + name);
+                    measureNaive.start();
+                    BackwardDiscovery naiveDiscovery = new MixedBackwardDiscovery();
+                    Set<Node> targets = new HashSet<>();
+                    targets.add(node);
+                    MinimalSourceSet mssNaive = naiveDiscovery.findMinimal(targets);
+                    measureNaive.end();
+                    printNames(mssNaive);
 
 //                    if (!mssIndexed.equals(mssNaive)) {
 //                        Log.error("ERROR: MSS diff at " + node.getId() + " " + name);

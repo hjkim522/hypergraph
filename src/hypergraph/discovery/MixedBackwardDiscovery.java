@@ -27,6 +27,7 @@ public class MixedBackwardDiscovery extends NaiveBuilder implements BackwardDisc
         // Find super source set
         Set<Node> start = new HashSet<>();
         BackwardTraversal bt = new BackwardTraversal(node -> {
+            hit.add(node.getId());
             if (node.hasLabel(Const.LABEL_STARTABLE)) {
                 start.add(node);
             }
