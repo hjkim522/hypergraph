@@ -41,7 +41,7 @@ public class Application {
 //            builder.run();
 //        });
 //
-        executeTx("kegg-query", "db/kegg", false, () -> {
+        executeTx("syn-query", "db/syn", false, () -> {
             Measure measure = new Measure("Query MSS");
             ResourceIterator<Node> nodes = graphDb.findNodes(Const.LABEL_NODE);
 
@@ -51,7 +51,8 @@ public class Application {
                 String name = (String) node.getProperty(Const.PROP_UNIQUE);
                 Log.debug(name);
 
-                if (name.startsWith("cpd:")) {
+//                if (name.startsWith("cpd:")) {
+                if (Math.random() < 0.01) {
                     Log.debug("query for node " + node.getId() + " " + name);
 
                     measure.start();
@@ -61,7 +62,8 @@ public class Application {
                     ForwardDiscovery discovery = new ForwardDiscovery();
                     Set<Node> result = discovery.find(node, (Node v) -> {
                         String vName = (String) v.getProperty(Const.PROP_UNIQUE);
-                        return vName.startsWith("hsa:");
+                        return vName.startsWith("1");
+//                        return vName.startsWith("hsa:");
                     });
 
                     measure.end();
@@ -128,8 +130,8 @@ public class Application {
             Importer importer = new SimpleImporter("input/hypergraph.txt");
             importer.run();
 
-            MinimalSourceSetBuilder builder = new PartitioningBuilder();
-            builder.run();
+//            MinimalSourceSetBuilder builder = new PartitioningBuilder();
+//            builder.run();
         });
     }
 

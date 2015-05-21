@@ -13,6 +13,7 @@ numStartable = 20
 sourceSetSizeMin = 1
 sourceSetSizeMax = 3
 avgPathLen = 1
+pickStrictStartable = False
 
 #not used
 avgIndegree = 3
@@ -66,6 +67,7 @@ def generate():
     global sourceSetSizeMin
     global sourceSetSizeMax
     global avgPathLen
+    global pickStrictStartable
 
     #degree count
     indegree = [0] * numNodes
@@ -100,9 +102,10 @@ def generate():
 
     #pick startables
     startables = set()
-    for i in range(numNodes):
-        if indegree[i] == 0:
-            startables.add(i)
+    if pickStrictStartable:
+        for i in range(numNodes):
+            if indegree[i] == 0:
+                startables.add(i)
     while len(startables) < numStartable:
         startables.add(random.randint(0, numNodes-1))
 
