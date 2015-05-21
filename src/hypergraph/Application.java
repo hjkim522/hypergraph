@@ -31,7 +31,7 @@ public class Application {
 
     public static void main(String[] args) {
 //        syntheticImport();
-        syntheticQuery();
+//        syntheticQuery();
 
 //        HypergraphDatabase.delete("db/syn");
 //        HypergraphDatabase.copy("db/syn-imported", "db/syn");
@@ -41,30 +41,30 @@ public class Application {
 //            builder.run();
 //        });
 //
-//        executeTx("kegg-query", "db/kegg", false, () -> {
-//            Measure measure = new Measure("Query MSS");
-//            ResourceIterator<Node> nodes = graphDb.findNodes(Const.LABEL_NODE);
-//
-//            while (nodes.hasNext()) {
-//                Node node = nodes.next();
-//
-//                String name = (String) node.getProperty(Const.PROP_UNIQUE);
-//                Log.debug(name);
-//
-//                if (name.startsWith("hsa:")) {
-//                    Log.debug("query for node " + node.getId() + " " + name);
-//
-//                    measure.start();
-//                    MinimalSourceSetFinder finder = new PartitioningFinder();
-//                    MinimalSourceSet mss = finder.find(node);
-//                    measure.end();
-//                    printNames(mss);
-//                    Log.debug(name);
+        executeTx("kegg-query", "db/kegg", false, () -> {
+            Measure measure = new Measure("Query MSS");
+            ResourceIterator<Node> nodes = graphDb.findNodes(Const.LABEL_NODE);
+
+            while (nodes.hasNext()) {
+                Node node = nodes.next();
+
+                String name = (String) node.getProperty(Const.PROP_UNIQUE);
+                Log.debug(name);
+
+                if (name.startsWith("hsa:")) {
+                    Log.debug("query for node " + node.getId() + " " + name);
+
+                    measure.start();
+                    DecompositionFinder finder = new DecompositionFinder();
+                    MinimalSourceSet mss = finder.findWithSampling(node);
+                    measure.end();
+                    printNames(mss);
+                    Log.debug(name);
 //                    break;
-//                }
-//            }
-//            measure.printStatistic();
-//        });
+                }
+            }
+            measure.printStatistic();
+        });
     }
 
     private static void codaImport() {

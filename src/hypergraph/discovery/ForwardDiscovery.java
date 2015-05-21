@@ -12,6 +12,20 @@ import java.util.Set;
  * Created by Hyunjun on 2015-05-14.
  */
 public class ForwardDiscovery {
+    public interface Rule {
+        boolean isTarget(Node node);
+    }
+
+    public Set<Node> find(Set<Node> source, Rule rule) {
+        Set<Node> result = new HashSet<>();
+        HypergraphTraversal traversal = new HypergraphTraversal(node -> {
+            if (rule.isTarget(node)) {
+                result.add(node);
+            }
+        });
+        traversal.traverse(source);
+        return result;
+    }
 
     public Set<Node> find(Set<Node> source, Node t) {
         Set<Node> target = new HashSet<>();
@@ -19,23 +33,8 @@ public class ForwardDiscovery {
         return find(source, target);
     }
 
-    /**
-     * Find reachable nodes among target
-     * Following hypergraph traversal rule
-     *
-     * @param source source set
-     * @param target target set
-     * @return reachable nodes
-     */
     public Set<Node> find(Set<Node> source, Set<Node> target) {
-        Set<Node> result = new HashSet<>();
-        HypergraphTraversal traversal = new HypergraphTraversal(node -> {
-            if (target.contains(node)) {
-                result.add(node);
-            }
-        });
-        traversal.traverse(source);
-        return result;
+        return find(source, (node) -> { return target.contains(node); });
     }
 
     public boolean isReachable(Set<Node> source, Set<Node> target) {
