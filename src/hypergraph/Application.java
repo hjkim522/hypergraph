@@ -27,19 +27,19 @@ public class Application {
     private static GraphDatabaseService graphDb;
 
     public static void main(String[] args) {
-        HypergraphDatabase.delete("db/coda");
-        HypergraphDatabase.copy("db/coda-imported", "db/coda");
-        codaImport();
-//        codaQuery();
+//        HypergraphDatabase.delete("db/coda");
+//        HypergraphDatabase.copy("db/coda-imported", "db/coda");
+//        codaImport();
+        codaQuery();
     }
 
     private static void codaImport() {
-        execute("coda-import", "db/coda", false, () -> {
-//            Importer importer = new CodaImporter();
-//            importer.run();
+        execute("coda-import", "db/coda", true, () -> {
+            Importer importer = new CodaImporter();
+            importer.run();
 
-            MinimalSourceSetBuilder builder = new DecompositionBuilder(512);
-            builder.run();
+//            MinimalSourceSetBuilder builder = new DecompositionBuilder(512);
+//            builder.run();
         });
     }
 

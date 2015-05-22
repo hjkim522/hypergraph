@@ -80,10 +80,11 @@ public class CodaImporter implements Importer {
         constructRuleType(new File("input/coda/BISL_Ontology/relation(RE).txt"));
         importEntityFile(new File("input/coda/BISL_Ontology/gene(GE)_HomoSapiens.txt"), "Gene");
         importEntityFile(new File("input/coda/BISL_Ontology/disease(DS).txt"), "Disease");
-        importEntityFile(new File("input/coda/BISL_Ontology/metabolite(MB).txt"), "Metabolite");
+//        importEntityFile(new File("input/coda/BISL_Ontology/metabolite(MB).txt"), "Metabolite");
         importRuleFile(new File("input/coda/FinalNetwork/CODA2_Gene_Disease_Network.txt"));
         importRuleFile(new File("input/coda/FinalNetwork/CODA2_Inter_Cell_Network.txt"));
-        importRuleFile(new File("input/coda/FinalNetwork/CODA2_Intra_Cell_Network.txt"));
+//        importRuleFile(new File("input/coda/FinalNetwork/CODA2_Intra_Cell_Network.txt"));
+        importRuleFile(new File("input/coda/FinalNetwork/kegg.txt"));
         importDrugAndInteraction(new File("input/coda/drug_target_interaction_alldrugs.txt"));
 
         Log.info("CodaImporter DONE");
@@ -156,6 +157,11 @@ public class CodaImporter implements Importer {
         String rel = data[1];
         String right = data[2];
 
+        if (rel.length() < 10)
+            rel = rel.replaceFirst("RE", "RE0");
+        if (rel.startsWith("RE00000111")) // XXX: exclude inhibit
+            return;
+
         // remove left() and right()
         left = left.substring(5, left.length() - 1);
         right = right.substring(6, right.length() - 1);
@@ -188,9 +194,6 @@ public class CodaImporter implements Importer {
             }
             h.addTarget(node);
         }
-
-        if (rel.length() < 10)
-            rel = rel.replaceFirst("RE", "RE0");
 
         if (!isDuplicated(h)) {
             h.save(graphDb);
