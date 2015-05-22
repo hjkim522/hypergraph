@@ -2,6 +2,7 @@
 /db
 /out
 /log
+/input/coda
 *.iml
 .DS_Store
 hypergraph*.txt

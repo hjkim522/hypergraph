@@ -10,6 +10,7 @@ import javax.sound.sampled.Line;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -92,6 +93,16 @@ public class CodaImporter implements Importer {
             }
             tx.success();
         }
+    }
+
+    private int importRuleFile(BufferedReader br, int lineMax) throws IOException {
+        int lines = 0;
+        String s;
+        while ((s = br.readLine()) != null && lines < lineMax) {
+            importRule(s);
+            lines++;
+        }
+        return lines;
     }
 
     private void importRule(String row) {
