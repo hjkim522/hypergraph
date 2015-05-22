@@ -49,10 +49,10 @@ public class CodaImporter implements Importer {
         relationMap = constructMap(new File("input/coda/BISL_Ontology/relation(RE).txt"), 1);
 //        geneMap = constructMap(new File("input/coda/BISL_Ontology/gene(GE)_HomoSapiens.txt"), 2);
 
-//        importRuleFile(new File("input/coda/FinalNetwork/CODA2_Gene_Disease_Network.txt"));
-        importRuleFile(new File("input/coda/FinalNetwork/CODA2_Inter_Cell_Network.txt"));
+        importRuleFile(new File("input/coda/FinalNetwork/CODA2_Gene_Disease_Network.txt"));
+//        importRuleFile(new File("input/coda/FinalNetwork/CODA2_Inter_Cell_Network.txt"));
 //        importRuleFile(new File("input/coda/FinalNetwork/CODA2_Intra_Cell_Network.txt"));
-        importRuleFile(new File("input/coda/FinalNetwork/kegg.txt"));
+//        importRuleFile(new File("input/coda/FinalNetwork/kegg.txt"));
 //        importDrugAndInteraction(new File("input/coda/drug_target_interaction_alldrugs.txt"));
 
         Log.info("CodaImporter DONE");
@@ -77,32 +77,28 @@ public class CodaImporter implements Importer {
     }
 
     private void importRuleFile(File file) {
-        int count = 0;
-        try (Transaction tx = graphDb.beginTx()) {
-            try (FileReader fr = new FileReader(file)) {
-                BufferedReader br = new BufferedReader(fr);
-                String s;
-                while ((s = br.readLine()) != null) {
-                    Log.debug(s);
-                    importRule(s);
-                    count++;
-//                    if (count > 100000) return;
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            tx.success();
+        try (FileReader fr = new FileReader(file)) {
+            BufferedReader br = new BufferedReader(fr);
+            while (importRules(br));
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
-    private int importRuleFile(BufferedReader br, int lineMax) throws IOException {
+    private boolean importRules(BufferedReader br) throws IOException {
+        final int lineMax = 50000;
         int lines = 0;
-        String s;
-        while ((s = br.readLine()) != null && lines < lineMax) {
-            importRule(s);
-            lines++;
+        try (Transaction tx = graphDb.beginTx()) {
+            String s;
+            while (lines < lineMax) {
+                s = br.readLine();
+                if (s == null) return false;
+                importRule(s);
+                lines++;
+            }
+            tx.success();
         }
-        return lines;
+        return true;
     }
 
     private void importRule(String row) {
