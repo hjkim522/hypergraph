@@ -2,6 +2,7 @@ import hypergraph.common.Const;
 import hypergraph.common.HypergraphDatabase;
 import hypergraph.data.Importer;
 import hypergraph.data.SimpleImporter;
+import hypergraph.discovery.ForwardDiscovery;
 import hypergraph.mss.*;
 import hypergraph.traversal.BackwardTraversal;
 import hypergraph.traversal.HypergraphTraversal;
@@ -27,7 +28,6 @@ public class ForwardDiscoveryTest {
 
         try (Transaction tx = graphDb.beginTx()) {
             Node s = graphDb.findNode(Const.LABEL_NODE, Const.PROP_UNIQUE, "dr:D00944");
-
         }
 
         HypergraphDatabase.close();
@@ -46,6 +46,26 @@ public class ForwardDiscoveryTest {
             Set<Node> target = new HashSet<>();
             target.add(t);
             traversal.traverse(target);
+        }
+
+        HypergraphDatabase.close();
+    }
+
+    @Test
+    public void testForwardTraversalWithExample() throws Exception {
+        GraphDatabaseService graphDb = HypergraphDatabase.init("db/test");
+        Importer importer = new SimpleImporter("input/example-2.txt");
+        importer.run();
+
+        try (Transaction tx = graphDb.beginTx()) {
+            Node s = graphDb.findNode(Const.LABEL_NODE, Const.PROP_UNIQUE, "20");
+
+            ForwardDiscovery discovery = new ForwardDiscovery();
+            Set<Node> result = discovery.find(s, (v) -> (true));
+
+            for (Node v : result) {
+                Log.debug("result : " + v.getId());
+            }
         }
 
         HypergraphDatabase.close();
