@@ -9,7 +9,6 @@ import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
 
-import javax.sound.sampled.Line;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -28,7 +27,7 @@ import java.util.Set;
  *
  * Created by Hyunjun on 2015-05-18.
  */
-public class CodaImporter implements Importer {
+public class CodaSimpleImporter implements Importer {
 
     private class CodaEntity {
         String id;
@@ -69,7 +68,7 @@ public class CodaImporter implements Importer {
     private int countRule;
     private Map<String, String> ruleTypes;
 
-    public CodaImporter() {
+    public CodaSimpleImporter() {
         graphDb = HypergraphDatabase.getGraphDatabase();
         countEntity = 0;
         countRule = 0;

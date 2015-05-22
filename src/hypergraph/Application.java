@@ -30,22 +30,27 @@ public class Application {
     public static void main(String[] args) {
 //        HypergraphDatabase.delete("db/coda");
 //        HypergraphDatabase.copy("db/coda-imported", "db/coda");
-//        codaImport();
+        codaImport();
 //        codaQuery();
 
-        executeTx("coda-query", "db/coda", false, () -> {
-            Node s = graphDb.findNode(Const.LABEL_NODE, Const.PROP_UNIQUE, "Lepirudin");
-            HypergraphTraversal traversal = new HypergraphTraversal((v)->{
-                String name = (String) v.getProperty("name");
-                Log.debug("node: " + name);
-            }, (v)->{
-                String name = "";
-                if (v.hasProperty("name"))
-                    name = (String) v.getProperty("name");
-                Log.debug("edge: " + name);
-            });
-            traversal.traverse(s);
-        });
+//        executeTx("coda-query", "db/coda", false, () -> {
+//            Set<Node> disease = new HashSet<Node>();
+//            Node s = graphDb.findNode(Const.LABEL_NODE, Const.PROP_UNIQUE, "Lepirudin");
+//            HypergraphTraversal traversal = new HypergraphTraversal((v)->{
+//                String name = (String) v.getProperty("name");
+//                Log.debug("node: " + name);
+//                if (v.hasLabel(DynamicLabel.label("Disease")))
+//                    disease.add(v);
+//            }, (v)->{
+////                String name = "";
+////                if (v.hasProperty("name"))
+////                    name = (String) v.getProperty("name");
+////                Log.debug("edge: " + name);
+//            });
+//            traversal.traverse(s);
+//            Log.debug("disease");
+//            printNames(disease);
+//        });
     }
 
     private static void codaImport() {
