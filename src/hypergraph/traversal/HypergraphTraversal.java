@@ -18,15 +18,27 @@ import java.util.Set;
  */
 public class HypergraphTraversal {
     private Set<Long> visited; // visited nodes, in-memory
-    private HypergraphTraversalCallback callback;
+    private HypergraphTraversalCallback onVisitNode;
+    private HypergraphTraversalCallback onVisitHyperedge;
 
     public HypergraphTraversal() {
-        this(node -> {});
+        this((v)->{}, (v)->{});
     }
 
-    public HypergraphTraversal(HypergraphTraversalCallback callback) {
+    public HypergraphTraversal(HypergraphTraversalCallback onVisitNode) {
+        this(onVisitNode, (v)->{});
+    }
+
+    public HypergraphTraversal(HypergraphTraversalCallback onVisitNode, HypergraphTraversalCallback onVisitHyperedge) {
         this.visited = new HashSet<Long>();
-        this.callback = callback;
+        this.onVisitNode = onVisitNode;
+        this.onVisitHyperedge = onVisitHyperedge;
+    }
+
+    public void traverse(Node s) {
+        Set<Node> start = new HashSet<>();
+        start.add(s);
+        traverse(start);
     }
 
     public void traverse(Set<Node> start) {
@@ -35,7 +47,7 @@ public class HypergraphTraversal {
         for (Node s : start) {
             setVisited(s);
             queue.add(s);
-            callback.onVisit(s);
+            onVisitNode.onVisit(s);
         }
 
         while (!queue.isEmpty()) {
@@ -51,8 +63,9 @@ public class HypergraphTraversal {
                     continue;
                 else if (!isEnabled(h))
                     continue;
-                else
-                    setVisited(h);
+
+                setVisited(h);
+                onVisitHyperedge.onVisit(h);
 
                 // get single target node
                 // Node t = h.getSingleRelationship(Const.REL_TO_TARGET, Direction.OUTGOING).getEndNode();
@@ -63,7 +76,7 @@ public class HypergraphTraversal {
                     if (!isVisited(t)) {
                         setVisited(t);
                         queue.add(t);
-                        callback.onVisit(t);
+                        onVisitNode.onVisit(t);
                     }
                 }
             }

@@ -8,6 +8,7 @@ import hypergraph.data.KeggImporter;
 import hypergraph.data.SimpleImporter;
 import hypergraph.discovery.*;
 import hypergraph.mss.*;
+import hypergraph.traversal.HypergraphTraversal;
 import hypergraph.util.Log;
 import hypergraph.util.Measure;
 import org.neo4j.graphdb.*;
@@ -31,6 +32,20 @@ public class Application {
 //        HypergraphDatabase.copy("db/coda-imported", "db/coda");
 //        codaImport();
 //        codaQuery();
+
+        executeTx("coda-query", "db/coda", false, () -> {
+            Node s = graphDb.findNode(Const.LABEL_NODE, Const.PROP_UNIQUE, "Lepirudin");
+            HypergraphTraversal traversal = new HypergraphTraversal((v)->{
+                String name = (String) v.getProperty("name");
+                Log.debug("node: " + name);
+            }, (v)->{
+                String name = "";
+                if (v.hasProperty("name"))
+                    name = (String) v.getProperty("name");
+                Log.debug("edge: " + name);
+            });
+            traversal.traverse(s);
+        });
     }
 
     private static void codaImport() {

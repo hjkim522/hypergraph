@@ -258,6 +258,7 @@ public class CodaImporter implements Importer {
         Node node = graphDb.createNode(Const.LABEL_NODE);
         node.addLabel(Const.LABEL_STARTABLE);
         node.addLabel(DynamicLabel.label("Drug"));
+        node.setProperty(Const.PROP_UNIQUE, name);
         node.setProperty("name", name);
 
         if (!up.startsWith("null"))
