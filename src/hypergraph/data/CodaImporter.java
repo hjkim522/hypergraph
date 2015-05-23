@@ -106,7 +106,7 @@ public class CodaImporter implements Importer {
         String left = data[0];
         String rel = data[1];
         String right = data[2];
-        String mode = data[3];
+        String mode = (data.length > 3) ? data[3] : "";
 
         if (rel.length() < 10)
             rel = rel.replaceFirst("RE", "RE0");
@@ -129,7 +129,7 @@ public class CodaImporter implements Importer {
         // handle -a and -i
         // -a [GE02056143 <BD00000567><CE00000535>]
         if (mode.startsWith("-a")) {
-            mode = mode.substring(3, mode.length() - 1);
+            mode = mode.substring(4, mode.length() - 1);
             leftSide.add(findOrCreate(mode));
         }
 

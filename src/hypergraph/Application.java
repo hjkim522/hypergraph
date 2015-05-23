@@ -2,10 +2,7 @@ package hypergraph;
 
 import hypergraph.common.Const;
 import hypergraph.common.HypergraphDatabase;
-import hypergraph.data.CodaImporter;
-import hypergraph.data.Importer;
-import hypergraph.data.KeggImporter;
-import hypergraph.data.SimpleImporter;
+import hypergraph.data.*;
 import hypergraph.discovery.*;
 import hypergraph.mss.*;
 import hypergraph.traversal.HypergraphTraversal;
@@ -55,7 +52,7 @@ public class Application {
 
     private static void codaImport() {
         execute("coda-import", "db/coda", true, () -> {
-            Importer importer = new CodaImporter();
+            Importer importer = new CodaSimpleImporter();
             importer.run();
 
 //            MinimalSourceSetBuilder builder = new DecompositionBuilder(512);
