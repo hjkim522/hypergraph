@@ -28,7 +28,7 @@ public class Application {
 //        HypergraphDatabase.delete("db/coda");
 //        HypergraphDatabase.copy("db/coda-imported", "db/coda");
         codaImport();
-//        codaQuery();
+        codaQuery();
 
 //        executeTx("coda-query", "db/coda", false, () -> {
 //            Set<Node> disease = new HashSet<Node>();
