@@ -228,17 +228,12 @@ public class CodaImporter implements Importer {
     }
 
     private void importDrugInteraction(Node node, String targetSeq) {
-        Set<String> targetIds = new HashSet<>();
         String[] targets = targetSeq.split("\\|");
-        for (String target : targets) {
-            String id = target.split(" ")[0];
-            targetIds.add(id);
-        }
 
         Hyperedge h = new Hyperedge();
         h.addSource(node);
 
-        for (String target : targetIds) {
+        for (String target : targets) {
             Node t = graphDb.findNode(Const.LABEL_NODE, Const.PROP_UNIQUE, target);
             if (t == null) continue;
             h.addTarget(t);
