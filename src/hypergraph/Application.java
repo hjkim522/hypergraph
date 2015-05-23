@@ -27,7 +27,7 @@ public class Application {
     public static void main(String[] args) {
 //        HypergraphDatabase.delete("db/coda");
 //        HypergraphDatabase.copy("db/coda-imported", "db/coda");
-        codaImport();
+//        codaImport();
         codaQuery();
 
 //        executeTx("coda-query", "db/coda", false, () -> {
@@ -77,7 +77,7 @@ public class Application {
 //                    MinimalSourceSet mss = finder.find(node);
                     ForwardDiscovery discovery = new ForwardDiscovery();
                     Set<Node> result = discovery.find(node, (v) -> {
-                        return v.hasLabel(DynamicLabel.label("Disease"));
+                        return true;//v.hasLabel(DynamicLabel.label("Disease"));
                     });
                     measure.end();
                     printNames(result);
@@ -216,8 +216,10 @@ public class Application {
 
     private static void printNames(Set<Node> nodes) {
         for (Node v : nodes) {
-            String name = (String) v.getProperty("name");
-            Log.debug(name);
+            if (v.hasProperty("name")) {
+                String name = (String) v.getProperty("name");
+                Log.debug(name);
+            }
         }
     }
 
