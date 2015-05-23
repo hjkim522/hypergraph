@@ -4,10 +4,7 @@ import hypergraph.common.Const;
 import hypergraph.common.Hyperedge;
 import hypergraph.common.HypergraphDatabase;
 import hypergraph.util.Log;
-import org.neo4j.graphdb.DynamicLabel;
-import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.Transaction;
+import org.neo4j.graphdb.*;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -155,24 +152,30 @@ public class CodaSimpleImporter implements Importer {
         String left = data[0];
         String rel = data[1];
         String right = data[2];
+        String mode = data[3];
 
         if (rel.length() < 10)
             rel = rel.replaceFirst("RE", "RE0");
         if (rel.startsWith("RE00000111")) // XXX: exclude inhibit
+            return;
+        if (mode.startsWith("-i")) //XXX: exclude inhibit
             return;
 
         // remove left() and right()
         left = left.substring(5, left.length() - 1);
         right = right.substring(6, right.length() - 1);
 
-//        Log.debug(left);
-//        Log.debug(right);
-
         Set<CodaSide> source = parseSides(left);
         Set<CodaSide> target = parseSides(right);
 
         if (source == null || target == null)
             return;
+
+        // handle -a
+        if (mode.startsWith("-a")) {
+            mode = mode.substring(3, mode.length() - 1);
+            source.add(new CodaSide(mode));
+        }
 
         Hyperedge h = new Hyperedge();
 

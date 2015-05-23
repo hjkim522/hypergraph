@@ -52,7 +52,7 @@ public class CodaImporter implements Importer {
         importRuleFile(new File("input/coda/FinalNetwork/CODA2_Gene_Disease_Network.txt"));
         importRuleFile(new File("input/coda/FinalNetwork/CODA2_Inter_Cell_Network.txt"));
 //        importRuleFile(new File("input/coda/FinalNetwork/CODA2_Intra_Cell_Network.txt"));
-        importRuleFile(new File("input/coda/FinalNetwork/kegg.txt"));
+//        importRuleFile(new File("input/coda/FinalNetwork/kegg.txt"));
 //        importDrugAndInteraction(new File("input/coda/drug_target_interaction_alldrugs.txt"));
 
         Log.info("CodaImporter DONE");
@@ -106,10 +106,13 @@ public class CodaImporter implements Importer {
         String left = data[0];
         String rel = data[1];
         String right = data[2];
+        String mode = data[3];
 
         if (rel.length() < 10)
             rel = rel.replaceFirst("RE", "RE0");
         if (rel.startsWith("RE00000111")) // XXX: exclude inhibit
+            return;
+        if (mode.startsWith("-i")) //XXX: exclude inhibit
             return;
 
         // remove left() and right()
@@ -122,6 +125,13 @@ public class CodaImporter implements Importer {
 
         if (leftSide == null || rightSide == null)
             return;
+
+        // handle -a and -i
+        // -a [GE02056143 <BD00000567><CE00000535>]
+        if (mode.startsWith("-a")) {
+            mode = mode.substring(3, mode.length() - 1);
+            leftSide.add(findOrCreate(mode));
+        }
 
         Hyperedge h = new Hyperedge(leftSide, rightSide);
         if (!isDuplicated(h)) {
@@ -138,6 +148,7 @@ public class CodaImporter implements Importer {
         Set<Node> result = new HashSet<>();
 
         //TODO: handle complex
+        // left(complex(GE02056012,GE02056659) <BD00000828><CE00000083>)
         if (s.startsWith("complex"))
             return null;
 
@@ -147,21 +158,23 @@ public class CodaImporter implements Importer {
                 entry = entry.substring(1, entry.length());
             if (entry.startsWith("<"))
                 continue;
-
-            // find or create a node
-            Node node = graphDb.findNode(Const.LABEL_NODE, Const.PROP_UNIQUE, entry);
-            if (node == null) {
-                node = graphDb.createNode(Const.LABEL_NODE);
-                node.setProperty(Const.PROP_UNIQUE, entry);
-
-                Label label = getLabel(entry);
-                if (label != null) node.addLabel(label);
-
-                countEntity++;
-            }
-            result.add(node);
+            result.add(findOrCreate(entry));
         }
         return result;
+    }
+
+    private Node findOrCreate(String entry) {
+        Node node = graphDb.findNode(Const.LABEL_NODE, Const.PROP_UNIQUE, entry);
+        if (node == null) {
+            node = graphDb.createNode(Const.LABEL_NODE);
+            node.setProperty(Const.PROP_UNIQUE, entry);
+
+            Label label = getLabel(entry);
+            if (label != null) node.addLabel(label);
+
+            countEntity++;
+        }
+        return node;
     }
 
     private boolean isDuplicated(Hyperedge hyperedge) {
