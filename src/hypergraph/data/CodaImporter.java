@@ -50,9 +50,9 @@ public class CodaImporter implements Importer {
 //        geneMap = constructMap(new File("input/coda/BISL_Ontology/gene(GE)_HomoSapiens.txt"), 2);
 
         importRuleFile(new File("input/coda/FinalNetwork/CODA2_Gene_Disease_Network.txt"));
-//        importRuleFile(new File("input/coda/FinalNetwork/CODA2_Inter_Cell_Network.txt"));
+        importRuleFile(new File("input/coda/FinalNetwork/CODA2_Inter_Cell_Network.txt"));
 //        importRuleFile(new File("input/coda/FinalNetwork/CODA2_Intra_Cell_Network.txt"));
-//        importRuleFile(new File("input/coda/FinalNetwork/kegg.txt"));
+        importRuleFile(new File("input/coda/FinalNetwork/kegg.txt"));
 //        importDrugAndInteraction(new File("input/coda/drug_target_interaction_alldrugs.txt"));
 
         Log.info("CodaImporter DONE");

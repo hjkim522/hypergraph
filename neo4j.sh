@@ -1,0 +1,1 @@
+/Developer/neo4j/bin/neo4j start -path ~/Desktop/hypergraph/db/syn
