@@ -240,7 +240,7 @@ public class CodaImporter implements Importer {
 
         for (String target : targetIds) {
             Node t = graphDb.findNode(Const.LABEL_NODE, Const.PROP_UNIQUE, target);
-            if (t != null) continue;
+            if (t == null) continue;
             h.addTarget(t);
         }
 
