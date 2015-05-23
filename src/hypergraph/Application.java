@@ -28,7 +28,7 @@ public class Application {
 //        HypergraphDatabase.delete("db/coda");
 //        HypergraphDatabase.copy("db/coda-imported", "db/coda");
         codaImport();
-        codaQuery();
+//        codaQuery();
 
 //        executeTx("coda-query", "db/coda", false, () -> {
 //            Set<Node> disease = new HashSet<Node>();
@@ -52,7 +52,7 @@ public class Application {
 
     private static void codaImport() {
         execute("coda-import", "db/coda", true, () -> {
-            Importer importer = new CodaSimpleImporter();
+            Importer importer = new CodaImporter();
             importer.run();
 
 //            MinimalSourceSetBuilder builder = new DecompositionBuilder(512);
@@ -70,7 +70,7 @@ public class Application {
 
                 if (node.hasLabel(Const.LABEL_STARTABLE)) {
                     String name = (String) node.getProperty("name");
-                    Log.debug("query for node " + node.getId() + " " + name);
+                    Log.debug("\nquery for node " + node.getId() + " " + name);
 
                     measure.start();
 //                    MinimalSourceSetFinder finder = new DecompositionFinder();

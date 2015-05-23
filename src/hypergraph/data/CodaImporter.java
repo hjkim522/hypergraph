@@ -52,8 +52,8 @@ public class CodaImporter implements Importer {
         importRuleFile(new File("input/coda/FinalNetwork/CODA2_Gene_Disease_Network.txt"));
         importRuleFile(new File("input/coda/FinalNetwork/CODA2_Inter_Cell_Network.txt"));
 //        importRuleFile(new File("input/coda/FinalNetwork/CODA2_Intra_Cell_Network.txt"));
-//        importRuleFile(new File("input/coda/FinalNetwork/kegg.txt"));
-//        importDrugAndInteraction(new File("input/coda/drug_target_interaction_alldrugs.txt"));
+        importRuleFile(new File("input/coda/FinalNetwork/kegg.txt"));
+        importDrugAndInteraction(new File("input/coda/drug_target_interaction_alldrugs.txt"));
 
         Log.info("CodaImporter DONE");
         Log.info("countEntity: " + countEntity);
@@ -192,5 +192,58 @@ public class CodaImporter implements Importer {
         else if (entry.startsWith("MB")) return DynamicLabel.label("Metabolite");
         else if (entry.startsWith("DS")) return DynamicLabel.label("Disease");
         return null;
+    }
+
+    private void importDrugAndInteraction(File file) {
+        try (Transaction tx = graphDb.beginTx()) {
+            try (FileReader fr = new FileReader(file)) {
+                BufferedReader br = new BufferedReader(fr);
+                String s = br.readLine(); // skip line
+                while ((s = br.readLine()) != null) {
+                    importDrug(s);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            tx.success();
+        }
+    }
+
+    private void importDrug(String s) {
+        String[] data = s.split("\t");
+        String name = data[0];
+        String up = data[1];
+        String down = data[2];
+
+        Node node = graphDb.createNode(Const.LABEL_NODE);
+        node.addLabel(Const.LABEL_STARTABLE);
+        node.addLabel(DynamicLabel.label("Drug"));
+        node.setProperty(Const.PROP_UNIQUE, name);
+        node.setProperty("name", name);
+
+        if (!up.startsWith("null"))
+            importDrugInteraction(node, up);
+        if (!down.startsWith("null"))
+            importDrugInteraction(node, down);
+    }
+
+    private void importDrugInteraction(Node node, String targetSeq) {
+        Set<String> targetIds = new HashSet<>();
+        String[] targets = targetSeq.split("\\|");
+        for (String target : targets) {
+            String id = target.split(" ")[0];
+            targetIds.add(id);
+        }
+
+        Hyperedge h = new Hyperedge();
+        h.addSource(node);
+
+        for (String target : targetIds) {
+            Node t = graphDb.findNode(Const.LABEL_NODE, Const.PROP_UNIQUE, target);
+            if (t != null) continue;
+            h.addTarget(t);
+        }
+
+        h.save(graphDb);
     }
 }
