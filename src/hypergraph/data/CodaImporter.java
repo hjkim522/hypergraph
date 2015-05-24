@@ -52,7 +52,7 @@ public class CodaImporter implements Importer {
         importRuleFile(new File("input/coda/FinalNetwork/CODA2_Gene_Disease_Network.txt"));
         importRuleFile(new File("input/coda/FinalNetwork/CODA2_Inter_Cell_Network.txt"));
 //        importRuleFile(new File("input/coda/FinalNetwork/CODA2_Intra_Cell_Network.txt"));
-        importRuleFile(new File("input/coda/FinalNetwork/kegg.txt"));
+//        importRuleFile(new File("input/coda/FinalNetwork/kegg.txt"));
         importDrugAndInteraction(new File("input/coda/drug_target_interaction_alldrugs.txt"));
 
         Log.info("CodaImporter DONE");
@@ -92,7 +92,10 @@ public class CodaImporter implements Importer {
             String s;
             while (lines < lineMax) {
                 s = br.readLine();
-                if (s == null) return false;
+                if (s == null) {
+                    tx.success();
+                    return false;
+                }
                 importRule(s);
                 lines++;
             }
@@ -171,6 +174,7 @@ public class CodaImporter implements Importer {
 
             Label label = getLabel(entry);
             if (label != null) node.addLabel(label);
+//            Log.debug("Adding entry " + entry);
 
             countEntity++;
         }
@@ -234,6 +238,7 @@ public class CodaImporter implements Importer {
         h.addSource(node);
 
         for (String target : targets) {
+//            Log.debug("drug target " + target);
             Node t = graphDb.findNode(Const.LABEL_NODE, Const.PROP_UNIQUE, target);
             if (t == null) continue;
             h.addTarget(t);

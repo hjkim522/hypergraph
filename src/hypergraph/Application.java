@@ -27,7 +27,7 @@ public class Application {
     public static void main(String[] args) {
 //        HypergraphDatabase.delete("db/coda");
 //        HypergraphDatabase.copy("db/coda-imported", "db/coda");
-//        codaImport();
+        codaImport();
         codaQuery();
 
 //        executeTx("coda-query", "db/coda", false, () -> {
