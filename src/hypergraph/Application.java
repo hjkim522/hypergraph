@@ -78,10 +78,12 @@ public class Application {
                     ForwardDiscovery discovery = new ForwardDiscovery();
                     Set<Node> result = discovery.find(node, (v) -> {
 //                        Log.debug("meet " + v.getId());
-                        return true;//v.hasLabel(DynamicLabel.label("Disease"));
+                        return v.hasLabel(DynamicLabel.label("Disease"));
                     });
                     measure.end();
-                    printNames(result);
+                    if (result.size() == 1)
+                        printNames(result);
+                    Log.debug("result " + result.size());
                 }
             }
             measure.printStatistic();
