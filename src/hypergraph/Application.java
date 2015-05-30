@@ -25,12 +25,12 @@ public class Application {
     private static GraphDatabaseService graphDb;
 
     public static void main(String[] args) {
-        syntheticImport();
+//        syntheticImport();
 
 
 //        HypergraphDatabase.delete("db/coda");
 //        HypergraphDatabase.copy("db/coda-imported", "db/coda");
-//        codaImport();
+        codaImport();
 //        codaQuery();
 
 //        executeTx("coda-query", "db/coda", false, () -> {
