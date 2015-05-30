@@ -62,9 +62,11 @@ public class DecompositionBuilder implements MinimalSourceSetBuilder {
             compute(start);
 
             // write computed mms into database
-            save();
-            tx.success();
+//            save();
+//            tx.success();
         }
+
+        saveTx();
 
         Log.info("Build MSSIndex complete (" + (System.currentTimeMillis() - t) + " ms)");
         Log.info("Decomposed MSS " + statDecomposed);
@@ -72,6 +74,7 @@ public class DecompositionBuilder implements MinimalSourceSetBuilder {
         Log.info("queueLen " + queueLen);
     }
 
+    @Deprecated
     private void save() {
         Measure measureSize = new Measure("MSS size");
         Measure measureCardinality = new Measure("MSS cardinality");
@@ -87,6 +90,38 @@ public class DecompositionBuilder implements MinimalSourceSetBuilder {
         }
         measureSize.printStatistic();
         measureCardinality.printStatistic();
+    }
+
+    private void saveTx() {
+        Measure measureCardinality = new Measure("MSS cardinality");
+        Iterator<Map.Entry<Long, MinimalSourceSet>> iter = mssMap.entrySet().iterator();
+        while (saveTxHelper(iter, measureCardinality));
+        measureCardinality.printStatistic();
+    }
+
+    private boolean saveTxHelper(Iterator<Map.Entry<Long, MinimalSourceSet>> iter, Measure measure) {
+        final int maxCount = 30000;
+        int count = 0;
+        try (Transaction tx = graphDb.beginTx()) {
+            while (iter.hasNext()) {
+                Map.Entry<Long, MinimalSourceSet> entry = iter.next();
+
+                Long id = entry.getKey();
+                MinimalSourceSet mss = entry.getValue();
+                Node node = graphDb.getNodeById(id);
+                node.setProperty(Const.PROP_MSS, mss.toString());
+
+                Log.debug("MSS(" + id + ") = " + mss.toString());
+                measure.addData(mss.cardinality());
+
+                if (count == maxCount) {
+                    tx.success();
+                    return true;
+                }
+            }
+            tx.success();
+        }
+        return false;
     }
 
     private void printQueue(Queue<Node> queue) {
