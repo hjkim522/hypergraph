@@ -25,12 +25,12 @@ public class Application {
     private static GraphDatabaseService graphDb;
 
     public static void main(String[] args) {
-//        syntheticImport();
-
+        syntheticImport();
+        syntheticQueryForward();
 
 //        HypergraphDatabase.delete("db/coda");
 //        HypergraphDatabase.copy("db/coda-imported", "db/coda");
-        codaImport();
+//        codaImport();
 //        codaQuery();
 
 //        executeTx("coda-query", "db/coda", false, () -> {
@@ -133,8 +133,35 @@ public class Application {
             Importer importer = new SimpleImporter("input/hypergraph.txt");
             importer.run();
 
-            MinimalSourceSetBuilder builder = new DecompositionBuilder(512);
-            builder.run();
+//            MinimalSourceSetBuilder builder = new DecompositionBuilder(512);
+//            builder.run();
+        });
+    }
+
+    private static void syntheticQueryForward() {
+        executeTx("syn-query", "db/syn", false, () -> {
+            Measure measure = new Measure("Forward Query MSS");
+            ResourceIterator<Node> nodes = graphDb.findNodes(Const.LABEL_NODE);
+            int count = 0;
+            int max = 10;
+
+            while (nodes.hasNext()) {
+                Node node = nodes.next();
+                String name = (String) node.getProperty(Const.PROP_UNIQUE);
+
+                if (Math.random() < 0.2) {
+
+                    measure.start();
+                    ForwardDiscovery discovery = new ForwardDiscovery();
+                    discovery.find(node, (v)->(true));
+                    measure.end();
+
+                    count++;
+                    if (count > max)
+                        break;
+                }
+            }
+            measure.printStatistic();
         });
     }
 
