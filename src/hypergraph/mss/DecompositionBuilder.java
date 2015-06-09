@@ -93,10 +93,10 @@ public class DecompositionBuilder implements MinimalSourceSetBuilder {
     }
 
     private void saveTx() {
-        Measure measureCardinality = new Measure("MSS cardinality");
+        Measure measure = new Measure("MSS size");
         Iterator<Map.Entry<Long, MinimalSourceSet>> iter = mssMap.entrySet().iterator();
-        while (saveTxHelper(iter, measureCardinality));
-        measureCardinality.printStatistic();
+        while (saveTxHelper(iter, measure));
+        measure.printStatistic();
     }
 
     private boolean saveTxHelper(Iterator<Map.Entry<Long, MinimalSourceSet>> iter, Measure measure) {
@@ -112,7 +112,7 @@ public class DecompositionBuilder implements MinimalSourceSetBuilder {
                 node.setProperty(Const.PROP_MSS, mss.toString());
 
                 Log.debug("MSS(" + id + ") = " + mss.toString());
-                measure.addData(mss.cardinality());
+                measure.addData(mss.size());
 
                 if (count == maxCount) {
                     tx.success();

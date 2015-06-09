@@ -25,8 +25,8 @@ public class Application {
     private static GraphDatabaseService graphDb;
 
     public static void main(String[] args) {
-//        syntheticImport();
-//        syntheticQuery();
+        syntheticImport();
+        syntheticQuery();
 
 //        HypergraphDatabase.delete("db/coda");
 //        HypergraphDatabase.copy("db/coda-imported", "db/coda");
@@ -34,10 +34,10 @@ public class Application {
 //        codaQuery();
 
         // fuck... rollbacked.......................
-        execute("coda-build", "db/coda", false, () -> {
-            MinimalSourceSetBuilder builder = new DecompositionBuilder(512);
-            builder.run();
-        });
+//        execute("coda-build", "db/coda", false, () -> {
+//            MinimalSourceSetBuilder builder = new DecompositionBuilder(512);
+//            builder.run();
+//        });
 
 //        executeTx("coda-query", "db/coda", false, () -> {
 //            ResourceIterator<Node> nodes = graphDb.findNodes(DynamicLabel.label("Disease"));
@@ -133,7 +133,7 @@ public class Application {
             Importer importer = new SimpleImporter("input/hypergraph.txt");
             importer.run();
 
-            MinimalSourceSetBuilder builder = new DecompositionBuilder(512);
+            MinimalSourceSetBuilder builder = new DecompositionBuilder(16);
             builder.run();
         });
     }
