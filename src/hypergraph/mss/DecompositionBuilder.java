@@ -100,7 +100,7 @@ public class DecompositionBuilder implements MinimalSourceSetBuilder {
     }
 
     private boolean saveTxHelper(Iterator<Map.Entry<Long, MinimalSourceSet>> iter, Measure measure) {
-        final int maxCount = 30000;
+        final int maxCount = 5000;
         int count = 0;
         try (Transaction tx = graphDb.beginTx()) {
             while (iter.hasNext()) {

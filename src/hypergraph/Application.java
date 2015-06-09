@@ -25,31 +25,31 @@ public class Application {
     private static GraphDatabaseService graphDb;
 
     public static void main(String[] args) {
-        syntheticImport();
-        syntheticQueryForward();
+//        syntheticImport();
+//        syntheticQueryForward();
 
 //        HypergraphDatabase.delete("db/coda");
 //        HypergraphDatabase.copy("db/coda-imported", "db/coda");
 //        codaImport();
 //        codaQuery();
 
+        // fuck... rollbacked.......................
+        execute("coda-build", "db/coda", false, () -> {
+            MinimalSourceSetBuilder builder = new DecompositionBuilder(512);
+            builder.run();
+        });
+
 //        executeTx("coda-query", "db/coda", false, () -> {
-//            Set<Node> disease = new HashSet<Node>();
-//            Node s = graphDb.findNode(Const.LABEL_NODE, Const.PROP_UNIQUE, "Lepirudin");
-//            HypergraphTraversal traversal = new HypergraphTraversal((v)->{
-//                String name = (String) v.getProperty("name");
-//                Log.debug("node: " + name);
-//                if (v.hasLabel(DynamicLabel.label("Disease")))
-//                    disease.add(v);
-//            }, (v)->{
-////                String name = "";
-////                if (v.hasProperty("name"))
-////                    name = (String) v.getProperty("name");
-////                Log.debug("edge: " + name);
-//            });
-//            traversal.traverse(s);
-//            Log.debug("disease");
-//            printNames(disease);
+//            ResourceIterator<Node> nodes = graphDb.findNodes(DynamicLabel.label("Disease"));
+//
+//            while (nodes.hasNext()) {
+//                Node node = nodes.next();
+//
+//                BackwardDiscovery discovery = new IndexedBackwardDiscovery();
+//                MinimalSourceSet mss = discovery.findMinimal(node);
+//                System.out.println(mss);
+//            }
+//
 //        });
     }
 
@@ -58,8 +58,8 @@ public class Application {
             Importer importer = new CodaImporter();
             importer.run();
 
-            MinimalSourceSetBuilder builder = new DecompositionBuilder(512);
-            builder.run();
+//            MinimalSourceSetBuilder builder = new DecompositionBuilder(512);
+//            builder.run();
         });
     }
 
@@ -153,7 +153,7 @@ public class Application {
 
                     measure.start();
                     ForwardDiscovery discovery = new ForwardDiscovery();
-                    discovery.find(node, (v)->(true));
+                    discovery.find(node, (v) -> (true));
                     measure.end();
 
                     count++;

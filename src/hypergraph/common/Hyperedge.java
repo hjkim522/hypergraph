@@ -83,7 +83,7 @@ public class Hyperedge {
         while (iter.hasNext()) {
             Node t = iter.next();
             if (source.contains(t)) {
-                Log.info("self edge");
+//                Log.info("self edge");
                 iter.remove();
             }
         }
