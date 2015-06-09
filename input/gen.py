@@ -11,7 +11,7 @@ numNodes = 100
 numHyperedges = 100
 numStartable = 20
 sourceSetSizeMin = 1
-sourceSetSizeMax = 3
+sourceSetSizeMax = 1
 avgPathLen = 1
 pickStrictStartable = False
 
@@ -95,10 +95,11 @@ def generate():
 
             hyperedges.append(h)
 
-            #continue path
-            h = Hyperedge()
-            h.sourceSet.add(t)
-            outdegree[t] = outdegree[t] + 1
+            #connnect to the next path
+            if j != avgPathLen - 1:
+                h = Hyperedge()
+                h.sourceSet.add(t)
+                outdegree[t] = outdegree[t] + 1
 
     #pick startables
     startables = set()

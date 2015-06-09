@@ -10,8 +10,8 @@ outputFile = "input/hypergraph.txt"
 numNodes = 100
 numHyperedges = 100
 numStartable = 20
-sourceSetSizeMin = 2
-sourceSetSizeMax = 3
+sourceSetSizeMin = 1
+sourceSetSizeMax = 1
 avgPathLen = 5
 
 #not used
