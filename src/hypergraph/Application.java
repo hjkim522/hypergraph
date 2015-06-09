@@ -26,7 +26,7 @@ public class Application {
 
     public static void main(String[] args) {
         syntheticImport();
-        syntheticQueryForward();
+        syntheticQuery();
 
 //        HypergraphDatabase.delete("db/coda");
 //        HypergraphDatabase.copy("db/coda-imported", "db/coda");
@@ -133,8 +133,8 @@ public class Application {
             Importer importer = new SimpleImporter("input/hypergraph.txt");
             importer.run();
 
-//            MinimalSourceSetBuilder builder = new DecompositionBuilder(512);
-//            builder.run();
+            MinimalSourceSetBuilder builder = new DecompositionBuilder(512);
+            builder.run();
         });
     }
 
@@ -171,7 +171,7 @@ public class Application {
             Measure measureNaive = new Measure("Naive Query MSS");
             ResourceIterator<Node> nodes = graphDb.findNodes(Const.LABEL_NODE);
             int count = 0;
-            int max = 10;
+            int max = 25;
             int countErr = 0;
 
             while (nodes.hasNext()) {
@@ -189,14 +189,14 @@ public class Application {
                     measureIndexed.end();
                     printNames(mssIndexed);
 
-                    Log.debug("Naive query for node " + node.getId() + " " + name);
-                    measureNaive.start();
-                    BackwardDiscovery naiveDiscovery = new MixedBackwardDiscovery();
-                    Set<Node> targets = new HashSet<>();
-                    targets.add(node);
-                    MinimalSourceSet mssNaive = naiveDiscovery.findMinimal(targets);
-                    measureNaive.end();
-                    printNames(mssNaive);
+//                    Log.debug("Naive query for node " + node.getId() + " " + name);
+//                    measureNaive.start();
+//                    BackwardDiscovery naiveDiscovery = new MixedBackwardDiscovery();
+//                    Set<Node> targets = new HashSet<>();
+//                    targets.add(node);
+//                    MinimalSourceSet mssNaive = naiveDiscovery.findMinimal(targets);
+//                    measureNaive.end();
+//                    printNames(mssNaive);
 
 //                    if (!mssIndexed.equals(mssNaive)) {
 //                        Log.error("ERROR: MSS diff at " + node.getId() + " " + name);
@@ -211,7 +211,7 @@ public class Application {
                 }
             }
             measureIndexed.printStatistic();
-            measureNaive.printStatistic();
+//            measureNaive.printStatistic();
             Log.info("error " + countErr);
         });
     }
