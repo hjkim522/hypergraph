@@ -107,8 +107,9 @@ def generate():
         for i in range(numNodes):
             if indegree[i] == 0:
                 startables.add(i)
-    while len(startables) < numStartable:
-        startables.add(random.randint(0, numNodes-1))
+    else:
+        while len(startables) < numStartable:
+            startables.add(random.randint(0, numNodes-1))
 
     #write output file
     f = open(outputFile, "w")
