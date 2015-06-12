@@ -13,7 +13,7 @@ numStartable = 20
 sourceSetSizeMin = 1
 sourceSetSizeMax = 3
 avgPathLen = 1
-pickStrictStartable = False
+pickStrictStartable = True #False
 
 #not used
 avgIndegree = 3

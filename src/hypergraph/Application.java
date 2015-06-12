@@ -25,8 +25,10 @@ public class Application {
     private static GraphDatabaseService graphDb;
 
     public static void main(String[] args) {
-        syntheticImport();
-        syntheticQuery();
+//        syntheticImport();
+//        syntheticQuery();
+        syntheticQueryFast();
+
 //        execute("syn-import", "db/syn", false, () -> {
 //            MinimalSourceSetBuilder builder = new DecompositionBuilder(512);
 //            builder.run();
@@ -194,6 +196,12 @@ public class Application {
                     measureIndexed.end();
 //                    printNames(mssIndexed);
 
+
+                    // temp - print for every time
+                    Log.debug("query done" + measureIndexed.getRecentMeasureTime());
+                    measureIndexed.printStatistic();
+
+
 //                    Log.debug("Naive query for node " + node.getId() + " " + name);
 //                    measureNaive.start();
 //                    BackwardDiscovery naiveDiscovery = new NaiveBackwardDiscovery();
@@ -217,6 +225,41 @@ public class Application {
             }
             measureIndexed.printStatistic();
             measureNaive.printStatistic();
+            Log.info("error " + countErr);
+        });
+    }
+
+    private static void syntheticQueryFast() {
+        executeTx("syn-query", "db/syn", false, () -> {
+            Measure measureIndexed = new Measure("Indexed Query MSS");
+            ResourceIterator<Node> nodes = graphDb.findNodes(Const.LABEL_NODE);
+            int count = 0;
+            int max = 25;
+            int countErr = 0;
+
+            while (nodes.hasNext()) {
+                Node node = nodes.next();
+                String name = (String) node.getProperty(Const.PROP_UNIQUE);
+
+                if (Math.random() < 0.2) {
+                    Log.debug("Indexed query for node " + node.getId() + " " + name);
+                    measureIndexed.start();
+
+                    FastDecompositionFinder finder = new FastDecompositionFinder();
+                    Set<Long> min = finder.findMinimum(node);
+                    measureIndexed.end();
+                    printSet(min);
+
+                    // temp - print for every time
+                    Log.debug("query done" + measureIndexed.getRecentMeasureTime());
+                    measureIndexed.printStatistic();
+
+                    count++;
+                    if (count > max)
+                        break;
+                }
+            }
+            measureIndexed.printStatistic();
             Log.info("error " + countErr);
         });
     }
@@ -266,6 +309,20 @@ public class Application {
                 Log.debug("node " + v.getId());
             }
         }
+    }
+
+    private static void printSet(Set<Long> s) {
+        if (s == null) {
+            Log.debug("null");
+            return;
+        }
+
+        String str = "{";
+        for (Long l : s) {
+            str += l + ",";
+        }
+        str += "}";
+        Log.debug(str);
     }
 
     private static void execute(String log, String db, boolean init, Runnable runnable) {
