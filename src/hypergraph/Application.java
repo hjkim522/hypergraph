@@ -11,6 +11,7 @@ import hypergraph.util.Measure;
 import org.neo4j.graphdb.*;
 
 import java.util.HashSet;
+import java.util.Random;
 import java.util.Set;
 
 /**
@@ -25,9 +26,19 @@ public class Application {
     private static GraphDatabaseService graphDb;
 
     public static void main(String[] args) {
-//        syntheticImport();
+        syntheticImport();
 //        syntheticQuery();
-        syntheticQueryFast();
+//        syntheticQueryFast();
+//        syntheticQueryForward(1);
+//        syntheticQueryForward(2);
+//        syntheticQueryForward(3);
+//        syntheticQueryForward(4);
+//        syntheticQueryForward(5);
+//        syntheticQueryForward(10);
+
+//        for (int i = 1; i <= 10; i++) {
+//            syntheticQueryBackward(i);
+//        }
 
 //        execute("syn-import", "db/syn", false, () -> {
 //            MinimalSourceSetBuilder builder = new DecompositionBuilder(512);
@@ -140,8 +151,86 @@ public class Application {
             Importer importer = new SimpleImporter("input/hypergraph.txt");
             importer.run();
 
-            MinimalSourceSetBuilder builder = new DecompositionBuilder(128);
+            MinimalSourceSetBuilder builder = new FastDecompositionBuilder(128);
             builder.run();
+        });
+    }
+
+    private static void syntheticQueryForward(int sourceSize) {
+        int numQuery = 25;
+        int numNodes = 1000;
+
+        Random random = new Random();
+
+        // create query set
+        Set<Set<Long>> querySet = new HashSet<>();
+
+        for (int i = 0; i < numQuery; i++) {
+            Set<Long> q = new HashSet<>();
+            while (q.size() < sourceSize) {
+                q.add((long) random.nextInt(numNodes));
+            }
+            querySet.add(q);
+        }
+
+        executeTx("syn-query", "db/syn", false, () -> {
+            Measure measure = new Measure("Forward Query MSS " + sourceSize);
+
+            for (Set<Long> q : querySet) {
+                Set<Node> source = new HashSet<Node>();
+                System.out.print("query for ");
+                for (Long id : q) {
+                    source.add(graphDb.getNodeById(id));
+                    System.out.print(id + ",");
+                }
+                System.out.println(":");
+
+                measure.start();
+                ForwardDiscovery discovery = new ForwardDiscovery();
+                Set<Node> result = discovery.find(source, (v) -> (true));
+                measure.end();
+                printNames(result);
+            }
+            measure.printStatistic();
+        });
+    }
+
+    private static void syntheticQueryBackward(int sourceSize) {
+        int numQuery = 25;
+        int numNodes = 1000;
+
+        Random random = new Random();
+
+        // create query set
+        Set<Set<Long>> querySet = new HashSet<>();
+
+        for (int i = 0; i < numQuery; i++) {
+            Set<Long> q = new HashSet<>();
+            while (q.size() < sourceSize) {
+                q.add((long) random.nextInt(numNodes));
+            }
+            querySet.add(q);
+        }
+
+        executeTx("syn-query", "db/syn", false, () -> {
+            Measure measure = new Measure("Backward Query MSS " + sourceSize);
+
+            for (Set<Long> q : querySet) {
+                Set<Node> source = new HashSet<Node>();
+//                System.out.print("query for ");
+                for (Long id : q) {
+                    source.add(graphDb.getNodeById(id));
+//                    System.out.print(id + ",");
+                }
+//                System.out.println(":");
+
+                measure.start();
+                BackwardDiscovery indexedDiscovery = new IndexedBackwardDiscovery();
+                MinimalSourceSet mssIndexed = indexedDiscovery.findMinimal(source);
+                measure.end();
+//                printNames(mssIndexed);
+            }
+            measure.printStatistic();
         });
     }
 

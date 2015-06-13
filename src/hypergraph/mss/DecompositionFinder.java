@@ -132,20 +132,20 @@ public class DecompositionFinder implements MinimalSourceSetFinder {
     }
 
     private long needReconstruction(MinimalSourceSet mss) {
-        Log.debug("call needReconstruction of mss(" + mss.cardinality() + "):");
-        Log.debug(mss.toString());
+//        Log.debug("call needReconstruction of mss(" + mss.cardinality() + "):");
+//        Log.debug(mss.toString());
 
         for (Set<Long> s : mss.getSourceSets()) {
             for (Long nodeId : s) {
                 Node v = graphDb.getNodeById(nodeId);
                 if (v.hasLabel(Const.LABEL_HYPERNODE)) {
-                    Log.debug("needs recon at " + nodeId);
-                    Log.debug("of " + s);
+//                    Log.debug("needs recon at " + nodeId);
+//                    Log.debug("of " + s);
                     return nodeId;
                 }
             }
         }
-        Log.debug("reconstructed!");
+//        Log.debug("reconstructed!");
         return -1;
     }
 
@@ -160,9 +160,9 @@ public class DecompositionFinder implements MinimalSourceSetFinder {
                 mss = mss.cartesian(getMinimalSourceSet(s));
             }
         }
-        Log.debug("computeMinimalSourceSet");
-        Log.debug("hypernode mss len = " + mss.cardinality());
-        Log.debug(mss.toString());
+//        Log.debug("computeMinimalSourceSet");
+//        Log.debug("hypernode mss len = " + mss.cardinality());
+//        Log.debug(mss.toString());
 
         return mss;
 

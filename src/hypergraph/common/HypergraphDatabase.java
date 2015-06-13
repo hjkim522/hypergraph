@@ -1,5 +1,6 @@
 package hypergraph.common;
 
+import hypergraph.util.Log;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.factory.GraphDatabaseFactory;
@@ -90,5 +91,28 @@ public class HypergraphDatabase {
     private static void removeShutdownHook() {
         Runtime.getRuntime().removeShutdownHook(hook);
         hook = null;
+    }
+
+    public static void execute(String log, String db, boolean init, Runnable runnable) {
+        // Initialize log
+        Log.init(log);
+
+        // Init or open hypergraph database
+        if (init) graphDb = HypergraphDatabase.init(db);
+        else graphDb = HypergraphDatabase.open(db);
+
+        runnable.run();
+
+        // close
+        HypergraphDatabase.close();
+        Log.close();
+    }
+
+    public static void executeTx(String log, String db, boolean init, Runnable runnable) {
+        execute(log, db, init, () -> {
+            try (Transaction tx = graphDb.beginTx()) {
+                runnable.run();
+            }
+        });
     }
 }
