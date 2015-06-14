@@ -5,4 +5,15 @@ package hypergraph;
  */
 public class Experiment {
 
+    public static void run() {
+        run("expr1");
+        run("expr2");
+        run("expr3");
+        run("expr4");
+        run("expr5");
+    }
+
+    private static void run(String inputFile) {
+
+    }
 }
