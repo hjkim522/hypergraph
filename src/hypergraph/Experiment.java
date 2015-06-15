@@ -40,6 +40,7 @@ public class Experiment {
 //            builder.run();
 //        });
 
+        forwardQuery(filename, 1); // run for cache
         forwardQuery(filename, 1);
         forwardQuery(filename, 2);
         forwardQuery(filename, 3);
