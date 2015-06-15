@@ -24,6 +24,7 @@ import java.util.Set;
  */
 public class Experiment {
 
+
     public static void run() {
         run("e.1.1");
     }
@@ -40,6 +41,10 @@ public class Experiment {
 //        });
 
         forwardQuery(filename, 1);
+        forwardQuery(filename, 2);
+        forwardQuery(filename, 3);
+        forwardQuery(filename, 4);
+        forwardQuery(filename, 5);
     }
 
     private static Set<Set<Long>> generateQuery(int numQuery, int size) {
@@ -73,13 +78,9 @@ public class Experiment {
 
             for (Set<Long> q : querySet) {
                 Set<Node> source = new HashSet<Node>();
-                System.out.print("query for ");
                 for (Long id : q) {
-                    System.out.print(id + ",");
                     source.add(graphDb.getNodeById(id));
-//                    source.add(graphDb.findNode(Const.LABEL_NODE, Const.PROP_UNIQUE, String.valueOf(id)));
                 }
-                System.out.println(":");
 
                 measure.start();
                 ForwardDiscovery discovery = new ForwardDiscovery();
