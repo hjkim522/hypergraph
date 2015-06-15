@@ -10,6 +10,7 @@ import hypergraph.discovery.IndexedBackwardDiscovery;
 import hypergraph.mss.FastDecompositionBuilder;
 import hypergraph.mss.MinimalSourceSet;
 import hypergraph.mss.MinimalSourceSetBuilder;
+import hypergraph.util.Log;
 import hypergraph.util.Measure;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
@@ -46,6 +47,8 @@ public class Experiment {
         Node meta = graphDb.findNodes(Const.LABEL_META).next();
         int n = (int) meta.getProperty(Const.PROP_COUNT);
 
+        Log.debug(n + " nodes");
+
         Random random = new Random();
 
         // create query set
@@ -63,9 +66,8 @@ public class Experiment {
     }
 
     private static void forwardQuery(String filename, int sourceSize) {
-        GraphDatabaseService graphDb = HypergraphDatabase.getGraphDatabase();
-
         HypergraphDatabase.executeTx(filename + "-forward-" + sourceSize, "db/" + filename, false, () -> {
+            GraphDatabaseService graphDb = HypergraphDatabase.getGraphDatabase();
             Measure measure = new Measure("Forward Query MSS " + sourceSize);
             Set<Set<Long>> querySet = generateQuery(25, sourceSize);
 
@@ -73,8 +75,9 @@ public class Experiment {
                 Set<Node> source = new HashSet<Node>();
                 System.out.print("query for ");
                 for (Long id : q) {
-                    source.add(graphDb.getNodeById(id));
                     System.out.print(id + ",");
+                    source.add(graphDb.getNodeById(id));
+//                    source.add(graphDb.findNode(Const.LABEL_NODE, Const.PROP_UNIQUE, String.valueOf(id)));
                 }
                 System.out.println(":");
 
@@ -88,9 +91,8 @@ public class Experiment {
     }
 
     private static void backwardQuery(String filename, int targetSize) {
-        GraphDatabaseService graphDb = HypergraphDatabase.getGraphDatabase();
-
         HypergraphDatabase.executeTx(filename + "-backward-" + targetSize, "db/" + filename, false, () -> {
+            GraphDatabaseService graphDb = HypergraphDatabase.getGraphDatabase();
             Measure measure = new Measure("Backward Query MSS " + targetSize);
 
             Set<Set<Long>> querySet = generateQuery(25, targetSize);
