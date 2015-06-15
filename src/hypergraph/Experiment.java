@@ -40,12 +40,7 @@ public class Experiment {
 //            builder.run();
 //        });
 
-        forwardQuery(filename, 1); // run for cache
-        forwardQuery(filename, 1);
         forwardQuery(filename, 2);
-        forwardQuery(filename, 3);
-        forwardQuery(filename, 4);
-        forwardQuery(filename, 5);
     }
 
     private static Set<Set<Long>> generateQuery(int numQuery, int size) {
