@@ -26,10 +26,10 @@ public class Application {
     private static GraphDatabaseService graphDb;
 
     public static void main(String[] args) {
-        Experiment.run();
+//        Experiment.run();
 
-//        syntheticImport();
-//        syntheticQuery();
+        syntheticImport();
+        syntheticQuery();
 //        syntheticQueryFast();
 //        syntheticQueryForward(1);
 //        syntheticQueryForward(2);
@@ -293,22 +293,22 @@ public class Application {
                     measureIndexed.printStatistic();
 
 
-//                    Log.debug("Naive query for node " + node.getId() + " " + name);
-//                    measureNaive.start();
-//                    BackwardDiscovery naiveDiscovery = new NaiveBackwardDiscovery();
-//                    Set<Node> targets = new HashSet<>();
-//                    targets.add(node);
-//                    MinimalSourceSet mssNaive = naiveDiscovery.findMinimal(targets);
-//                    measureNaive.end();
-////                    printNames(mssNaive);
-//
-//                    if (!mssIndexed.equals(mssNaive)) {
-//                        Log.error("ERROR: MSS diff at " + node.getId() + " " + name);
-//                        Log.error(mssIndexed.toString());
-//                        Log.error("naive");
-//                        Log.error(mssNaive.toString());
-//                        countErr++;
-//                    }
+                    Log.debug("Naive query for node " + node.getId() + " " + name);
+                    measureNaive.start();
+                    BackwardDiscovery naiveDiscovery = new NaiveBackwardDiscovery();
+                    Set<Node> targets = new HashSet<>();
+                    targets.add(node);
+                    MinimalSourceSet mssNaive = naiveDiscovery.findMinimal(targets);
+                    measureNaive.end();
+//                    printNames(mssNaive);
+
+                    if (!mssIndexed.equals(mssNaive)) {
+                        Log.error("ERROR: MSS diff at " + node.getId() + " " + name);
+                        Log.error(mssIndexed.toString());
+                        Log.error("naive");
+                        Log.error(mssNaive.toString());
+                        countErr++;
+                    }
                     count++;
                     if (count > max)
                         break;

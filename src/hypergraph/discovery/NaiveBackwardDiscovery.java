@@ -114,7 +114,7 @@ public class NaiveBackwardDiscovery implements BackwardDiscovery {
         while (!queue.isEmpty()) {
             Node v = queue.poll();
             Node selectedHyperedge = null;
-            Log.debug("visit " + v.getId());
+//            Log.debug("visit " + v.getId());
 
             int inDegree = v.getDegree(Const.REL_TO_TARGET, Direction.INCOMING);
             int edgeIndex = nextEdge.getOrDefault(v.getId(), 0);
@@ -157,7 +157,7 @@ public class NaiveBackwardDiscovery implements BackwardDiscovery {
                     }
                 }
             }
-            Log.debug("selectedHyperedge " + selectedHyperedge.getId());
+//            Log.debug("selectedHyperedge " + selectedHyperedge.getId());
 
             // insert sources into queue
             Iterable<Relationship> fromSources = selectedHyperedge.getRelationships(Direction.INCOMING, Const.REL_FROM_SOURCE);

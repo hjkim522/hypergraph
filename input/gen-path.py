@@ -11,7 +11,7 @@ numNodes = 100
 numHyperedges = 100
 numStartable = 20
 sourceSetSizeMin = 1
-sourceSetSizeMax = 1
+sourceSetSizeMax = 3
 avgPathLen = 5
 
 #not used
