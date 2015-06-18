@@ -27,34 +27,10 @@ public class Application {
 
     public static void main(String[] args) {
 //        Experiment.run();
-
-        syntheticImport();
-        syntheticQuery();
-//        syntheticQueryFast();
-//        syntheticQueryForward(1);
-//        syntheticQueryForward(2);
-//        syntheticQueryForward(3);
-//        syntheticQueryForward(4);
-//        syntheticQueryForward(5);
-//        syntheticQueryForward(10);
-
-//        for (int i = 1; i <= 10; i++) {
-//            syntheticQueryBackward(i);
-//        }
-
-//        execute("syn-import", "db/syn", false, () -> {
-//            MinimalSourceSetBuilder builder = new DecompositionBuilder(512);
-//            builder.run();
-//        });
+//        syntheticImport();
 //        syntheticQuery();
 
-//        HypergraphDatabase.delete("db/coda");
-//        HypergraphDatabase.copy("db/coda-imported", "db/coda");
-//        codaImport();
-//        codaQuery();
-
-        // fuck... rollbacked.......................
-//        execute("coda-build", "db/coda", false, () -> {
+//        execute("syn-import", "db/syn", false, () -> {
 //            MinimalSourceSetBuilder builder = new DecompositionBuilder(512);
 //            builder.run();
 //        });
