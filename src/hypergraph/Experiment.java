@@ -26,21 +26,35 @@ public class Experiment {
 
 
     public static void run() {
-        run("e.1.1");
+        run("b1");
+        run("b2");
+        run("b3");
+        run("b4");
+        run("b5");
+
+//        run("e25-25");
+//        run("e25-37.5");
+//        run("e25-50");
+//        run("e25-62.5");
     }
 
     private static void run(String filename) {
-        HypergraphDatabase.execute(filename + "-import", "db/" + filename, true, () -> {
-            Importer importer = new SimpleImporter("input/" + filename + ".txt");
-            importer.run();
-        });
-
+//        HypergraphDatabase.execute(filename + "-import", "db/" + filename, true, () -> {
+//            Importer importer = new SimpleImporter("input/" + filename + ".txt");
+//            importer.run();
+//        });
+//
 //        HypergraphDatabase.execute(filename + "-build", "db/" + filename, false, () -> {
-//            MinimalSourceSetBuilder builder = new FastDecompositionBuilder(128);
+//            MinimalSourceSetBuilder builder = new FastDecompositionBuilder(512);
 //            builder.run();
 //        });
 
-        forwardQuery(filename, 2);
+        backwardQuery(filename, 1);
+        backwardQuery(filename, 1);
+        backwardQuery(filename, 2);
+        backwardQuery(filename, 3);
+        backwardQuery(filename, 4);
+        backwardQuery(filename, 5);
     }
 
     private static Set<Set<Long>> generateQuery(int numQuery, int size) {
@@ -92,7 +106,7 @@ public class Experiment {
             GraphDatabaseService graphDb = HypergraphDatabase.getGraphDatabase();
             Measure measure = new Measure("Backward Query MSS " + targetSize);
 
-            Set<Set<Long>> querySet = generateQuery(25, targetSize);
+            Set<Set<Long>> querySet = generateQuery(200, targetSize);
             for (Set<Long> q : querySet) {
                 Set<Node> source = new HashSet<Node>();
                 for (Long id : q) {

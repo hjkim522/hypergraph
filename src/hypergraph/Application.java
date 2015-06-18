@@ -30,18 +30,18 @@ public class Application {
 //        syntheticImport();
 //        syntheticQuery();
 
-        execute("syn-import", "db/syn", false, () -> {
+        execute("test", "db/test", true, () -> {
+            SimpleImporter importer = new SimpleImporter("input/example-2.txt");
+            importer.run();
+        });
+
+        execute("test", "db/test", false, () -> {
             MinimalSourceSetBuilder builder = new DecompositionBuilder(512);
             builder.run();
         });
 
-        execute("syn-import", "db/syn", false, () -> {
-            MinimalSourceSetBuilder builder = new DecompositionBuilder(512);
-            builder.run();
-        });
-
-        executeTx("coda-query", "db/coda", false, () -> {
-            ResourceIterator<Node> nodes = graphDb.findNodes(DynamicLabel.label("Disease"));
+        executeTx("test", "db/test", false, () -> {
+            ResourceIterator<Node> nodes = graphDb.findNodes(Const.LABEL_NODE);
 
             while (nodes.hasNext()) {
                 Node node = nodes.next();
