@@ -18,6 +18,7 @@ import java.util.*;
 public class NaiveBackwardDiscovery implements BackwardDiscovery {
     private GraphDatabaseService graphDb;
     private Set<Long> visited;
+    private int countNodeAccess = 0;
 
     // to enumerate backward star
     Stack<Node> branchingNode = new Stack<>();
@@ -81,6 +82,8 @@ public class NaiveBackwardDiscovery implements BackwardDiscovery {
             }
         }
 
+        Log.info("countNodeAccess " + countNodeAccess);
+
         return result;
     }
 
@@ -115,6 +118,8 @@ public class NaiveBackwardDiscovery implements BackwardDiscovery {
             Node v = queue.poll();
             Node selectedHyperedge = null;
 //            Log.debug("visit " + v.getId());
+
+            countNodeAccess++;
 
             int inDegree = v.getDegree(Const.REL_TO_TARGET, Direction.INCOMING);
             int edgeIndex = nextEdge.getOrDefault(v.getId(), 0);

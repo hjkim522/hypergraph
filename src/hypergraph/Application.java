@@ -27,31 +27,45 @@ public class Application {
 
     public static void main(String[] args) {
 //        Experiment.run();
-//        syntheticImport();
-//        syntheticQuery();
+        syntheticImport();
+        syntheticQuery();
 
-        execute("test", "db/test", true, () -> {
-            SimpleImporter importer = new SimpleImporter("input/example-2.txt");
-            importer.run();
-        });
-
-        execute("test", "db/test", false, () -> {
-            MinimalSourceSetBuilder builder = new DecompositionBuilder(512);
-            builder.run();
-        });
-
-        executeTx("test", "db/test", false, () -> {
-            ResourceIterator<Node> nodes = graphDb.findNodes(Const.LABEL_NODE);
-
-            while (nodes.hasNext()) {
-                Node node = nodes.next();
-
-                BackwardDiscovery discovery = new IndexedBackwardDiscovery();
-                MinimalSourceSet mss = discovery.findMinimal(node);
-                System.out.println(mss);
-            }
-
-        });
+//        execute("test", "db/test", true, () -> {
+//            SimpleImporter importer = new SimpleImporter("input/example-2.txt");
+//            importer.run();
+//        });
+//
+//        execute("test", "db/test", false, () -> {
+//            MinimalSourceSetBuilder builder = new DecompositionBuilder(512);
+//            builder.run();
+//        });
+//
+//        executeTx("test", "db/test", false, () -> {
+//            ResourceIterator<Node> nodes = graphDb.findNodes(Const.LABEL_NODE);
+//            Measure m1 = new Measure("m1");
+//            Measure m2 = new Measure("m2");
+//
+//            while (nodes.hasNext()) {
+//                Node node = nodes.next();
+//
+//                if (node.getId() != 23) continue;
+//
+//                m1.start();
+//                BackwardDiscovery discovery = new IndexedBackwardDiscovery();
+//                MinimalSourceSet mss = discovery.findMinimal(node);
+//                m1.end();
+//                System.out.println(mss);
+//
+//                m2.start();
+//                BackwardDiscovery naive = new NaiveBackwardDiscovery();
+//                MinimalSourceSet naiveMss = naive.findMinimal(node);
+//                m2.end();
+//                System.out.println(naiveMss);
+//            }
+//
+//            m1.printStatistic();
+//            m2.printStatistic();
+//        });
     }
 
     private static void codaImport() {
