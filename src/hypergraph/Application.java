@@ -296,6 +296,7 @@ public class Application {
                     MinimalSourceSet mssNaive = naiveDiscovery.findMinimal(targets);
                     measureNaive.end();
 //                    printNames(mssNaive);
+                    measureNaive.printStatistic();
 
                     if (!mssIndexed.equals(mssNaive)) {
                         Log.error("ERROR: MSS diff at " + node.getId() + " " + name);
