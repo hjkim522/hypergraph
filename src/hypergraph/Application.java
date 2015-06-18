@@ -30,23 +30,28 @@ public class Application {
 //        syntheticImport();
 //        syntheticQuery();
 
-//        execute("syn-import", "db/syn", false, () -> {
-//            MinimalSourceSetBuilder builder = new DecompositionBuilder(512);
-//            builder.run();
-//        });
+        execute("syn-import", "db/syn", false, () -> {
+            MinimalSourceSetBuilder builder = new DecompositionBuilder(512);
+            builder.run();
+        });
 
-//        executeTx("coda-query", "db/coda", false, () -> {
-//            ResourceIterator<Node> nodes = graphDb.findNodes(DynamicLabel.label("Disease"));
-//
-//            while (nodes.hasNext()) {
-//                Node node = nodes.next();
-//
-//                BackwardDiscovery discovery = new IndexedBackwardDiscovery();
-//                MinimalSourceSet mss = discovery.findMinimal(node);
-//                System.out.println(mss);
-//            }
-//
-//        });
+        execute("syn-import", "db/syn", false, () -> {
+            MinimalSourceSetBuilder builder = new DecompositionBuilder(512);
+            builder.run();
+        });
+
+        executeTx("coda-query", "db/coda", false, () -> {
+            ResourceIterator<Node> nodes = graphDb.findNodes(DynamicLabel.label("Disease"));
+
+            while (nodes.hasNext()) {
+                Node node = nodes.next();
+
+                BackwardDiscovery discovery = new IndexedBackwardDiscovery();
+                MinimalSourceSet mss = discovery.findMinimal(node);
+                System.out.println(mss);
+            }
+
+        });
     }
 
     private static void codaImport() {
