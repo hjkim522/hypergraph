@@ -148,7 +148,7 @@ public class Application {
             Importer importer = new SimpleImporter("input/hypergraph.txt");
             importer.run();
 
-            MinimalSourceSetBuilder builder = new FastDecompositionBuilder(128);
+            MinimalSourceSetBuilder builder = new NodeDecompositionBuilder(16);
             builder.run();
         });
     }
@@ -285,25 +285,27 @@ public class Application {
 
                     // temp - print for every time
                     Log.debug("query done" + measureIndexed.getRecentMeasureTime());
-                    measureIndexed.printStatistic();
 
+                    boolean naive = false;
+                    if (naive) {
+                        measureIndexed.printStatistic();
+                        Log.debug("Naive query for node " + node.getId() + " " + name);
+                        measureNaive.start();
+                        BackwardDiscovery naiveDiscovery = new NaiveBackwardDiscovery();
+                        Set<Node> targets = new HashSet<>();
+                        targets.add(node);
+                        MinimalSourceSet mssNaive = naiveDiscovery.findMinimal(targets);
+                        measureNaive.end();
+                        //                    printNames(mssNaive);
+                        measureNaive.printStatistic();
 
-                    Log.debug("Naive query for node " + node.getId() + " " + name);
-                    measureNaive.start();
-                    BackwardDiscovery naiveDiscovery = new NaiveBackwardDiscovery();
-                    Set<Node> targets = new HashSet<>();
-                    targets.add(node);
-                    MinimalSourceSet mssNaive = naiveDiscovery.findMinimal(targets);
-                    measureNaive.end();
-//                    printNames(mssNaive);
-                    measureNaive.printStatistic();
-
-                    if (!mssIndexed.equals(mssNaive)) {
-                        Log.error("ERROR: MSS diff at " + node.getId() + " " + name);
-                        Log.error(mssIndexed.toString());
-                        Log.error("naive");
-                        Log.error(mssNaive.toString());
-                        countErr++;
+                        if (!mssIndexed.equals(mssNaive)) {
+                            Log.error("ERROR: MSS diff at " + node.getId() + " " + name);
+                            Log.error(mssIndexed.toString());
+                            Log.error("naive");
+                            Log.error(mssNaive.toString());
+                            countErr++;
+                        }
                     }
                     count++;
                     if (count > max)

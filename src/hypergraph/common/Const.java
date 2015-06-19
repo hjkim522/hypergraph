@@ -13,7 +13,6 @@ public class Const {
     public static final Label LABEL_HYPERNODE = DynamicLabel.label("Hypernode");
     public static final Label LABEL_STARTABLE = DynamicLabel.label("Startable");
     public static final Label LABEL_META = DynamicLabel.label("Meta");
-    public static final Label LABEL_SATISFIED = DynamicLabel.label("Satisfied");
 
     public static final RelationshipType REL_FROM_SOURCE = DynamicRelationshipType.withName("fromSource");
     public static final RelationshipType REL_TO_TARGET = DynamicRelationshipType.withName("toTarget");
