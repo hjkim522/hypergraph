@@ -148,7 +148,7 @@ public class Application {
             Importer importer = new SimpleImporter("input/hypergraph.txt");
             importer.run();
 
-            MinimalSourceSetBuilder builder = new NodeDecompositionBuilder(160);
+            MinimalSourceSetBuilder builder = new NodeDecompositionBuilder(16);
             builder.run();
         });
     }
