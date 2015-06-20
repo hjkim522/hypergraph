@@ -62,6 +62,9 @@ public class NodeDecompositionBuilder implements MinimalSourceSetBuilder {
 
             // compute with startable nodes
             compute(start);
+
+            // precompute decomposition
+            recomputeDecomposed();
         }
 
         saveTx(mssMap, Const.PROP_MSS);
@@ -295,6 +298,26 @@ public class NodeDecompositionBuilder implements MinimalSourceSetBuilder {
         for (Relationship rel : rels) {
             Node h = rel.getEndNode();
             computed.remove(h.getId());
+        }
+    }
+
+    private void recomputeDecomposed() {
+        for (Map.Entry<Long, MinimalSourceSet> entry : decomposedMap.entrySet()) {
+            long id = entry.getKey();
+            Node node = graphDb.getNodeById(id);
+
+            MinimalSourceSet mss = new MinimalSourceSet();
+            if (node.hasLabel(Const.LABEL_STARTABLE)) {
+                mss.add(id);
+            }
+
+            Iterable<Relationship> rels = node.getRelationships(Direction.INCOMING, Const.REL_TO_TARGET);
+            for (Relationship rel : rels) {
+                Node h = rel.getStartNode();
+                mss.addAll(computeMinimalSourceSet(h));
+            }
+
+            decomposedMap.put(id, mss);
         }
     }
 }
