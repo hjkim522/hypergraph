@@ -28,7 +28,7 @@ public class Application {
     public static void main(String[] args) {
 //        Experiment.run();
         syntheticImport();
-        syntheticQuery();
+//        syntheticQuery();
 
 //        execute("test", "db/test", true, () -> {
 //            SimpleImporter importer = new SimpleImporter("input/example-2.txt");
@@ -148,7 +148,7 @@ public class Application {
             Importer importer = new SimpleImporter("input/hypergraph.txt");
             importer.run();
 
-            MinimalSourceSetBuilder builder = new NodeDecompositionBuilder(16);
+            MinimalSourceSetBuilder builder = new NodeDecompositionBuilder(160);
             builder.run();
         });
     }

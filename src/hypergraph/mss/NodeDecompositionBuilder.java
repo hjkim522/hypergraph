@@ -74,8 +74,8 @@ public class NodeDecompositionBuilder implements MinimalSourceSetBuilder {
     }
 
     private void saveTx(Map<Long, MinimalSourceSet> map, String prop) {
-        Measure measure = new Measure("MSS size");
-        Iterator<Map.Entry<Long, MinimalSourceSet>> iter = mssMap.entrySet().iterator();
+        Measure measure = new Measure("MSS size " + prop);
+        Iterator<Map.Entry<Long, MinimalSourceSet>> iter = map.entrySet().iterator();
         while (saveTxHelper(iter, prop, measure));
         measure.printStatistic();
     }
@@ -167,6 +167,11 @@ public class NodeDecompositionBuilder implements MinimalSourceSetBuilder {
 
                     setVisited(t);
                     Log.debug("add target " + t.getId());
+
+                    if (decomposedMap.containsKey(t.getId())) {
+                        //TODO:
+                        continue;
+                    }
 
                     // calculate and update mss
                     MinimalSourceSet mssTarget = getMinimalSourceSet(t);
