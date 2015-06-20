@@ -317,6 +317,10 @@ public class NodeDecompositionBuilder implements MinimalSourceSetBuilder {
                 mss.addAll(computeMinimalSourceSet(h));
             }
 
+            if (!node.hasLabel(Const.LABEL_STARTABLE)) {
+                mss.removeContains(id);
+            }
+
             decomposedMap.put(id, mss);
         }
     }
