@@ -15,7 +15,7 @@ public class IndexedBackwardDiscovery implements BackwardDiscovery {
         MinimalSourceSet result = null;
 
         for (Node t : target) {
-            MinimalSourceSetFinder finder = new FastDecompositionFinder();
+            MinimalSourceSetFinder finder = new NodeDecompositionFinder();
             MinimalSourceSet mss = finder.find(t);
             if (result == null) result = mss;
             else result = result.cartesian(mss);

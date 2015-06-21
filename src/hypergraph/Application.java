@@ -28,7 +28,7 @@ public class Application {
     public static void main(String[] args) {
 //        Experiment.run();
         syntheticImport();
-//        syntheticQuery();
+        syntheticQuery();
 
 //        execute("test", "db/test", true, () -> {
 //            SimpleImporter importer = new SimpleImporter("input/example-2.txt");
