@@ -24,18 +24,8 @@ import java.util.Set;
  */
 public class Experiment {
 
-
     public static void run() {
-        run("b1");
-        run("b2");
-        run("b3");
-        run("b4");
-        run("b5");
-
-//        run("e25-25");
-//        run("e25-37.5");
-//        run("e25-50");
-//        run("e25-62.5");
+        run("e1");
     }
 
     private static void run(String filename) {
@@ -49,12 +39,7 @@ public class Experiment {
 //            builder.run();
 //        });
 
-        backwardQuery(filename, 1);
-        backwardQuery(filename, 1);
-        backwardQuery(filename, 2);
-        backwardQuery(filename, 3);
-        backwardQuery(filename, 4);
-        backwardQuery(filename, 5);
+        //backwardQuery(filename, 3);
     }
 
     private static Set<Set<Long>> generateQuery(int numQuery, int size) {
@@ -102,6 +87,10 @@ public class Experiment {
     }
 
     private static void backwardQuery(String filename, int targetSize) {
+        backwardQuery(filename, targetSize, IndexedBackwardDiscovery.class);
+    }
+
+    private static void backwardQuery(String filename, int targetSize, Class strategy) {
         HypergraphDatabase.executeTx(filename + "-backward-" + targetSize, "db/" + filename, false, () -> {
             GraphDatabaseService graphDb = HypergraphDatabase.getGraphDatabase();
             Measure measure = new Measure("Backward Query MSS " + targetSize);
@@ -114,8 +103,12 @@ public class Experiment {
                 }
 
                 measure.start();
-                BackwardDiscovery indexedDiscovery = new IndexedBackwardDiscovery();
-                MinimalSourceSet mssIndexed = indexedDiscovery.findMinimal(source);
+                try {
+                    BackwardDiscovery discovery = (BackwardDiscovery) strategy.newInstance();
+                    MinimalSourceSet mssIndexed = discovery.findMinimal(source);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
                 measure.end();
             }
             measure.printStatistic();

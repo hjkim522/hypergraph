@@ -27,59 +27,97 @@ public class Application {
 
     public static void main(String[] args) {
 //        Experiment.run();
+
         syntheticImport();
         syntheticQuery();
 
-//        execute("test", "db/test", true, () -> {
-//            SimpleImporter importer = new SimpleImporter("input/example-2.txt");
-//            importer.run();
-//        });
-//
-//        execute("test", "db/test", false, () -> {
-//            MinimalSourceSetBuilder builder = new DecompositionBuilder(512);
-//            builder.run();
-//        });
-//
-//        executeTx("test", "db/test", false, () -> {
-//            ResourceIterator<Node> nodes = graphDb.findNodes(Const.LABEL_NODE);
-//            Measure m1 = new Measure("m1");
-//            Measure m2 = new Measure("m2");
-//
-//            while (nodes.hasNext()) {
-//                Node node = nodes.next();
-//
-//                if (node.getId() != 23) continue;
-//
-//                m1.start();
-//                BackwardDiscovery discovery = new IndexedBackwardDiscovery();
-//                MinimalSourceSet mss = discovery.findMinimal(node);
-//                m1.end();
-//                System.out.println(mss);
-//
-//                m2.start();
-//                BackwardDiscovery naive = new NaiveBackwardDiscovery();
-//                MinimalSourceSet naiveMss = naive.findMinimal(node);
-//                m2.end();
-//                System.out.println(naiveMss);
-//            }
-//
-//            m1.printStatistic();
-//            m2.printStatistic();
-//        });
+//        codaImport();
+//        codaQuery();
+
+//        keggImport();
+//        keggQuery();
+    }
+
+
+    private static void syntheticImport() {
+        HypergraphDatabase.execute("syn-import", "db/syn", true, () -> {
+            Importer importer = new SimpleImporter("input/hypergraph.txt");
+            importer.run();
+
+            MinimalSourceSetBuilder builder = new FastDecompositionBuilder();
+            builder.run();
+        });
+    }
+
+    private static void syntheticQuery() {
+        HypergraphDatabase.executeTx("syn-query", "db/syn", false, () -> {
+            Measure measureNaive = new Measure("Naive Query MSS");
+            Measure measureMixed = new Measure("Mixed Query MSS");
+            Measure measureIndexed = new Measure("Indexed Query MSS");
+
+            ResourceIterator<Node> nodes = graphDb.findNodes(Const.LABEL_NODE);
+            int count = 0;
+            int max = 25;
+
+            boolean naive = true;
+            boolean mixed = true;
+            boolean indexed = true;
+
+            while (nodes.hasNext()) {
+                Node node = nodes.next();
+                String name = (String) node.getProperty(Const.PROP_UNIQUE);
+
+                if (Math.random() < 0.2) {
+                    if (indexed) {
+                        measureIndexed.printStatistic();
+                        Log.debug("Indexed query for node " + node.getId() + " " + name);
+                        measureIndexed.start();
+                        BackwardDiscovery indexedDiscovery = new IndexedBackwardDiscovery();
+                        MinimalSourceSet mssIndexed = indexedDiscovery.findMinimal(node);
+                        measureIndexed.end();
+                    }
+
+                    if (mixed) {
+                        measureMixed.printStatistic();
+                        Log.debug("Mixed query for node " + node.getId() + " " + name);
+                        measureMixed.start();
+                        BackwardDiscovery mixedDiscovery = new MixedBackwardDiscovery();
+                        MinimalSourceSet mssMixed = mixedDiscovery.findMinimal(node);
+                        measureMixed.end();
+                    }
+
+                    if (naive) {
+                        measureNaive.printStatistic();
+                        Log.debug("Naive query for node " + node.getId() + " " + name);
+                        measureNaive.start();
+                        BackwardDiscovery naiveDiscovery = new NaiveBackwardDiscovery();
+                        MinimalSourceSet mssNaive = naiveDiscovery.findMinimal(node);
+                        measureNaive.end();
+                    }
+
+                    count++;
+                    if (count > max)
+                        break;
+                }
+            }
+            measureIndexed.printStatistic();
+            measureMixed.printStatistic();
+            measureNaive.printStatistic();
+        });
     }
 
     private static void codaImport() {
-        execute("coda-import", "db/coda", true, () -> {
+        HypergraphDatabase.execute("coda-import", "db/coda", true, () -> {
             Importer importer = new CodaImporter();
             importer.run();
 
-//            MinimalSourceSetBuilder builder = new DecompositionBuilder(512);
-//            builder.run();
+            MinimalSourceSetBuilder builder = new DecompositionBuilder(512);
+            builder.run();
         });
     }
 
     private static void codaQuery() {
-        executeTx("coda-query", "db/coda", false, () -> {
+        HypergraphDatabase.executeTx("coda-query", "db/coda", false, () -> {
             Measure measure = new Measure("Query MSS");
             ResourceIterator<Node> nodes = graphDb.findNodes(Const.LABEL_NODE);
 
@@ -91,16 +129,13 @@ public class Application {
                     Log.debug("\nquery for node " + node.getId() + " " + name);
 
                     measure.start();
-//                    MinimalSourceSetFinder finder = new DecompositionFinder();
-//                    MinimalSourceSet mss = finder.find(node);
+                    MinimalSourceSetFinder finder = new DecompositionFinder();
+                    MinimalSourceSet mss = finder.find(node);
                     ForwardDiscovery discovery = new ForwardDiscovery();
                     Set<Node> result = discovery.find(node, (v) -> {
-//                        Log.debug("meet " + v.getId());
                         return v.hasLabel(DynamicLabel.label("Disease"));
                     });
                     measure.end();
-                    if (result.size() == 1)
-                        printNames(result);
                     Log.debug("result " + result.size());
                 }
             }
@@ -109,17 +144,17 @@ public class Application {
     }
 
     private static void keggImport() {
-        execute("kegg-import", "db/kegg", true, () -> {
+        HypergraphDatabase.execute("kegg-import", "db/kegg", true, () -> {
             Importer importer = new KeggImporter();
             importer.run();
 
-//            MinimalSourceSetBuilder builder = new NaiveBuilder();
-//            builder.run();
+            MinimalSourceSetBuilder builder = new NaiveBuilder();
+            builder.run();
         });
     }
 
     private static void keggQuery() {
-        executeTx("kegg-query", "db/kegg", false, () -> {
+        HypergraphDatabase.executeTx("kegg-query", "db/kegg", false, () -> {
             Measure measure = new Measure("Query MSS");
             ResourceIterator<Node> nodes = graphDb.findNodes(Const.LABEL_NODE);
 
@@ -136,12 +171,16 @@ public class Application {
                     MinimalSourceSetFinder finder = new DecompositionFinder();
                     MinimalSourceSet mss = finder.find(node);
                     measure.end();
-                    printNames(mss);
                 }
             }
             measure.printStatistic();
         });
     }
+
+
+
+    // ---------- unnecessary part -------------
+/*
 
     private static void syntheticImport() {
         execute("syn-import", "db/syn", true, () -> {
@@ -436,4 +475,5 @@ public class Application {
             }
         });
     }
+    */
 }
