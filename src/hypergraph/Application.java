@@ -55,19 +55,20 @@ public class Application {
             Measure measureMixed = new Measure("Mixed Query MSS");
             Measure measureIndexed = new Measure("Indexed Query MSS");
 
+            graphDb = HypergraphDatabase.getGraphDatabase();
             ResourceIterator<Node> nodes = graphDb.findNodes(Const.LABEL_NODE);
             int count = 0;
             int max = 25;
 
-            boolean naive = true;
+            boolean naive = false;
             boolean mixed = true;
-            boolean indexed = true;
+            boolean indexed = false;
 
             while (nodes.hasNext()) {
                 Node node = nodes.next();
                 String name = (String) node.getProperty(Const.PROP_UNIQUE);
 
-                if (Math.random() < 0.2) {
+                if (Math.random() < 0.2) {//5) {
                     if (indexed) {
                         measureIndexed.printStatistic();
                         Log.debug("Indexed query for node " + node.getId() + " " + name);
