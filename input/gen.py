@@ -42,7 +42,7 @@ def parseParam():
     if len(sys.argv) > 1:
         numNodes = int(sys.argv[1])
         numHyperedges = numNodes #* 2
-        numStartable = numNodes / 10 #5
+        numStartable = numNodes / 5 #5
     if len(sys.argv) > 2:
         numHyperedges = int(sys.argv[2])
     if len(sys.argv) > 3:
