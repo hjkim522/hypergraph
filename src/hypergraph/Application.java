@@ -28,14 +28,34 @@ public class Application {
     public static void main(String[] args) {
 //        Experiment.run();
 
-        syntheticImport();
-        syntheticQuery();
+//        syntheticImport();
+//        syntheticQuery();
 
 //        codaImport();
 //        codaQuery();
 
 //        keggImport();
 //        keggQuery();
+
+        HypergraphDatabase.execute("syn-import", "db/syn", true, () -> {
+            Importer importer = new SimpleImporter("input/hypergraph.txt");
+            importer.run();
+
+            TargetableBuilder targetableBuilder = new TargetableBuilder();
+            GraphDatabaseService graphDb = HypergraphDatabase.getGraphDatabase();
+            try (Transaction tx = graphDb.beginTx()) {
+                Random random = new Random();
+                Set<Long> targetables = new HashSet<>();
+                for (int i = 0; i < 10; i++) {
+                    Long nodeId = (long) random.nextInt(10000);
+                    targetables.add(nodeId);
+                }
+
+                targetableBuilder.setTargetables(targetables);
+            }
+
+            targetableBuilder.run();
+        });
     }
 
 
