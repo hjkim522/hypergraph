@@ -46,8 +46,8 @@ public class Application {
             try (Transaction tx = graphDb.beginTx()) {
                 Random random = new Random();
                 Set<Long> targetables = new HashSet<>();
-                for (int i = 0; i < 1000; i++) {
-                    Long nodeId = (long) random.nextInt(10000);
+                for (int i = 0; i < 2000; i++) {
+                    Long nodeId = (long) random.nextInt(20000);
                     targetables.add(nodeId);
                 }
 
