@@ -46,7 +46,7 @@ public class Application {
             try (Transaction tx = graphDb.beginTx()) {
                 Random random = new Random();
                 Set<Long> targetables = new HashSet<>();
-                for (int i = 0; i < 10; i++) {
+                for (int i = 0; i < 1000; i++) {
                     Long nodeId = (long) random.nextInt(10000);
                     targetables.add(nodeId);
                 }
@@ -56,6 +56,8 @@ public class Application {
 
             targetableBuilder.run();
         });
+
+        syntheticQuery();
     }
 
 
@@ -81,8 +83,8 @@ public class Application {
             int max = 25;
 
             boolean naive = false;
-            boolean mixed = true;
-            boolean indexed = false;
+            boolean mixed = false;
+            boolean indexed = true;
 
             while (nodes.hasNext()) {
                 Node node = nodes.next();
